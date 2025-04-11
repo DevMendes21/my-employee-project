@@ -89,13 +89,13 @@ namespace MinhaEmpresa.Views
                 },
                 new DataGridViewTextBoxColumn
                 {
-                    DataPropertyName = "Cargo.Nome",
+                    Name = "ColCargo",
                     HeaderText = "Cargo",
                     Width = 120
                 },
                 new DataGridViewTextBoxColumn
                 {
-                    DataPropertyName = "Departamento.Nome",
+                    Name = "ColDepartamento",
                     HeaderText = "Departamento",
                     Width = 120
                 },
@@ -207,12 +207,38 @@ namespace MinhaEmpresa.Views
             try
             {
                 var funcionarios = funcionarioDAO.ListarFuncionarios();
+                dgvFuncionarios.DataSource = null; // Clear previous binding
                 dgvFuncionarios.DataSource = funcionarios;
+                
+                // Format the nested properties manually
+                FormatarPropriedadesAninhadas();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Erro ao carregar funcionários: {ex.Message}", "Erro",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        
+        private void FormatarPropriedadesAninhadas()
+        {
+            // Handle nested properties manually
+            foreach (DataGridViewRow row in dgvFuncionarios.Rows)
+            {
+                if (row.DataBoundItem is Funcionario funcionario)
+                {
+                    // Set Cargo column value
+                    if (funcionario.Cargo != null)
+                    {
+                        row.Cells["ColCargo"].Value = funcionario.Cargo.Nome;
+                    }
+                    
+                    // Set Departamento column value
+                    if (funcionario.Departamento != null)
+                    {
+                        row.Cells["ColDepartamento"].Value = funcionario.Departamento.Nome;
+                    }
+                }
             }
         }
 
