@@ -79,19 +79,18 @@ namespace MinhaEmpresa.Views
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             
-            // Carregar cargos do banco de dados
-            try
+            // Definir cargos manualmente para evitar duplicações
+            var cargos = new List<Cargo>
             {
-                var cargos = cargoDAO.ListarCargos();
-                cmbCargo.DataSource = cargos;
-                cmbCargo.DisplayMember = "Nome";
-                cmbCargo.ValueMember = "Id";
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erro ao carregar cargos: {ex.Message}", "Erro", 
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+                new Cargo { Id = 1, Nome = "Analista", Nivel = "Junior" },
+                new Cargo { Id = 2, Nome = "Desenvolvedor", Nivel = "Pleno" },
+                new Cargo { Id = 3, Nome = "Gerente", Nivel = "Senior" },
+                new Cargo { Id = 4, Nome = "Coordenador", Nivel = "Senior" },
+                new Cargo { Id = 5, Nome = "Assistente", Nivel = "Junior" }
+            };
+            cmbCargo.DataSource = cargos;
+            cmbCargo.DisplayMember = "Nome";
+            cmbCargo.ValueMember = "Id";
 
             txtSalario = new TextBox { Location = new System.Drawing.Point(150, 180), Width = 300 };
             
