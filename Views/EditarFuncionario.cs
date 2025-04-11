@@ -1,5 +1,7 @@
 using System;
 using System.Windows.Forms;
+using System.Collections.Generic;
+using System.Linq;
 using MinhaEmpresa.Models;
 using MinhaEmpresa.DAO;
 
@@ -15,14 +17,18 @@ namespace MinhaEmpresa.Views
         private Button btnSalvar = null!;
         private Button btnCancelar = null!;
         private FuncionarioDAO funcionarioDAO = null!;
+        private CargoDAO cargoDAO = null!;
+        private DepartamentoDAO departamentoDAO = null!;
         private Funcionario funcionario = null!;
 
         public EditarFuncionario(Funcionario funcionario)
         {
             this.funcionario = funcionario;
             InitializeComponent();
-            InitializeCustomComponents();
             funcionarioDAO = new FuncionarioDAO();
+            cargoDAO = new CargoDAO();
+            departamentoDAO = new DepartamentoDAO();
+            InitializeCustomComponents();
             PreencherCampos();
         }
 
@@ -54,17 +60,20 @@ namespace MinhaEmpresa.Views
                 Width = 300,
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
-            var cargos = new List<Cargo>
+            
+            // Carregar cargos do banco de dados
+            try
             {
-                new Cargo { Id = 1, Nome = "Analista", Nivel = "Junior" },
-                new Cargo { Id = 2, Nome = "Desenvolvedor", Nivel = "Pleno" },
-                new Cargo { Id = 3, Nome = "Gerente", Nivel = "Senior" },
-                new Cargo { Id = 4, Nome = "Coordenador", Nivel = "Senior" },
-                new Cargo { Id = 5, Nome = "Assistente", Nivel = "Junior" }
-            };
-            cmbCargo.DataSource = cargos;
-            cmbCargo.DisplayMember = "Nome";
-            cmbCargo.ValueMember = "Id";
+                var cargos = cargoDAO.ListarCargos();
+                cmbCargo.DataSource = cargos;
+                cmbCargo.DisplayMember = "Nome";
+                cmbCargo.ValueMember = "Id";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao carregar cargos: {ex.Message}", "Erro", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
             txtSalario = new TextBox { Location = new System.Drawing.Point(150, 140), Width = 300 };
             
@@ -74,17 +83,20 @@ namespace MinhaEmpresa.Views
                 Width = 300,
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
-            var departamentos = new List<Departamento>
+            
+            // Carregar departamentos do banco de dados
+            try
             {
-                new Departamento { Id = 1, Nome = "TI", DataCriacao = DateTime.Now },
-                new Departamento { Id = 2, Nome = "RH", DataCriacao = DateTime.Now },
-                new Departamento { Id = 3, Nome = "Financeiro", DataCriacao = DateTime.Now },
-                new Departamento { Id = 4, Nome = "Administrativo", DataCriacao = DateTime.Now },
-                new Departamento { Id = 5, Nome = "Comercial", DataCriacao = DateTime.Now }
-            };
-            cmbDepartamento.DataSource = departamentos;
-            cmbDepartamento.DisplayMember = "Nome";
-            cmbDepartamento.ValueMember = "Id";
+                var departamentos = departamentoDAO.ListarDepartamentos();
+                cmbDepartamento.DataSource = departamentos;
+                cmbDepartamento.DisplayMember = "Nome";
+                cmbDepartamento.ValueMember = "Id";
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao carregar departamentos: {ex.Message}", "Erro", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
             dtpDataContratacao = new DateTimePicker 
             { 
