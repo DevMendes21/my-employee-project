@@ -130,26 +130,8 @@ namespace MinhaEmpresa.Views
                 }
             };
 
+            // Add all columns at once
             dgvFuncionarios.Columns.AddRange(colunas);
-            
-            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Salario",
-                HeaderText = "Salário",
-                Width = 100,
-                DefaultCellStyle = new DataGridViewCellStyle 
-                { 
-                    Format = "C2",
-                    Alignment = DataGridViewContentAlignment.MiddleRight
-                }
-            });
-            
-            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Departamento.Nome",
-                HeaderText = "Departamento",
-                Width = 120
-            });
             
             dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
             {
@@ -167,12 +149,7 @@ namespace MinhaEmpresa.Views
                 DefaultCellStyle = new DataGridViewCellStyle { Format = "dd/MM/yyyy", NullValue = "" }
             });
             
-            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Status",
-                HeaderText = "Status",
-                Width = 80
-            });
+            // Status column is already added in the colunas array above
 
             // Buttons
             btnEditar = new Button
