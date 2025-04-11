@@ -61,18 +61,23 @@ namespace MinhaEmpresa.Views
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             
-            // Definir cargos manualmente para evitar duplicações
-            var cargos = new List<Cargo>
-            {
-                new Cargo { Id = 1, Nome = "Analista", Nivel = "Junior" },
-                new Cargo { Id = 2, Nome = "Desenvolvedor", Nivel = "Pleno" },
-                new Cargo { Id = 3, Nome = "Gerente", Nivel = "Senior" },
-                new Cargo { Id = 4, Nome = "Coordenador", Nivel = "Senior" },
-                new Cargo { Id = 5, Nome = "Assistente", Nivel = "Junior" }
-            };
-            cmbCargo.DataSource = cargos;
+            // Carregar cargos do banco de dados
+            CargoDAO cargoDAO = new CargoDAO();
+            var cargos = cargoDAO.ListarCargos();
+            
+            // Configurar o ComboBox de cargos
+            cmbCargo.DataSource = null; // Limpar qualquer binding anterior
+            cmbCargo.Items.Clear();
+            cmbCargo.DataSource = new BindingSource(cargos, null);
             cmbCargo.DisplayMember = "Nome";
             cmbCargo.ValueMember = "Id";
+            
+            // Log para debug
+            Console.WriteLine("Cargos carregados do banco de dados:");
+            foreach (var cargo in cargos)
+            {
+                Console.WriteLine($"ID: {cargo.Id}, Nome: {cargo.Nome}, Nivel: {cargo.Nivel}");
+            }
 
             txtSalario = new TextBox { Location = new System.Drawing.Point(150, 140), Width = 300 };
             
@@ -83,15 +88,9 @@ namespace MinhaEmpresa.Views
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             
-            // Definir departamentos manualmente para garantir que todos estejam disponíveis
-            var departamentos = new List<Departamento>
-            {
-                new Departamento { Id = 1, Nome = "TI", DataCriacao = DateTime.Now },
-                new Departamento { Id = 2, Nome = "RH", DataCriacao = DateTime.Now },
-                new Departamento { Id = 3, Nome = "Financeiro", DataCriacao = DateTime.Now },
-                new Departamento { Id = 4, Nome = "Administrativo", DataCriacao = DateTime.Now },
-                new Departamento { Id = 5, Nome = "Comercial", DataCriacao = DateTime.Now }
-            };
+            // Carregar departamentos do banco de dados
+            DepartamentoDAO departamentoDAO = new DepartamentoDAO();
+            var departamentos = departamentoDAO.ListarDepartamentos();
             
             // Configurar o ComboBox de departamentos
             cmbDepartamento.DataSource = null; // Limpar qualquer binding anterior
@@ -99,6 +98,13 @@ namespace MinhaEmpresa.Views
             cmbDepartamento.DataSource = new BindingSource(departamentos, null);
             cmbDepartamento.DisplayMember = "Nome";
             cmbDepartamento.ValueMember = "Id";
+            
+            // Log para debug
+            Console.WriteLine("Departamentos carregados do banco de dados:");
+            foreach (var departamento in departamentos)
+            {
+                Console.WriteLine($"ID: {departamento.Id}, Nome: {departamento.Nome}");
+            }
 
             dtpDataContratacao = new DateTimePicker 
             { 
@@ -135,67 +141,82 @@ namespace MinhaEmpresa.Views
 
         private void PreencherCampos()
         {
+            // Definir o nome
             txtNome.Text = funcionario.Nome;
             
-            // Log para debug - antes de definir o cargo
-            Console.WriteLine($"Carregando funcionário ID {funcionario.Id} - CargoId: {funcionario.CargoId}");
-            foreach (var item in cmbCargo.Items)
-            {
-                if (item is Cargo cargo)
-                {
-                    Console.WriteLine($"Cargo disponível: ID {cargo.Id}, Nome: {cargo.Nome}");
-                }
-            }
+            // Obter o cargo e departamento atuais do banco de dados
+            CargoDAO cargoDAO = new CargoDAO();
+            DepartamentoDAO departamentoDAO = new DepartamentoDAO();
             
-            // Definir o cargo selecionado
-            bool cargoEncontrado = false;
-            foreach (var item in cmbCargo.Items)
+            var cargoAtual = cargoDAO.ObterCargoPorId(funcionario.CargoId);
+            var departamentoAtual = departamentoDAO.ObterDepartamentoPorId(funcionario.DepartamentoId);
+            
+            Console.WriteLine("===== INFORMAÇÕES DO FUNCIONÁRIO NO BANCO DE DADOS =====");
+            Console.WriteLine($"ID: {funcionario.Id}, Nome: {funcionario.Nome}");
+            Console.WriteLine($"CargoId: {funcionario.CargoId}, Cargo: {cargoAtual?.Nome ?? "Não encontrado"}");
+            Console.WriteLine($"DepartamentoId: {funcionario.DepartamentoId}, Departamento: {departamentoAtual?.Nome ?? "Não encontrado"}");
+            Console.WriteLine("================================================");
+            
+            // Resetar os ComboBoxes
+            cmbCargo.SelectedIndex = -1;
+            cmbDepartamento.SelectedIndex = -1;
+            
+            // Selecionar o cargo correto
+            for (int i = 0; i < cmbCargo.Items.Count; i++)
             {
-                if (item is Cargo cargo && cargo.Id == funcionario.CargoId)
+                if (cmbCargo.Items[i] is Cargo cargo && cargo.Id == funcionario.CargoId)
                 {
-                    cmbCargo.SelectedItem = item;
-                    cargoEncontrado = true;
-                    Console.WriteLine($"Cargo selecionado: ID {cargo.Id}, Nome: {cargo.Nome}");
+                    cmbCargo.SelectedIndex = i;
+                    Console.WriteLine($"Cargo selecionado no ComboBox: {cargo.Nome} (ID: {cargo.Id})");
                     break;
                 }
             }
             
-            if (!cargoEncontrado)
+            // Verificar se o cargo foi selecionado
+            if (cmbCargo.SelectedIndex == -1)
             {
-                Console.WriteLine($"ALERTA: Cargo ID {funcionario.CargoId} não encontrado na lista!");
+                Console.WriteLine($"ERRO: Não foi possível selecionar o cargo ID {funcionario.CargoId}");
+                // Tentar selecionar pelo índice 0 como fallback
+                if (cmbCargo.Items.Count > 0)
+                {
+                    cmbCargo.SelectedIndex = 0;
+                    Console.WriteLine("Selecionado o primeiro cargo da lista como fallback");
+                }
             }
             
+            // Definir o salário
             txtSalario.Text = funcionario.Salario.ToString("F2");
             
-            // Log para debug - antes de definir o departamento
-            Console.WriteLine($"Carregando funcionário ID {funcionario.Id} - DepartamentoId: {funcionario.DepartamentoId}");
-            foreach (var item in cmbDepartamento.Items)
+            // Selecionar o departamento correto
+            for (int i = 0; i < cmbDepartamento.Items.Count; i++)
             {
-                if (item is Departamento departamento)
+                if (cmbDepartamento.Items[i] is Departamento departamento && departamento.Id == funcionario.DepartamentoId)
                 {
-                    Console.WriteLine($"Departamento disponível: ID {departamento.Id}, Nome: {departamento.Nome}");
-                }
-            }
-            
-            // Definir o departamento selecionado
-            bool departamentoEncontrado = false;
-            foreach (var item in cmbDepartamento.Items)
-            {
-                if (item is Departamento departamento && departamento.Id == funcionario.DepartamentoId)
-                {
-                    cmbDepartamento.SelectedItem = item;
-                    departamentoEncontrado = true;
-                    Console.WriteLine($"Departamento selecionado: ID {departamento.Id}, Nome: {departamento.Nome}");
+                    cmbDepartamento.SelectedIndex = i;
+                    Console.WriteLine($"Departamento selecionado no ComboBox: {departamento.Nome} (ID: {departamento.Id})");
                     break;
                 }
             }
             
-            if (!departamentoEncontrado)
+            // Verificar se o departamento foi selecionado
+            if (cmbDepartamento.SelectedIndex == -1)
             {
-                Console.WriteLine($"ALERTA: Departamento ID {funcionario.DepartamentoId} não encontrado na lista!");
+                Console.WriteLine($"ERRO: Não foi possível selecionar o departamento ID {funcionario.DepartamentoId}");
+                // Tentar selecionar pelo índice 0 como fallback
+                if (cmbDepartamento.Items.Count > 0)
+                {
+                    cmbDepartamento.SelectedIndex = 0;
+                    Console.WriteLine("Selecionado o primeiro departamento da lista como fallback");
+                }
             }
             
+            // Definir a data de contratação
             dtpDataContratacao.Value = funcionario.DataContratacao;
+            
+            // Verificar os valores selecionados
+            Console.WriteLine("===== VALORES FINAIS SELECIONADOS =====");
+            Console.WriteLine($"Cargo selecionado: {(cmbCargo.SelectedItem as Cargo)?.Nome ?? "Nenhum"} (ID: {(cmbCargo.SelectedItem as Cargo)?.Id ?? 0})");
+            Console.WriteLine($"Departamento selecionado: {(cmbDepartamento.SelectedItem as Departamento)?.Nome ?? "Nenhum"} (ID: {(cmbDepartamento.SelectedItem as Departamento)?.Id ?? 0})");
         }
 
         private void BtnSalvar_Click(object? sender, EventArgs e)
@@ -206,33 +227,87 @@ namespace MinhaEmpresa.Views
                 {
                     funcionario.Nome = txtNome.Text;
                     
-                    // Verificar e obter o cargo selecionado
+                    // Obter o cargo diretamente do banco de dados para garantir consistu00eancia
+                    CargoDAO cargoDAO = new CargoDAO();
+                    int cargoId = 0;
+                    
                     if (cmbCargo.SelectedItem is Cargo selectedCargo)
                     {
-                        Console.WriteLine($"Cargo selecionado para atualização: ID {selectedCargo.Id}, Nome: {selectedCargo.Nome}");
-                        funcionario.CargoId = selectedCargo.Id;
-                        funcionario.Cargo = selectedCargo;
+                        cargoId = selectedCargo.Id;
+                        Console.WriteLine($"Cargo selecionado no ComboBox: ID {selectedCargo.Id}, Nome: {selectedCargo.Nome}");
                     }
-                    else
+                    else if (cmbCargo.SelectedIndex >= 0)
                     {
-                        MessageBox.Show("Erro: Nenhum cargo selecionado.", "Erro",
+                        // Tentar obter o ID do cargo pelo u00edndice selecionado
+                        var item = cmbCargo.Items[cmbCargo.SelectedIndex];
+                        if (item is Cargo cargo)
+                        {
+                            cargoId = cargo.Id;
+                            Console.WriteLine($"Cargo obtido pelo u00edndice {cmbCargo.SelectedIndex}: ID {cargo.Id}, Nome: {cargo.Nome}");
+                        }
+                    }
+                    
+                    if (cargoId <= 0)
+                    {
+                        MessageBox.Show("Erro: Nenhum cargo selecionado ou cargo invu00e1lido.", "Erro",
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
                     
-                    // Verificar e obter o departamento selecionado
-                    if (cmbDepartamento.SelectedItem is Departamento selectedDepartamento)
+                    // Obter o cargo completo do banco de dados
+                    var cargoBD = cargoDAO.ObterCargoPorId(cargoId);
+                    if (cargoBD == null)
                     {
-                        Console.WriteLine($"Departamento selecionado para atualização: ID {selectedDepartamento.Id}, Nome: {selectedDepartamento.Nome}");
-                        funcionario.DepartamentoId = selectedDepartamento.Id;
-                        funcionario.Departamento = selectedDepartamento;
-                    }
-                    else
-                    {
-                        MessageBox.Show("Erro: Nenhum departamento selecionado.", "Erro",
+                        MessageBox.Show($"Erro: Cargo com ID {cargoId} nu00e3o encontrado no banco de dados.", "Erro",
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
+                    
+                    // Atualizar o funcionu00e1rio com o cargo correto
+                    funcionario.CargoId = cargoBD.Id;
+                    funcionario.Cargo = cargoBD;
+                    Console.WriteLine($"Cargo definido para atualizau00e7u00e3o: ID {cargoBD.Id}, Nome: {cargoBD.Nome}");
+                    
+                    // Obter o departamento diretamente do banco de dados para garantir consistu00eancia
+                    DepartamentoDAO departamentoDAO = new DepartamentoDAO();
+                    int departamentoId = 0;
+                    
+                    if (cmbDepartamento.SelectedItem is Departamento selectedDepartamento)
+                    {
+                        departamentoId = selectedDepartamento.Id;
+                        Console.WriteLine($"Departamento selecionado no ComboBox: ID {selectedDepartamento.Id}, Nome: {selectedDepartamento.Nome}");
+                    }
+                    else if (cmbDepartamento.SelectedIndex >= 0)
+                    {
+                        // Tentar obter o ID do departamento pelo u00edndice selecionado
+                        var item = cmbDepartamento.Items[cmbDepartamento.SelectedIndex];
+                        if (item is Departamento departamento)
+                        {
+                            departamentoId = departamento.Id;
+                            Console.WriteLine($"Departamento obtido pelo u00edndice {cmbDepartamento.SelectedIndex}: ID {departamento.Id}, Nome: {departamento.Nome}");
+                        }
+                    }
+                    
+                    if (departamentoId <= 0)
+                    {
+                        MessageBox.Show("Erro: Nenhum departamento selecionado ou departamento invu00e1lido.", "Erro",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    
+                    // Obter o departamento completo do banco de dados
+                    var departamentoBD = departamentoDAO.ObterDepartamentoPorId(departamentoId);
+                    if (departamentoBD == null)
+                    {
+                        MessageBox.Show($"Erro: Departamento com ID {departamentoId} nu00e3o encontrado no banco de dados.", "Erro",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    
+                    // Atualizar o funcionu00e1rio com o departamento correto
+                    funcionario.DepartamentoId = departamentoBD.Id;
+                    funcionario.Departamento = departamentoBD;
+                    Console.WriteLine($"Departamento definido para atualizau00e7u00e3o: ID {departamentoBD.Id}, Nome: {departamentoBD.Nome}");
                     
                     // Atualizar salário e data de contratação
                     funcionario.Salario = Convert.ToDecimal(txtSalario.Text);

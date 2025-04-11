@@ -79,15 +79,9 @@ namespace MinhaEmpresa.Views
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             
-            // Definir cargos manualmente para evitar duplicações e garantir que todos os cargos estejam disponíveis
-            var cargos = new List<Cargo>
-            {
-                new Cargo { Id = 1, Nome = "Analista", Nivel = "Junior" },
-                new Cargo { Id = 2, Nome = "Desenvolvedor", Nivel = "Pleno" },
-                new Cargo { Id = 3, Nome = "Gerente", Nivel = "Senior" },
-                new Cargo { Id = 4, Nome = "Coordenador", Nivel = "Senior" },
-                new Cargo { Id = 5, Nome = "Assistente", Nivel = "Junior" }
-            };
+            // Carregar cargos do banco de dados
+            CargoDAO cargoDAO = new CargoDAO();
+            var cargos = cargoDAO.ListarCargos();
             
             // Configurar o ComboBox de cargos
             cmbCargo.DataSource = null; // Limpar qualquer binding anterior
@@ -95,6 +89,13 @@ namespace MinhaEmpresa.Views
             cmbCargo.DataSource = new BindingSource(cargos, null);
             cmbCargo.DisplayMember = "Nome";
             cmbCargo.ValueMember = "Id";
+            
+            // Log para debug
+            Console.WriteLine("Cargos carregados do banco de dados:");
+            foreach (var cargo in cargos)
+            {
+                Console.WriteLine($"ID: {cargo.Id}, Nome: {cargo.Nome}, Nivel: {cargo.Nivel}");
+            }
 
             txtSalario = new TextBox { Location = new System.Drawing.Point(150, 180), Width = 300 };
             
@@ -105,15 +106,9 @@ namespace MinhaEmpresa.Views
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             
-            // Definir departamentos manualmente para garantir que todos estejam disponíveis
-            var departamentos = new List<Departamento>
-            {
-                new Departamento { Id = 1, Nome = "TI", DataCriacao = DateTime.Now },
-                new Departamento { Id = 2, Nome = "RH", DataCriacao = DateTime.Now },
-                new Departamento { Id = 3, Nome = "Financeiro", DataCriacao = DateTime.Now },
-                new Departamento { Id = 4, Nome = "Administrativo", DataCriacao = DateTime.Now },
-                new Departamento { Id = 5, Nome = "Comercial", DataCriacao = DateTime.Now }
-            };
+            // Carregar departamentos do banco de dados
+            DepartamentoDAO departamentoDAO = new DepartamentoDAO();
+            var departamentos = departamentoDAO.ListarDepartamentos();
             
             // Configurar o ComboBox de departamentos
             cmbDepartamento.DataSource = null; // Limpar qualquer binding anterior
@@ -121,6 +116,13 @@ namespace MinhaEmpresa.Views
             cmbDepartamento.DataSource = new BindingSource(departamentos, null);
             cmbDepartamento.DisplayMember = "Nome";
             cmbDepartamento.ValueMember = "Id";
+            
+            // Log para debug
+            Console.WriteLine("Departamentos carregados do banco de dados:");
+            foreach (var departamento in departamentos)
+            {
+                Console.WriteLine($"ID: {departamento.Id}, Nome: {departamento.Nome}");
+            }
 
             dtpDataContratacao = new DateTimePicker 
             { 
