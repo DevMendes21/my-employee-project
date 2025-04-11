@@ -12,12 +12,24 @@ namespace MinhaEmpresa.Views
         private Button btnRemover = new();
         private Button btnAtualizar = new();
         private readonly FuncionarioDAO funcionarioDAO = new();
+        private bool isFirstLoad = true;
 
         public ListagemFuncionarios()
         {
             InitializeComponent();
             InitializeCustomComponents();
-            CarregarFuncionarios();
+            // Initial load will happen in the Shown event
+            this.Shown += ListagemFuncionarios_Shown;
+        }
+        
+        private void ListagemFuncionarios_Shown(object? sender, EventArgs e)
+        {
+            // Only reload on first show or when explicitly requested
+            if (isFirstLoad)
+            {
+                CarregarFuncionarios();
+                isFirstLoad = false;
+            }
         }
 
         private void InitializeComponent()
@@ -227,16 +239,34 @@ namespace MinhaEmpresa.Views
             {
                 if (row.DataBoundItem is Funcionario funcionario)
                 {
-                    // Set Cargo column value
-                    if (funcionario.Cargo != null)
+                    try
                     {
-                        row.Cells["ColCargo"].Value = funcionario.Cargo.Nome;
+                        // Set Cargo column value
+                        if (funcionario.Cargo != null && !string.IsNullOrEmpty(funcionario.Cargo.Nome))
+                        {
+                            row.Cells["ColCargo"].Value = funcionario.Cargo.Nome;
+                        }
+                        else
+                        {
+                            // Try to get cargo name directly from database if needed
+                            row.Cells["ColCargo"].Value = "N/A";
+                        }
+                        
+                        // Set Departamento column value
+                        if (funcionario.Departamento != null && !string.IsNullOrEmpty(funcionario.Departamento.Nome))
+                        {
+                            row.Cells["ColDepartamento"].Value = funcionario.Departamento.Nome;
+                        }
+                        else
+                        {
+                            // Try to get departamento name directly from database if needed
+                            row.Cells["ColDepartamento"].Value = "N/A";
+                        }
                     }
-                    
-                    // Set Departamento column value
-                    if (funcionario.Departamento != null)
+                    catch (Exception ex)
                     {
-                        row.Cells["ColDepartamento"].Value = funcionario.Departamento.Nome;
+                        // Log error but continue processing other rows
+                        Console.WriteLine($"Erro ao formatar linha: {ex.Message}");
                     }
                 }
             }
@@ -248,7 +278,11 @@ namespace MinhaEmpresa.Views
             {
                 var funcionario = (Funcionario)dgvFuncionarios.CurrentRow.DataBoundItem;
                 var formEditar = new CadastroFuncionario(funcionario);
-                formEditar.FormClosed += (s, args) => CarregarFuncionarios(); // Recarrega após fechar o form
+                formEditar.FormClosed += (s, args) => 
+                {
+                    // Always reload after editing
+                    CarregarFuncionarios();
+                }; 
                 formEditar.Show(); // Usar Show() em vez de ShowDialog() para melhor experiência
             }
             else
