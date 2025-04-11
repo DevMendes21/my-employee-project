@@ -45,50 +45,122 @@ namespace MinhaEmpresa.Views
         private void InitializeComponent()
         {
             this.Text = "Cadastro de Funcionário";
-            this.Width = 500;
-            this.Height = 650;
+            this.Width = 800;
+            this.Height = 700;
             this.AutoScroll = true;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
+            this.BackColor = System.Drawing.Color.FromArgb(240, 240, 240);
+            this.Font = new System.Drawing.Font("Segoe UI", 10F);
+        }
+
+        // Método auxiliar para criar labels estilizadas
+        private Label CreateStyledLabel(string text, int x, int y, System.Drawing.Font font, System.Drawing.Color color)
+        {
+            return new Label
+            {
+                Text = text,
+                Location = new System.Drawing.Point(x, y),
+                AutoSize = true,
+                Font = font,
+                ForeColor = color
+            };
+        }
+        
+        // Método auxiliar para criar textboxes estilizadas
+        private TextBox CreateStyledTextBox(int x, int y, int width, int height)
+        {
+            return new TextBox
+            {
+                Location = new System.Drawing.Point(x, y),
+                Width = width,
+                Height = height,
+                BorderStyle = BorderStyle.FixedSingle,
+                Font = new System.Drawing.Font("Segoe UI", 10),
+                BackColor = System.Drawing.Color.White
+            };
         }
 
         private void InitializeCustomComponents()
         {
-            // Labels
-            Label lblNome = new Label { Text = "Nome:", Location = new System.Drawing.Point(20, 20) };
-            Label lblEmail = new Label { Text = "Email:", Location = new System.Drawing.Point(20, 60) };
-            Label lblTelefone = new Label { Text = "Telefone:", Location = new System.Drawing.Point(20, 100) };
-            Label lblCargo = new Label { Text = "Cargo:", Location = new System.Drawing.Point(20, 140) };
-            Label lblSalario = new Label { Text = "Salário:", Location = new System.Drawing.Point(20, 180) };
-            Label lblDepartamento = new Label { Text = "Departamento:", Location = new System.Drawing.Point(20, 220) };
-            Label lblDataContratacao = new Label { Text = "Data de Contratação:", Location = new System.Drawing.Point(20, 260), AutoSize = true, Width = 120 };
-            Label lblDataNascimento = new Label { Text = "Data de Nascimento:", Location = new System.Drawing.Point(20, 300), AutoSize = true, Width = 120 };
-            Label lblStatus = new Label { Text = "Status:", Location = new System.Drawing.Point(20, 340) };
-            Label lblObservacoes = new Label { Text = "Observações:", Location = new System.Drawing.Point(20, 380) };
+            // Painel de cabeçalho
+            Panel headerPanel = new Panel
+            {
+                BackColor = System.Drawing.Color.FromArgb(41, 128, 185),
+                Location = new System.Drawing.Point(0, 0),
+                Width = this.ClientSize.Width,
+                Height = 80,
+                Dock = DockStyle.Top
+            };
+            
+            Label lblHeader = new Label
+            {
+                Text = funcionarioId.HasValue ? "Editar Funcionário" : "Novo Funcionário",
+                ForeColor = System.Drawing.Color.White,
+                Font = new System.Drawing.Font("Segoe UI", 18, System.Drawing.FontStyle.Bold),
+                Location = new System.Drawing.Point(20, 20),
+                AutoSize = true
+            };
+            
+            headerPanel.Controls.Add(lblHeader);
+            this.Controls.Add(headerPanel);
+            
+            // Painel principal
+            Panel mainPanel = new Panel
+            {
+                BackColor = System.Drawing.Color.White,
+                Location = new System.Drawing.Point(20, 100),
+                Width = this.ClientSize.Width - 40,
+                Height = this.ClientSize.Height - 120,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom,
+                BorderStyle = BorderStyle.None
+            };
+            
+            // Estilo comum para labels
+            System.Drawing.Font labelFont = new System.Drawing.Font("Segoe UI", 10, System.Drawing.FontStyle.Bold);
+            System.Drawing.Color labelColor = System.Drawing.Color.FromArgb(70, 70, 70);
+            
+            // Labels com estilo moderno
+            Label lblNome = CreateStyledLabel("Nome", 30, 30, labelFont, labelColor);
+            Label lblEmail = CreateStyledLabel("Email", 30, 90, labelFont, labelColor);
+            Label lblTelefone = CreateStyledLabel("Telefone", 30, 150, labelFont, labelColor);
+            Label lblCargo = CreateStyledLabel("Cargo", 30, 210, labelFont, labelColor);
+            Label lblSalario = CreateStyledLabel("Salário", 30, 270, labelFont, labelColor);
+            Label lblDepartamento = CreateStyledLabel("Departamento", 400, 30, labelFont, labelColor);
+            Label lblDataContratacao = CreateStyledLabel("Data de Contratação", 400, 90, labelFont, labelColor);
+            Label lblDataNascimento = CreateStyledLabel("Data de Nascimento", 400, 150, labelFont, labelColor);
+            Label lblStatus = CreateStyledLabel("Status", 400, 210, labelFont, labelColor);
+            Label lblObservacoes = CreateStyledLabel("Observações", 30, 330, labelFont, labelColor);
 
-            // TextBoxes e ComboBoxes
-            txtNome = new TextBox { Location = new System.Drawing.Point(150, 20), Width = 300 };
-            txtEmail = new TextBox { Location = new System.Drawing.Point(150, 60), Width = 300 };
-            txtTelefone = new TextBox { Location = new System.Drawing.Point(150, 100), Width = 300 };
+            // TextBoxes e ComboBoxes com estilo moderno
+            txtNome = CreateStyledTextBox(30, 55, 340, 30);
+            txtEmail = CreateStyledTextBox(30, 115, 340, 30);
+            txtTelefone = CreateStyledTextBox(30, 175, 340, 30);
             
             cmbCargo = new ComboBox 
             { 
-                Location = new System.Drawing.Point(150, 140), 
-                Width = 300,
-                DropDownStyle = ComboBoxStyle.DropDownList
+                Location = new System.Drawing.Point(30, 235), 
+                Width = 340,
+                Height = 30,
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Font = new System.Drawing.Font("Segoe UI", 10),
+                FlatStyle = FlatStyle.Flat
             };
             
             // Carregar cargos do banco de dados
             CargoDAO cargoDAO = new CargoDAO();
             var cargos = cargoDAO.ListarCargos();
             
-            // Configurar o ComboBox de cargos
+            // Configurar o ComboBox de cargos com estilo moderno
             cmbCargo.DataSource = null; // Limpar qualquer binding anterior
             cmbCargo.Items.Clear();
+            cmbCargo.BackColor = System.Drawing.Color.White;
+            cmbCargo.ForeColor = System.Drawing.Color.FromArgb(50, 50, 50);
             cmbCargo.DataSource = new BindingSource(cargos, null);
             cmbCargo.DisplayMember = "Nome";
             cmbCargo.ValueMember = "Id";
+            cmbCargo.SelectedIndex = -1; // Nenhum cargo selecionado inicialmente
             
             // Log para debug
             Console.WriteLine("Cargos carregados do banco de dados:");
@@ -97,13 +169,18 @@ namespace MinhaEmpresa.Views
                 Console.WriteLine($"ID: {cargo.Id}, Nome: {cargo.Nome}, Nivel: {cargo.Nivel}");
             }
 
-            txtSalario = new TextBox { Location = new System.Drawing.Point(150, 180), Width = 300 };
+            txtSalario = CreateStyledTextBox(30, 295, 340, 30);
             
-            cmbDepartamento = new ComboBox 
-            { 
-                Location = new System.Drawing.Point(150, 220), 
-                Width = 300,
-                DropDownStyle = ComboBoxStyle.DropDownList
+            cmbDepartamento = new ComboBox
+            {
+                Location = new System.Drawing.Point(400, 55),
+                Width = 340,
+                Height = 30,
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Font = new System.Drawing.Font("Segoe UI", 10),
+                FlatStyle = FlatStyle.Flat,
+                BackColor = System.Drawing.Color.White,
+                ForeColor = System.Drawing.Color.FromArgb(50, 50, 50)
             };
             
             // Carregar departamentos do banco de dados
@@ -126,27 +203,40 @@ namespace MinhaEmpresa.Views
 
             dtpDataContratacao = new DateTimePicker 
             { 
-                Location = new System.Drawing.Point(150, 260), 
-                Width = 300,
+                Location = new System.Drawing.Point(400, 115), 
+                Width = 340,
+                Height = 30,
                 Format = DateTimePickerFormat.Custom,
                 CustomFormat = "dd/MM/yyyy",
-                Value = DateTime.Now
+                Value = DateTime.Now,
+                Font = new System.Drawing.Font("Segoe UI", 10),
+                CalendarForeColor = System.Drawing.Color.FromArgb(50, 50, 50),
+                CalendarTitleBackColor = System.Drawing.Color.FromArgb(41, 128, 185)
             };
 
             dtpDataNascimento = new DateTimePicker 
             { 
-                Location = new System.Drawing.Point(150, 300), 
-                Width = 300,
+                Location = new System.Drawing.Point(400, 175), 
+                Width = 340,
+                Height = 30,
                 Format = DateTimePickerFormat.Custom,
                 CustomFormat = "dd/MM/yyyy",
-                Value = DateTime.Now
+                Value = DateTime.Now,
+                Font = new System.Drawing.Font("Segoe UI", 10),
+                CalendarForeColor = System.Drawing.Color.FromArgb(50, 50, 50),
+                CalendarTitleBackColor = System.Drawing.Color.FromArgb(41, 128, 185)
             };
 
             cmbStatus = new ComboBox
             {
-                Location = new System.Drawing.Point(150, 340),
-                Width = 300,
-                DropDownStyle = ComboBoxStyle.DropDownList
+                Location = new System.Drawing.Point(400, 235),
+                Width = 340,
+                Height = 30,
+                DropDownStyle = ComboBoxStyle.DropDownList,
+                Font = new System.Drawing.Font("Segoe UI", 10),
+                FlatStyle = FlatStyle.Flat,
+                BackColor = System.Drawing.Color.White,
+                ForeColor = System.Drawing.Color.FromArgb(50, 50, 50)
             };
             cmbStatus.Items.AddRange(Enum.GetValues(typeof(StatusFuncionario))
                                       .Cast<StatusFuncionario>()
@@ -156,39 +246,49 @@ namespace MinhaEmpresa.Views
 
             txtObservacoes = new TextBox 
             { 
-                Location = new System.Drawing.Point(150, 380), 
-                Width = 300,
-                Height = 80,
+                Location = new System.Drawing.Point(30, 355), 
+                Width = 710,
+                Height = 120,
                 Multiline = true,
-                ScrollBars = ScrollBars.Vertical
+                ScrollBars = ScrollBars.Vertical,
+                Font = new System.Drawing.Font("Segoe UI", 10),
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = System.Drawing.Color.White
             };
 
-            // Buttons
+            // Buttons com estilo moderno
             btnSalvar = new Button
             {
                 Text = "Salvar",
-                Location = new System.Drawing.Point(150, 480),
-                Width = 100,
-                Height = 30,
-                BackColor = System.Drawing.Color.FromArgb(0, 120, 212),
+                Location = new System.Drawing.Point(550, 490),
+                Width = 120,
+                Height = 45,
+                BackColor = System.Drawing.Color.FromArgb(41, 128, 185),
                 ForeColor = System.Drawing.Color.White,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Flat,
+                Font = new System.Drawing.Font("Segoe UI", 11, System.Drawing.FontStyle.Bold),
+                Cursor = Cursors.Hand,
+                FlatAppearance = { BorderSize = 0 }
             };
             btnSalvar.Click += BtnSalvar_Click;
 
             btnVoltar = new Button
             {
-                Text = "Voltar",
-                Location = new System.Drawing.Point(350, 480),
-                Width = 100,
-                Height = 30,
-                BackColor = System.Drawing.Color.FromArgb(234, 234, 234),
-                FlatStyle = FlatStyle.Flat
+                Text = "Cancelar",
+                Location = new System.Drawing.Point(410, 490),
+                Width = 120,
+                Height = 45,
+                BackColor = System.Drawing.Color.FromArgb(220, 53, 69),
+                ForeColor = System.Drawing.Color.White,
+                FlatStyle = FlatStyle.Flat,
+                Font = new System.Drawing.Font("Segoe UI", 11, System.Drawing.FontStyle.Bold),
+                Cursor = Cursors.Hand,
+                FlatAppearance = { BorderSize = 0 }
             };
             btnVoltar.Click += (s, e) => this.Close();
 
-            // Adicionar controles ao formulário
-            this.Controls.AddRange(new Control[] 
+            // Adicionar controles ao painel principal
+            mainPanel.Controls.AddRange(new Control[] 
             { 
                 lblNome, lblEmail, lblTelefone, lblCargo, lblSalario, lblDepartamento, 
                 lblDataContratacao, lblDataNascimento, lblStatus, lblObservacoes,
@@ -196,6 +296,9 @@ namespace MinhaEmpresa.Views
                 dtpDataContratacao, dtpDataNascimento, cmbStatus, txtObservacoes,
                 btnSalvar, btnVoltar
             });
+            
+            // Adicionar painel principal ao formulário
+            this.Controls.Add(mainPanel);
         }
 
         private void BtnSalvar_Click(object? sender, EventArgs e)
