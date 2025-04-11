@@ -122,12 +122,7 @@ namespace MinhaEmpresa.Views
                 Height = 40
             };
             
-            // Botão de configurações no menu lateral
-            Button btnConfiguracoes = CreateMenuButton("Configurações", "⚙️", 400);
-            btnConfiguracoes.Click += (sender, e) => {
-                AbrirConfiguracoes();
-            };
-            sidePanel.Controls.Add(btnConfiguracoes);
+            // Botão de configurações será adicionado depois do botão de relatórios
             
             // Separador
             Panel separator = new Panel
@@ -152,12 +147,16 @@ namespace MinhaEmpresa.Views
             Button btnRelatorios = CreateMenuButton("Relatórios", "\uD83D\uDCC8", 300);
             btnRelatorios.Click += (s, e) => MessageBox.Show("Funcionalidade de relatórios em desenvolvimento.", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
             
-            // Botão de configurações já adicionado no início do método
+            // Botão de configurações
+            Button btnConfiguracoes = CreateMenuButton("Configurações", "⚙️", 360);
+            btnConfiguracoes.Click += (sender, e) => {
+                AbrirConfiguracoes();
+            };
             
             // Adicionar controles ao painel lateral
             sidePanel.Controls.AddRange(new Control[] { 
                 lblCompany, separator, btnDashboard, 
-                btnFuncionarios, btnCadastrar, btnRelatorios
+                btnFuncionarios, btnCadastrar, btnRelatorios, btnConfiguracoes
             });
         }
         

@@ -52,8 +52,9 @@ namespace MinhaEmpresa.Views
                 Font = new Font("Segoe UI", 14, FontStyle.Bold),
                 ForeColor = Color.FromArgb(41, 128, 185),
                 Dock = DockStyle.Top,
-                Height = 40,
-                TextAlign = ContentAlignment.MiddleCenter
+                Height = 30,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Margin = new Padding(0, 0, 0, 10)
             };
             
             // Container para as opções
@@ -64,7 +65,7 @@ namespace MinhaEmpresa.Views
                 RowCount = 5,
                 Height = 220,
                 Width = mainPanel.Width - 40,
-                Location = new Point(20, 60),
+                Location = new Point(20, 50),
                 CellBorderStyle = TableLayoutPanelCellBorderStyle.None
             };
             
