@@ -2,93 +2,74 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-
+using System.Collections.Generic;
 using MinhaEmpresa.DAO;
+using MinhaEmpresa.Models;
 
 namespace MinhaEmpresa.Views
 {
-    public class MenuPrincipal : Form
+    public partial class MenuPrincipal : Form
     {
-        private readonly FuncionarioDAO funcionarioDAO = new();
-        private Panel sideMenu = new();
-        private Panel dashboardPanel = new();
-        private TableLayoutPanel indicadoresPanel = new();
-        private TableLayoutPanel graficosPanel = new()
-        {
-            Dock = DockStyle.Fill,
-            ColumnCount = 2,
-            RowCount = 2,
-            Padding = new Padding(10),
-            BackColor = Color.FromArgb(240, 240, 240)
-        };
-        private ListView listSalariosPorDepartamento = new();
-        private ListView listFuncionariosPorCargo = new();
-        private Label lblTotalFuncionarios = new();
-        private Label lblCustoTotal = new();
-        private Label lblMediaSalarial = new();
+        // UI Components
+        private Panel sideMenu;
+        private Panel dashboardPanel;
+        private TableLayoutPanel indicadoresPanel;
+        private Panel graficosPanel;
+        private ListView listSalariosPorDepartamento;
+        private ListView listFuncionariosPorCargo;
+        private FuncionarioDAO funcionarioDAO;
 
         public MenuPrincipal()
         {
             InitializeComponent();
+            InicializarComponentesUI();
+            ConfigurarSideMenu();
+            ConfigurarDashboard();
+            ConfigurarListViews();
             CarregarDashboard();
         }
 
         private void InitializeComponent()
         {
+            this.SuspendLayout();
+            // 
+            // MenuPrincipal
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(1200, 700);
+            this.Name = "MenuPrincipal";
             this.Text = "Sistema de Gestão de Funcionários";
             this.WindowState = FormWindowState.Maximized;
+            this.ResumeLayout(false);
+        }
+
+        private void InicializarComponentesUI()
+        {
+            // Initialize UI components
+            sideMenu = new Panel();
+            dashboardPanel = new Panel();
+            indicadoresPanel = new TableLayoutPanel();
+            graficosPanel = new Panel();
+            listSalariosPorDepartamento = new ListView();
+            listFuncionariosPorCargo = new ListView();
+            funcionarioDAO = new FuncionarioDAO();
+            
+            // Configure form properties
             this.BackColor = Color.FromArgb(240, 240, 240);
 
-            // Side Menu
-            sideMenu = new Panel
-            {
-                BackColor = Color.FromArgb(51, 51, 76),
-                Location = new Point(0, 0),
-                Width = 220,
-                Dock = DockStyle.Left
-            };
+            // Add main panels to form
+            this.Controls.Add(dashboardPanel);
+            this.Controls.Add(sideMenu);
+        }
 
-            var btnFuncionarios = new Button
-            {
-                Text = "Funcionários",
-                FlatStyle = FlatStyle.Flat,
-                ForeColor = Color.Gainsboro,
-                Font = new Font("Segoe UI", 10F, FontStyle.Regular),
-                Dock = DockStyle.Top,
-                Height = 60,
-                TextAlign = ContentAlignment.MiddleLeft,
-                Padding = new Padding(10, 0, 0, 0),
-                FlatAppearance = { BorderSize = 0 }
-            };
-            btnFuncionarios.Click += (s, e) => new ListagemFuncionarios().Show();
+        private void ConfigurarSideMenu()
+        {
+            sideMenu.BackColor = Color.FromArgb(51, 51, 76);
+            sideMenu.Location = new Point(0, 0);
+            sideMenu.Width = 220;
+            sideMenu.Dock = DockStyle.Left;
 
-            var btnCargos = new Button
-            {
-                Text = "Cargos",
-                FlatStyle = FlatStyle.Flat,
-                ForeColor = Color.Gainsboro,
-                Font = new Font("Segoe UI", 10F, FontStyle.Regular),
-                Dock = DockStyle.Top,
-                Height = 60,
-                TextAlign = ContentAlignment.MiddleLeft,
-                Padding = new Padding(10, 0, 0, 0),
-                FlatAppearance = { BorderSize = 0 }
-            };
-
-            var btnDepartamentos = new Button
-            {
-                Text = "Departamentos",
-                FlatStyle = FlatStyle.Flat,
-                ForeColor = Color.Gainsboro,
-                Font = new Font("Segoe UI", 10F, FontStyle.Regular),
-                Dock = DockStyle.Top,
-                Height = 60,
-                TextAlign = ContentAlignment.MiddleLeft,
-                Padding = new Padding(10, 0, 0, 0),
-                FlatAppearance = { BorderSize = 0 }
-            };
-
-            // Logo Panel
             var logoPanel = new Panel
             {
                 BackColor = Color.FromArgb(39, 39, 58),
@@ -106,192 +87,228 @@ namespace MinhaEmpresa.Views
             };
             logoPanel.Controls.Add(lblLogo);
 
-            sideMenu.Controls.AddRange(new Control[] { btnDepartamentos, btnCargos, btnFuncionarios, logoPanel });
+            var btnFuncionarios = CriarBotaoMenu("Funcionários");
+            btnFuncionarios.Click += (s, e) => new ListagemFuncionarios().Show();
 
-            // Dashboard Panel
+            var btnCargos = CriarBotaoMenu("Cargos");
+            var btnDepartamentos = CriarBotaoMenu("Departamentos");
+
+            sideMenu.Controls.AddRange(new Control[] { btnDepartamentos, btnCargos, btnFuncionarios, logoPanel });
+        }
+
+        private Button CriarBotaoMenu(string texto)
+        {
+            var btn = new Button
+            {
+                Text = texto,
+                FlatStyle = FlatStyle.Flat,
+                ForeColor = Color.Gainsboro,
+                Font = new Font("Segoe UI", 10F, FontStyle.Regular),
+                Dock = DockStyle.Top,
+                Height = 60,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(10, 0, 0, 0)
+            };
+            btn.FlatAppearance.BorderSize = 0;
+            return btn;
+        }
+
+        private void ConfigurarDashboard()
+        {
             dashboardPanel.Dock = DockStyle.Fill;
             dashboardPanel.Padding = new Padding(20);
 
-            // Configurar indicadores
-            var indicadores = new[]
-            {
-                ("Total de Funcionários", "0", "person"),
-                ("Custo Total Mensal", "R$ 0,00", "money"),
-                ("Média Salarial", "R$ 0,00", "chart-line"),
-                ("Maior Salário", "R$ 0,00", "trophy")
-            };
-
-            // Configurar painel de indicadores
-            this.indicadoresPanel.Dock = DockStyle.Top;
-            this.indicadoresPanel.Height = 120;
-            this.indicadoresPanel.Padding = new Padding(10);
-            this.indicadoresPanel.BackColor = Color.FromArgb(240, 240, 240);
-            this.indicadoresPanel.ColumnCount = 4;
-            this.indicadoresPanel.RowCount = 1;
-
-            // Configurar colunas do painel de indicadores
-            for (int i = 0; i < 4; i++)
-            {
-                this.indicadoresPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
-            }
-
-            // Adicionar indicadores
-            for (int i = 0; i < indicadores.Length; i++)
-            {
-                var (titulo, valor, icone) = indicadores[i];
-                var card = CriarCardIndicador(titulo, valor, icone);
-                var label = (Label)card.Controls[0].Controls[0];
-
-                switch (i)
-                {
-                    case 0:
-                        lblTotalFuncionarios = label;
-                        break;
-                    case 1:
-                        lblCustoTotal = label;
-                        break;
-                    case 2:
-                        lblMediaSalarial = label;
-                        break;
-                }
-
-                this.indicadoresPanel.Controls.Add(card, i, 0);
-            }
-
-            // Configurar painéis de gráficos
-            var paineis = new[]
-            {
-                ("Custos por Departamento", "money", listSalariosPorDepartamento, new[] { ("Departamento", 200), ("Total", 150), ("%", 70) }),
-                ("Distribuição por Cargo", "person", listFuncionariosPorCargo, new[] { ("Cargo", 200), ("Total", 100), ("%", 70) }),
-                ("Média Salarial por Cargo", "chart-line", new ListView(), new[] { ("Cargo", 200), ("Média", 150) }),
-                ("Status dos Funcionários", "info", new ListView(), new[] { ("Status", 200), ("Total", 100), ("%", 70) })
-            };
-
-            for (int i = 0; i < paineis.Length; i++)
-            {
-                var (titulo, icone, listView, colunas) = paineis[i];
-                var painel = CriarPainelGrafico(titulo, icone);
-                ConfigurarListView(listView, colunas);
-                painel.Controls[0].Controls.Add(listView);
-                this.graficosPanel.Controls.Add(painel, i % 2, i / 2);
-            }
-
-            this.dashboardPanel.Controls.Add(this.indicadoresPanel);
-            this.dashboardPanel.Controls.Add(this.graficosPanel);
-            this.indicadoresPanel.BackColor = Color.White;
-            this.indicadoresPanel.Margin = new Padding(0, 0, 0, 20);
-
-
-
-
-
-
-            // Lista de Salários por Departamento
-            var panelSalarios = new Panel
-            {
-                Dock = DockStyle.Fill,
-                Padding = new Padding(10),
-                BackColor = Color.White
-            };
-
-            var lblSalarios = new Label
-            {
-                Text = "Salários por Departamento",
-                Dock = DockStyle.Top,
-                Font = new Font("Segoe UI", 12F, FontStyle.Bold),
-                ForeColor = Color.FromArgb(51, 51, 76),
-                TextAlign = ContentAlignment.MiddleLeft,
-                Height = 30
-            };
-
-            listSalariosPorDepartamento = new ListView
-            {
-                View = View.Details,
-                FullRowSelect = true,
-                GridLines = true,
-                Dock = DockStyle.Fill,
-                Font = new Font("Segoe UI", 9.75F)
-            };
-            listSalariosPorDepartamento.Columns.Add("Departamento", 200);
-            listSalariosPorDepartamento.Columns.Add("Total", 150);
-
-            panelSalarios.Controls.AddRange(new Control[] { listSalariosPorDepartamento, lblSalarios });
-
-            // Lista de Funcionários por Cargo
-            var panelCargos = new Panel
-            {
-                Dock = DockStyle.Fill,
-                Padding = new Padding(10),
-                BackColor = Color.White
-            };
-
-            var lblCargos = new Label
-            {
-                Text = "Funcionários por Cargo",
-                Dock = DockStyle.Top,
-                Font = new Font("Segoe UI", 12F, FontStyle.Bold),
-                ForeColor = Color.FromArgb(51, 51, 76),
-                TextAlign = ContentAlignment.MiddleLeft,
-                Height = 30
-            };
-
-            listFuncionariosPorCargo = new ListView
-            {
-                View = View.Details,
-                FullRowSelect = true,
-                GridLines = true,
-                Dock = DockStyle.Fill,
-                Font = new Font("Segoe UI", 9.75F)
-            };
-            listFuncionariosPorCargo.Columns.Add("Cargo", 200);
-            listFuncionariosPorCargo.Columns.Add("Total", 150);
-
-            panelCargos.Controls.AddRange(new Control[] { listFuncionariosPorCargo, lblCargos });
-
-            graficosPanel.Controls.Add(panelSalarios, 0, 0);
-            graficosPanel.Controls.Add(panelCargos, 1, 0);
+            ConfigurarPainelIndicadores();
+            ConfigurarPainelGraficos();
 
             dashboardPanel.Controls.Add(graficosPanel);
             dashboardPanel.Controls.Add(indicadoresPanel);
+        }
 
-            this.Controls.AddRange(new Control[] { dashboardPanel, sideMenu });
+        private void ConfigurarPainelIndicadores()
+        {
+            indicadoresPanel.ColumnCount = 4;
+            indicadoresPanel.RowCount = 1;
+            indicadoresPanel.Dock = DockStyle.Top;
+            indicadoresPanel.Height = 150;
+            indicadoresPanel.BackColor = Color.FromArgb(240, 240, 240);
+            indicadoresPanel.Padding = new Padding(20);
+            
+            // Configure column and row styles
+            for (int i = 0; i < indicadoresPanel.ColumnCount; i++)
+            {
+                indicadoresPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 25F));
+            }
+            
+            indicadoresPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+        }
+
+        private void ConfigurarPainelGraficos()
+        {
+            graficosPanel.Dock = DockStyle.Fill;
+            graficosPanel.Padding = new Padding(10);
+            graficosPanel.BackColor = Color.FromArgb(240, 240, 240);
+            
+            // Create a TableLayoutPanel for the charts
+            var tableLayout = new TableLayoutPanel
+            {
+                ColumnCount = 2,
+                RowCount = 2,
+                Dock = DockStyle.Fill,
+                BackColor = Color.Transparent
+            };
+            
+            // Configure column and row styles
+            tableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50F));
+            tableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            tableLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 50F));
+            
+            // Add chart panels
+            var salariosDepartamentoPanel = CriarPainelGrafico("Salários por Departamento", new[] { "Departamento", "Funcionários", "Total Salários" });
+            var funcionariosCargoPanel = CriarPainelGrafico("Funcionários por Cargo", new[] { "Cargo", "Quantidade", "Percentual" });
+            var mediaSalarialPanel = CriarPainelGrafico("Média Salarial por Cargo", new[] { "Cargo", "Média Salarial" });
+            var statusPanel = CriarPainelGrafico("Status dos Funcionários", new[] { "Status", "Quantidade", "Percentual" });
+            
+            tableLayout.Controls.Add(salariosDepartamentoPanel, 0, 0);
+            tableLayout.Controls.Add(funcionariosCargoPanel, 1, 0);
+            tableLayout.Controls.Add(mediaSalarialPanel, 0, 1);
+            tableLayout.Controls.Add(statusPanel, 1, 1);
+            
+            graficosPanel.Controls.Add(tableLayout);
+        }
+
+        private Panel CriarPainelGrafico(string titulo, string[] colunas)
+        {
+            var panel = new Panel
+            {
+                BackColor = Color.White,
+                Dock = DockStyle.Fill,
+                Margin = new Padding(10),
+                Padding = new Padding(0),
+                BorderStyle = BorderStyle.None
+            };
+            
+            // Header panel for the title
+            var headerPanel = new Panel
+            {
+                BackColor = Color.FromArgb(51, 51, 76),
+                Dock = DockStyle.Top,
+                Height = 40
+            };
+            
+            var titleLabel = new Label
+            {
+                Text = titulo,
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 12F, FontStyle.Regular),
+                TextAlign = ContentAlignment.MiddleLeft,
+                Dock = DockStyle.Fill,
+                Padding = new Padding(10, 0, 0, 0)
+            };
+            
+            headerPanel.Controls.Add(titleLabel);
+            
+            // Content panel for the ListView
+            var contentPanel = new Panel
+            {
+                Dock = DockStyle.Fill,
+                Padding = new Padding(10)
+            };
+            
+            // Create and configure the ListView
+            var listView = new ListView
+            {
+                Dock = DockStyle.Fill,
+                View = View.Details,
+                FullRowSelect = true,
+                GridLines = true
+            };
+            
+            // Add columns
+            foreach (var coluna in colunas)
+            {
+                listView.Columns.Add(coluna, -2);
+            }
+            
+            // Store the ListView in the appropriate variable based on the title
+            if (titulo == "Salários por Departamento")
+            {
+                // Replace the existing ListView with this one
+                listSalariosPorDepartamento = listView;
+            }
+            else if (titulo == "Funcionários por Cargo")
+            {
+                // Replace the existing ListView with this one
+                listFuncionariosPorCargo = listView;
+            }
+            
+            contentPanel.Controls.Add(listView);
+            
+            panel.Controls.Add(contentPanel);
+            panel.Controls.Add(headerPanel);
+            
+            return panel;
+        }
+
+        private void ConfigurarListViews()
+        {
+            // The ListViews are already configured in CriarPainelGrafico
+            // This method is kept for compatibility with the constructor call sequence
+        }
+
+        private void CriarIndicadores()
+        {
+            try
+            {
+                var funcionarios = funcionarioDAO.ListarFuncionarios();
+                var totalFuncionarios = funcionarios.Count;
+                var totalSalarios = funcionarios.Sum(f => f.Salario);
+                var mediaSalarial = totalFuncionarios > 0 ? totalSalarios / totalFuncionarios : 0;
+                var departamentos = funcionarios.Select(f => f.Departamento?.Nome).Distinct().Count();
+
+                var cards = new[]
+                {
+                    CriarCardIndicador("Total Funcionários", totalFuncionarios.ToString(), "user"),
+                    CriarCardIndicador("Custo Total", totalSalarios.ToString("C2"), "money"),
+                    CriarCardIndicador("Média Salarial", mediaSalarial.ToString("C2"), "chart"),
+                    CriarCardIndicador("Departamentos", departamentos.ToString(), "building")
+                };
+
+                // Clear existing controls before adding new ones
+                indicadoresPanel.Controls.Clear();
+                
+                for (int i = 0; i < cards.Length; i++)
+                {
+                    var card = cards[i];
+                    indicadoresPanel.Controls.Add(card, i, 0);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao criar indicadores: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private Panel CriarCardIndicador(string titulo, string valor, string icone)
         {
-            var card = new Panel
+            var panel = new Panel
             {
                 BackColor = Color.White,
-                Margin = new Padding(10),
-                Dock = DockStyle.Fill,
-                Padding = new Padding(15)
+                Margin = new Padding(5),
+                Padding = new Padding(10),
+                Dock = DockStyle.Fill
             };
-
-            var lblIcone = new Label
-            {
-                Text = ObterIcone(icone),
-                Font = new Font("Segoe UI Symbol", 24F, FontStyle.Regular),
-                ForeColor = Color.FromArgb(51, 51, 76),
-                Dock = DockStyle.Left,
-                Width = 40,
-                TextAlign = ContentAlignment.MiddleCenter
-            };
-
-            var conteudoPanel = new Panel
-            {
-                Dock = DockStyle.Fill,
-                Padding = new Padding(10, 0, 0, 0)
-            };
-
+            
             var lblTitulo = new Label
             {
                 Text = titulo,
                 Font = new Font("Segoe UI", 10F, FontStyle.Regular),
-                ForeColor = Color.Gray,
+                ForeColor = Color.FromArgb(100, 100, 100),
                 Dock = DockStyle.Top,
                 Height = 25
             };
-
+            
             var lblValor = new Label
             {
                 Text = valor,
@@ -300,114 +317,32 @@ namespace MinhaEmpresa.Views
                 Dock = DockStyle.Fill,
                 TextAlign = ContentAlignment.MiddleLeft
             };
-
-            conteudoPanel.Controls.AddRange(new Control[] { lblValor, lblTitulo });
-            card.Controls.AddRange(new Control[] { conteudoPanel, lblIcone });
-            return card;
+            
+            var iconePictureBox = new PictureBox
+            {
+                Image = ObterIcone(icone),
+                SizeMode = PictureBoxSizeMode.Zoom,
+                Width = 40,
+                Height = 40,
+                Dock = DockStyle.Right
+            };
+            
+            panel.Controls.Add(iconePictureBox);
+            panel.Controls.Add(lblValor);
+            panel.Controls.Add(lblTitulo);
+            
+            return panel;
         }
 
-        private Panel CriarPainelGrafico(string titulo, string icone)
+        private Image ObterIcone(string nome)
         {
-            var mainPanel = new Panel
+            // Placeholder - in a real application, you would load actual icons
+            var bitmap = new Bitmap(32, 32);
+            using (var g = Graphics.FromImage(bitmap))
             {
-                Dock = DockStyle.Fill,
-                Padding = new Padding(0),
-                BackColor = Color.White,
-                Margin = new Padding(5)
-            };
-
-            var headerPanel = new Panel
-            {
-                Dock = DockStyle.Top,
-                Height = 50,
-                BackColor = Color.FromArgb(51, 51, 76)
-            };
-
-            var lblIcone = new Label
-            {
-                Text = ObterIcone(icone),
-                Font = new Font("Segoe UI Symbol", 16F, FontStyle.Regular),
-                ForeColor = Color.White,
-                Dock = DockStyle.Left,
-                Width = 50,
-                TextAlign = ContentAlignment.MiddleCenter
-            };
-
-            var lblTitulo = new Label
-            {
-                Text = titulo,
-                Font = new Font("Segoe UI", 12F, FontStyle.Bold),
-                ForeColor = Color.White,
-                TextAlign = ContentAlignment.MiddleLeft,
-                Dock = DockStyle.Fill,
-                Padding = new Padding(5, 0, 0, 0)
-            };
-
-            headerPanel.Controls.AddRange(new Control[] { lblTitulo, lblIcone });
-
-            var contentPanel = new Panel
-            {
-                Dock = DockStyle.Fill,
-                Padding = new Padding(15),
-                BackColor = Color.White
-            };
-
-            mainPanel.Controls.Add(contentPanel);
-            mainPanel.Controls.Add(headerPanel);
-
-            return mainPanel;
-        }
-
-        private void ConfigurarListView(ListView listView, (string Nome, int Largura)[] colunas)
-        {
-            listView.View = View.Details;
-            listView.FullRowSelect = true;
-            listView.GridLines = false;
-            listView.Dock = DockStyle.Fill;
-            listView.Font = new Font("Segoe UI", 9.75F);
-            listView.BackColor = Color.White;
-            listView.ForeColor = Color.FromArgb(64, 64, 64);
-            listView.BorderStyle = BorderStyle.None;
-
-            foreach (var (Nome, Largura) in colunas)
-            {
-                var column = listView.Columns.Add(Nome, Largura);
-                column.TextAlign = HorizontalAlignment.Left;
+                g.Clear(Color.FromArgb(51, 51, 76));
             }
-
-            // Adicionar estilo alternado nas linhas
-            listView.OwnerDraw = true;
-            listView.DrawItem += (s, e) => {
-                e.DrawDefault = true;
-                if (e.ItemIndex >= 0)
-                {
-                    if (e.ItemIndex % 2 == 0)
-                        e.Item.BackColor = Color.White;
-                    else
-                        e.Item.BackColor = Color.FromArgb(240, 240, 240);
-                }
-            };
-
-            listView.DrawColumnHeader += (s, e) => {
-                e.DrawDefault = false;
-                using var brush = new SolidBrush(Color.FromArgb(51, 51, 76));
-                e.Graphics.FillRectangle(brush, e.Bounds);
-                TextRenderer.DrawText(e.Graphics, e.Header.Text, listView.Font,
-                    e.Bounds, Color.White, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
-            };
-        }
-
-        private string ObterIcone(string nome)
-        {
-            return nome switch
-            {
-                "person" => "὆4",     // 👤
-                "money" => "Ὃ0",     // 💰
-                "chart-line" => "Ὄ8", // 📈
-                "trophy" => "Ἴ6",     // 🏆
-                "info" => "ℹ",       // ℹ
-                _ => "⭐"              // ⭐
-            };
+            return bitmap;
         }
 
         private void CarregarDashboard()
@@ -415,66 +350,104 @@ namespace MinhaEmpresa.Views
             try
             {
                 var funcionarios = funcionarioDAO.ListarFuncionarios();
-                if (funcionarios == null || !funcionarios.Any())
+                CriarIndicadores();
+                AtualizarListViews(funcionarios);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Erro ao carregar dashboard: {ex.Message}", "Erro", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void AtualizarListViews(List<Funcionario> funcionarios)
+        {
+            AtualizarListViewSalarios(funcionarios);
+            AtualizarListViewCargos(funcionarios);
+            AtualizarListViewMediaSalarial(funcionarios);
+            AtualizarListViewStatus(funcionarios);
+        }
+
+        private void AtualizarListViewSalarios(List<Funcionario> funcionarios)
+        {
+            listSalariosPorDepartamento.Items.Clear();
+            var salariosPorDepartamento = funcionarios
+                .GroupBy(f => f.Departamento?.Nome ?? "Sem Departamento")
+                .Select(g => new
                 {
-                    MessageBox.Show("Nenhum funcionário encontrado.", "Aviso",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
+                    Departamento = g.Key,
+                    Quantidade = g.Count(),
+                    TotalSalarios = g.Sum(f => f.Salario)
+                })
+                .OrderByDescending(g => g.TotalSalarios);
 
-                // Atualizar indicadores
-                var totalFuncionarios = funcionarios.Count;
-                var custoTotal = funcionarios.Sum(f => f.Salario);
-                var mediaSalarial = funcionarios.Average(f => f.Salario);
-                var maiorSalario = funcionarios.Max(f => f.Salario);
+            foreach (var item in salariosPorDepartamento)
+            {
+                var listViewItem = new ListViewItem(item.Departamento);
+                listViewItem.SubItems.Add(item.Quantidade.ToString());
+                listViewItem.SubItems.Add(item.TotalSalarios.ToString("C"));
+                listSalariosPorDepartamento.Items.Add(listViewItem);
+            }
+        }
 
-                indicadoresPanel.Controls.Clear();
-                indicadoresPanel.Controls.Add(CriarCardIndicador("Total de Funcionários", totalFuncionarios.ToString(), "person"), 0, 0);
-                indicadoresPanel.Controls.Add(CriarCardIndicador("Custo Total", custoTotal.ToString("C2"), "money"), 1, 0);
-                indicadoresPanel.Controls.Add(CriarCardIndicador("Média Salarial", mediaSalarial.ToString("C2"), "chart-line"), 2, 0);
-                indicadoresPanel.Controls.Add(CriarCardIndicador("Maior Salário", maiorSalario.ToString("C2"), "trophy"), 3, 0);
+        private void AtualizarListViewCargos(List<Funcionario> funcionarios)
+        {
+            listFuncionariosPorCargo.Items.Clear();
+            var totalFuncionarios = funcionarios.Count;
+            var funcionariosPorCargo = funcionarios
+                .GroupBy(f => f.Cargo?.Nome ?? "Sem Cargo")
+                .Select(g => new
+                {
+                    Cargo = g.Key,
+                    Quantidade = g.Count(),
+                    Percentual = totalFuncionarios > 0 ? (double)g.Count() / totalFuncionarios : 0
+                })
+                .OrderByDescending(g => g.Quantidade);
 
-                // Atualizar lista de salários por departamento
-                var salariosPorDepartamento = funcionarios
-                    .GroupBy(f => f.Departamento?.Nome ?? "Sem Departamento")
-                    .Select(g => new
+            foreach (var item in funcionariosPorCargo)
+            {
+                var listViewItem = new ListViewItem(item.Cargo);
+                listViewItem.SubItems.Add(item.Quantidade.ToString());
+                listViewItem.SubItems.Add(item.Percentual.ToString("P1"));
+                listFuncionariosPorCargo.Items.Add(listViewItem);
+            }
+        }
+        
+        private void AtualizarListViewMediaSalarial(List<Funcionario> funcionarios)
+        {
+            // Find the ListView for media salarial
+            ListView listViewMediaSalarial = null;
+            foreach (Control control in graficosPanel.Controls)
+            {
+                if (control is TableLayoutPanel tablePanel)
+                {
+                    foreach (Control panelControl in tablePanel.Controls)
                     {
-                        Departamento = g.Key,
-                        TotalSalarios = g.Sum(f => f.Salario),
-                        Percentual = (double)(g.Sum(f => f.Salario) / custoTotal)
-                    })
-                    .OrderByDescending(g => g.TotalSalarios);
-
-                listSalariosPorDepartamento.Items.Clear();
-                foreach (var item in salariosPorDepartamento)
-                {
-                    var listItem = new ListViewItem(item.Departamento);
-                    listItem.SubItems.Add(item.TotalSalarios.ToString("C2"));
-                    listItem.SubItems.Add(item.Percentual.ToString("P1"));
-                    listSalariosPorDepartamento.Items.Add(listItem);
+                        if (panelControl is Panel panel)
+                        {
+                            var headerPanel = panel.Controls.OfType<Panel>().FirstOrDefault(p => p.Dock == DockStyle.Top);
+                            if (headerPanel != null)
+                            {
+                                var titleLabel = headerPanel.Controls.OfType<Label>().FirstOrDefault();
+                                if (titleLabel != null && titleLabel.Text == "Média Salarial por Cargo")
+                                {
+                                    var contentPanel = panel.Controls.OfType<Panel>().FirstOrDefault(p => p.Dock == DockStyle.Fill);
+                                    if (contentPanel != null)
+                                    {
+                                        listViewMediaSalarial = contentPanel.Controls.OfType<ListView>().FirstOrDefault();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (listViewMediaSalarial != null) break;
                 }
-
-                // Atualizar lista de funcionários por cargo
-                var funcionariosPorCargo = funcionarios
-                    .GroupBy(f => f.Cargo?.Nome ?? "Sem Cargo")
-                    .Select(g => new
-                    {
-                        Cargo = g.Key,
-                        Total = g.Count(),
-                        Percentual = (double)g.Count() / totalFuncionarios
-                    })
-                    .OrderByDescending(g => g.Total);
-
-                listFuncionariosPorCargo.Items.Clear();
-                foreach (var item in funcionariosPorCargo)
-                {
-                    var listItem = new ListViewItem(item.Cargo);
-                    listItem.SubItems.Add(item.Total.ToString());
-                    listItem.SubItems.Add(item.Percentual.ToString("P1"));
-                    listFuncionariosPorCargo.Items.Add(listItem);
-                }
-
-                // Atualizar lista de média salarial por cargo
+            }
+            
+            if (listViewMediaSalarial != null)
+            {
+                listViewMediaSalarial.Items.Clear();
                 var mediaSalarialPorCargo = funcionarios
                     .GroupBy(f => f.Cargo?.Nome ?? "Sem Cargo")
                     .Select(g => new
@@ -484,62 +457,68 @@ namespace MinhaEmpresa.Views
                     })
                     .OrderByDescending(g => g.MediaSalarial);
 
-                var listMediaSalarial = new ListView();
-                var listStatus = new ListView();
-
-                foreach (Control control in graficosPanel.Controls)
-                {
-                    if (control is Panel panel)
-                    {
-                        var headerLabel = panel.Controls.OfType<Panel>().FirstOrDefault()?
-                            .Controls.OfType<Label>().FirstOrDefault();
-
-                        if (headerLabel?.Text == "Média Salarial por Cargo")
-                        {
-                            listMediaSalarial = panel.Controls.OfType<Panel>().LastOrDefault()?
-                                .Controls.OfType<ListView>().FirstOrDefault() ?? new ListView();
-                        }
-                        else if (headerLabel?.Text == "Status dos Funcionários")
-                        {
-                            listStatus = panel.Controls.OfType<Panel>().LastOrDefault()?
-                                .Controls.OfType<ListView>().FirstOrDefault() ?? new ListView();
-                        }
-                    }
-                }
-
-                // Atualizar média salarial por cargo
-                listMediaSalarial.Items.Clear();
                 foreach (var item in mediaSalarialPorCargo)
                 {
-                    var listItem = new ListViewItem(item.Cargo);
-                    listItem.SubItems.Add(item.MediaSalarial.ToString("C2"));
-                    listMediaSalarial.Items.Add(listItem);
+                    var listViewItem = new ListViewItem(item.Cargo);
+                    listViewItem.SubItems.Add(item.MediaSalarial.ToString("C2"));
+                    listViewMediaSalarial.Items.Add(listViewItem);
                 }
-
-                // Atualizar lista de status
+            }
+        }
+        
+        private void AtualizarListViewStatus(List<Funcionario> funcionarios)
+        {
+            // Find the ListView for status
+            ListView listViewStatus = null;
+            foreach (Control control in graficosPanel.Controls)
+            {
+                if (control is TableLayoutPanel tablePanel)
+                {
+                    foreach (Control panelControl in tablePanel.Controls)
+                    {
+                        if (panelControl is Panel panel)
+                        {
+                            var headerPanel = panel.Controls.OfType<Panel>().FirstOrDefault(p => p.Dock == DockStyle.Top);
+                            if (headerPanel != null)
+                            {
+                                var titleLabel = headerPanel.Controls.OfType<Label>().FirstOrDefault();
+                                if (titleLabel != null && titleLabel.Text == "Status dos Funcionários")
+                                {
+                                    var contentPanel = panel.Controls.OfType<Panel>().FirstOrDefault(p => p.Dock == DockStyle.Fill);
+                                    if (contentPanel != null)
+                                    {
+                                        listViewStatus = contentPanel.Controls.OfType<ListView>().FirstOrDefault();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (listViewStatus != null) break;
+                }
+            }
+            
+            if (listViewStatus != null)
+            {
+                listViewStatus.Items.Clear();
+                var totalFuncionarios = funcionarios.Count;
                 var statusFuncionarios = funcionarios
                     .GroupBy(f => f.Status)
                     .Select(g => new
                     {
                         Status = g.Key,
                         Total = g.Count(),
-                        Percentual = (double)g.Count() / totalFuncionarios
+                        Percentual = totalFuncionarios > 0 ? (double)g.Count() / totalFuncionarios : 0
                     })
                     .OrderByDescending(g => g.Total);
 
-                listStatus.Items.Clear();
                 foreach (var item in statusFuncionarios)
                 {
-                    var listItem = new ListViewItem(item.Status.ToString());
-                    listItem.SubItems.Add(item.Total.ToString());
-                    listItem.SubItems.Add(item.Percentual.ToString("P1"));
-                    listStatus.Items.Add(listItem);
+                    var listViewItem = new ListViewItem(item.Status.ToString());
+                    listViewItem.SubItems.Add(item.Total.ToString());
+                    listViewItem.SubItems.Add(item.Percentual.ToString("P1"));
+                    listViewStatus.Items.Add(listViewItem);
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erro ao carregar dashboard: {ex.Message}", "Erro",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
