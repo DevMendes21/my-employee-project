@@ -72,65 +72,65 @@ namespace MinhaEmpresa.Views
             // Configurar colunas
             dgvFuncionarios.AutoGenerateColumns = false;
             
-            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
+            // Configurar colunas do DataGridView
+            var colunas = new[]
             {
-                DataPropertyName = "Id",
-                HeaderText = "ID",
-                Width = 50
-            });
-            
-            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Nome",
-                HeaderText = "Nome",
-                Width = 150
-            });
-            
-            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Email",
-                HeaderText = "Email",
-                Width = 150
-            });
-            
-            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Telefone",
-                HeaderText = "Telefone",
-                Width = 100
-            });
-            
-            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Cargo.Nome",
-                HeaderText = "Cargo",
-                Width = 120
-            });
-
-            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Departamento.Nome",
-                HeaderText = "Departamento",
-                Width = 120
-            });
-
-            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Salario",
-                HeaderText = "Salário",
-                Width = 100,
-                DefaultCellStyle = new DataGridViewCellStyle
+                new DataGridViewTextBoxColumn
                 {
-                    Format = "C2"
+                    DataPropertyName = "Id",
+                    HeaderText = "ID",
+                    Width = 50
+                },
+                new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "Nome",
+                    HeaderText = "Nome",
+                    Width = 200
+                },
+                new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "Cargo.Nome",
+                    HeaderText = "Cargo",
+                    Width = 120
+                },
+                new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "Departamento.Nome",
+                    HeaderText = "Departamento",
+                    Width = 120
+                },
+                new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "Salario",
+                    HeaderText = "Salário",
+                    Width = 100,
+                    DefaultCellStyle = new DataGridViewCellStyle
+                    {
+                        Format = "C2",
+                        Alignment = DataGridViewContentAlignment.MiddleRight
+                    }
+                },
+                new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "Email",
+                    HeaderText = "Email",
+                    Width = 180
+                },
+                new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "Telefone",
+                    HeaderText = "Telefone",
+                    Width = 100
+                },
+                new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "Status",
+                    HeaderText = "Status",
+                    Width = 70
                 }
-            });
+            };
 
-            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Status",
-                HeaderText = "Status",
-                Width = 80
-            });
+            dgvFuncionarios.Columns.AddRange(colunas);
             
             dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
             {
