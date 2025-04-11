@@ -388,6 +388,11 @@ namespace MinhaEmpresa.Views
                 
             if (chartPanel == null || departamentos.Count == 0) return;
             
+            chartPanel.Controls.Clear();
+            
+            // Calcular o total de funcionários para porcentagens
+            int totalFuncionarios = funcionarios.Count;
+            
             // Agrupar funcionários por departamento
             var departamentoGroups = funcionarios
                 .GroupBy(f => f.DepartamentoId)
@@ -511,20 +516,66 @@ namespace MinhaEmpresa.Views
                     barHeight = Math.Max(barHeight, 20);
                 }
                 
-                // Criar barra com estilo melhorado
+                // Criar barra com estilo melhorado e interatividade
                 Panel bar = new Panel
                 {
                     Location = new Point(i * barWidth + 20, chartHeight - barHeight),
                     Width = barWidth - 30, // Mais espaço entre as barras
                     Height = barHeight,
                     BackColor = colors[colorIndex % colors.Length],
-                    BorderStyle = BorderStyle.FixedSingle // Adicionar borda para melhor definição
+                    BorderStyle = BorderStyle.FixedSingle, // Adicionar borda para melhor definição
+                    Tag = departamento // Armazenar o departamento para uso nos eventos
                 };
                 
-                // Adicionar valor no topo da barra com estilo melhorado
+                // Calcular porcentagem
+                double porcentagem = totalFuncionarios > 0 ? (double)count / totalFuncionarios * 100 : 0;
+                
+                // Adicionar tooltip com informações detalhadas
+                ToolTip tooltip = new ToolTip();
+                tooltip.SetToolTip(bar, $"Departamento: {departamento.Nome} | Funcionários: {count} | Porcentagem: {porcentagem:0.0}%");
+                
+                // Capturar o índice de cor atual para uso no evento
+                int currentColorIndex = colorIndex;
+                
+                // Adicionar eventos de mouse para interatividade
+                bar.MouseEnter += (sender, e) => {
+                    // Destacar a barra quando o mouse passar por cima
+                    Panel currentBar = (Panel)sender;
+                    currentBar.BackColor = ControlPaint.Light(colors[currentColorIndex % colors.Length]);
+                    currentBar.Cursor = Cursors.Hand;
+                };
+                
+                bar.MouseLeave += (sender, e) => {
+                    // Restaurar a cor original quando o mouse sair
+                    Panel currentBar = (Panel)sender;
+                    currentBar.BackColor = colors[currentColorIndex % colors.Length];
+                };
+                
+                bar.Click += (sender, e) => {
+                    // Mostrar detalhes do departamento quando clicar na barra
+                    var dept = (Departamento)((Panel)sender).Tag;
+                    var deptFuncionarios = funcionarios.Where(f => f.DepartamentoId == dept.Id).ToList();
+                    double percentagemDept = totalFuncionarios > 0 ? (double)deptFuncionarios.Count / totalFuncionarios * 100 : 0;
+                    decimal salarioMedio = deptFuncionarios.Any() ? deptFuncionarios.Average(f => f.Salario) : 0;
+                    
+                    // Criar mensagem com quebras de linha usando Environment.NewLine
+                    string mensagem = "Departamento: " + dept.Nome;
+                    mensagem += Environment.NewLine + "Total de funcionários: " + deptFuncionarios.Count;
+                    mensagem += Environment.NewLine + "Porcentagem do total: " + percentagemDept.ToString("0.0") + "%";
+                    mensagem += Environment.NewLine + "Salário médio: R$ " + salarioMedio.ToString("N2");
+                    
+                    MessageBox.Show(
+                        mensagem,
+                        $"Detalhes do Departamento {dept.Nome}",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information
+                    );
+                };
+                
+                // Adicionar valor no topo da barra com estilo melhorado e porcentagem
                 Label lblBarValue = new Label
                 {
-                    Text = count.ToString(),
+                    Text = $"{count} ({porcentagem:0.0}%)",
                     Location = new Point(0, -25),
                     Width = barWidth - 30,
                     TextAlign = ContentAlignment.MiddleCenter,
@@ -582,9 +633,54 @@ namespace MinhaEmpresa.Views
                 colorIndex++;
             }
             
-            // Adicionar painéis ao painel do gráfico
+            // Adicionar título do gráfico
+            Label lblChartTitle = new Label
+            {
+                Text = "Distribuição de Funcionários por Departamento",
+                Location = new Point(0, 10),
+                Width = chartPanel.Width,
+                TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = Color.FromArgb(50, 50, 50),
+                Font = new Font("Segoe UI", 12, FontStyle.Bold)
+            };
+            
+            // Adicionar subtítulo com instruções de interatividade
+            Label lblSubtitle = new Label
+            {
+                Text = "Passe o mouse sobre as barras para mais detalhes ou clique para ver estatísticas completas",
+                Location = new Point(0, 35),
+                Width = chartPanel.Width,
+                TextAlign = ContentAlignment.MiddleCenter,
+                ForeColor = Color.FromArgb(100, 100, 100),
+                Font = new Font("Segoe UI", 9, FontStyle.Italic)
+            };
+            
+            // Adicionar controles ao painel do gráfico
+            chartPanel.Controls.Add(lblChartTitle);
+            chartPanel.Controls.Add(lblSubtitle);
             chartPanel.Controls.Add(barPanel);
             chartPanel.Controls.Add(legendPanel);
+            
+            // Adicionar botão para atualizar o gráfico
+            Button btnRefresh = new Button
+            {
+                Text = "Atualizar Gráfico",
+                Location = new Point(chartPanel.Width - 150, chartPanel.Height - 40),
+                Width = 130,
+                Height = 30,
+                FlatStyle = FlatStyle.Flat,
+                BackColor = Color.FromArgb(41, 128, 185),
+                ForeColor = Color.White,
+                Font = new Font("Segoe UI", 9, FontStyle.Regular),
+                Cursor = Cursors.Hand
+            };
+            
+            btnRefresh.Click += (sender, e) => {
+                // Recarregar dados e redesenhar o gráfico
+                LoadDashboardData();
+            };
+            
+            chartPanel.Controls.Add(btnRefresh);
         }
         
         private void UpdateDateTime()
