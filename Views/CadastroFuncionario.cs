@@ -20,12 +20,20 @@ namespace MinhaEmpresa.Views
         private Button btnSalvar = null!;
         private Button btnVoltar = null!;
         private FuncionarioDAO funcionarioDAO;
+        private int? funcionarioId;
 
-        public CadastroFuncionario()
+        public CadastroFuncionario(Funcionario? funcionario = null)
         {
             InitializeComponent();
             InitializeCustomComponents();
             funcionarioDAO = new FuncionarioDAO();
+
+            if (funcionario != null)
+            {
+                funcionarioId = funcionario.Id;
+                PreencherDadosFuncionario(funcionario);
+                this.Text = "Editar Funcionário";
+            }
         }
 
         private void InitializeComponent()
@@ -48,8 +56,8 @@ namespace MinhaEmpresa.Views
             Label lblCargo = new Label { Text = "Cargo:", Location = new System.Drawing.Point(20, 140) };
             Label lblSalario = new Label { Text = "Salário:", Location = new System.Drawing.Point(20, 180) };
             Label lblDepartamento = new Label { Text = "Departamento:", Location = new System.Drawing.Point(20, 220) };
-            Label lblDataContratacao = new Label { Text = "Data de Contratação:", Location = new System.Drawing.Point(20, 260) };
-            Label lblDataNascimento = new Label { Text = "Data de Nascimento:", Location = new System.Drawing.Point(20, 300) };
+            Label lblDataContratacao = new Label { Text = "Data de Contratação:", Location = new System.Drawing.Point(20, 260), AutoSize = true, Width = 120 };
+            Label lblDataNascimento = new Label { Text = "Data de Nascimento:", Location = new System.Drawing.Point(20, 300), AutoSize = true, Width = 120 };
             Label lblStatus = new Label { Text = "Status:", Location = new System.Drawing.Point(20, 340) };
             Label lblObservacoes = new Label { Text = "Observações:", Location = new System.Drawing.Point(20, 380) };
 
@@ -101,7 +109,8 @@ namespace MinhaEmpresa.Views
                 Location = new System.Drawing.Point(150, 260), 
                 Width = 300,
                 Format = DateTimePickerFormat.Custom,
-                CustomFormat = "dd/MM/yyyy"
+                CustomFormat = "dd/MM/yyyy",
+                Value = DateTime.Now
             };
 
             dtpDataNascimento = new DateTimePicker 
@@ -109,7 +118,8 @@ namespace MinhaEmpresa.Views
                 Location = new System.Drawing.Point(150, 300), 
                 Width = 300,
                 Format = DateTimePickerFormat.Custom,
-                CustomFormat = "dd/MM/yyyy"
+                CustomFormat = "dd/MM/yyyy",
+                Value = DateTime.Now
             };
 
             cmbStatus = new ComboBox
@@ -186,6 +196,7 @@ namespace MinhaEmpresa.Views
 
                     Funcionario funcionario = new Funcionario
                     {
+                        Id = funcionarioId ?? 0,
                         Nome = txtNome.Text,
                         Email = string.IsNullOrWhiteSpace(txtEmail.Text) ? null : txtEmail.Text,
                         Telefone = string.IsNullOrWhiteSpace(txtTelefone.Text) ? null : txtTelefone.Text,
@@ -200,10 +211,20 @@ namespace MinhaEmpresa.Views
                         Observacoes = string.IsNullOrWhiteSpace(txtObservacoes.Text) ? null : txtObservacoes.Text
                     };
 
-                    funcionarioDAO.InserirFuncionario(funcionario);
-                    MessageBox.Show("Funcionário cadastrado com sucesso!", "Sucesso", 
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LimparCampos();
+                    if (funcionarioId.HasValue)
+                    {
+                        funcionarioDAO.AtualizarFuncionario(funcionario);
+                        MessageBox.Show("Funcionário atualizado com sucesso!", "Sucesso", 
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        this.Close();
+                    }
+                    else
+                    {
+                        funcionarioDAO.InserirFuncionario(funcionario);
+                        MessageBox.Show("Funcionário cadastrado com sucesso!", "Sucesso", 
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        LimparCampos();
+                    }
                 }
             }
             catch (Exception ex)
@@ -258,6 +279,45 @@ namespace MinhaEmpresa.Views
             dtpDataNascimento.Value = DateTime.Now;
             cmbStatus.SelectedIndex = 0;
             txtObservacoes.Clear();
+        }
+
+        private void PreencherDadosFuncionario(Funcionario funcionario)
+        {
+            if (funcionario == null) return;
+
+            txtNome.Text = funcionario.Nome;
+            txtEmail.Text = funcionario.Email ?? "";
+            txtTelefone.Text = funcionario.Telefone ?? "";
+            
+            // Selecionar o cargo
+            for (int i = 0; i < cmbCargo.Items.Count; i++)
+            {
+                if (cmbCargo.Items[i] is Cargo cargo && cargo.Id == funcionario.CargoId)
+                {
+                    cmbCargo.SelectedIndex = i;
+                    break;
+                }
+            }
+
+            txtSalario.Text = funcionario.Salario.ToString();
+
+            // Selecionar o departamento
+            for (int i = 0; i < cmbDepartamento.Items.Count; i++)
+            {
+                if (cmbDepartamento.Items[i] is Departamento departamento && departamento.Id == funcionario.DepartamentoId)
+                {
+                    cmbDepartamento.SelectedIndex = i;
+                    break;
+                }
+            }
+
+            dtpDataContratacao.Value = funcionario.DataContratacao;
+            dtpDataNascimento.Value = funcionario.DataNascimento ?? DateTime.Now;
+            
+            // Selecionar o status
+            cmbStatus.SelectedItem = funcionario.Status.ToString();
+            
+            txtObservacoes.Text = funcionario.Observacoes ?? "";
         }
     }
 }

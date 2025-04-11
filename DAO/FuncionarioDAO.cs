@@ -100,22 +100,36 @@ namespace MinhaEmpresa.DAO
 
         public void AtualizarFuncionario(Funcionario funcionario)
         {
-            string sql = "UPDATE funcionarios SET nome = @nome, cargo_id = @cargoId, departamento_id = @departamentoId, " +
-                        "salario = @salario, data_contratacao = @dataContratacao WHERE id = @id";
+            string sql = @"UPDATE funcionarios 
+                         SET nome = @nome, 
+                             email = @email,
+                             telefone = @telefone,
+                             cargo_id = @cargoId, 
+                             departamento_id = @departamentoId, 
+                             salario = @salario, 
+                             data_contratacao = @dataContratacao,
+                             data_nascimento = @dataNascimento,
+                             status = @status,
+                             observacoes = @observacoes
+                         WHERE id = @id";
 
             using (MySqlConnection conn = MinhaEmpresa.Conexao.Conexao.GetConnection())
             {
                 try
                 {
-                    // A conexão já é aberta no GetConnection()
                     using (MySqlCommand cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@id", funcionario.Id);
                         cmd.Parameters.AddWithValue("@nome", funcionario.Nome);
+                        cmd.Parameters.AddWithValue("@email", funcionario.Email ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@telefone", funcionario.Telefone ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@cargoId", funcionario.CargoId);
                         cmd.Parameters.AddWithValue("@departamentoId", funcionario.DepartamentoId);
                         cmd.Parameters.AddWithValue("@salario", funcionario.Salario);
                         cmd.Parameters.AddWithValue("@dataContratacao", funcionario.DataContratacao);
+                        cmd.Parameters.AddWithValue("@dataNascimento", funcionario.DataNascimento);
+                        cmd.Parameters.AddWithValue("@status", funcionario.Status.ToString());
+                        cmd.Parameters.AddWithValue("@observacoes", funcionario.Observacoes ?? (object)DBNull.Value);
                         cmd.ExecuteNonQuery();
                     }
                 }
