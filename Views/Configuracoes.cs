@@ -51,21 +51,20 @@ namespace MinhaEmpresa.Views
                 Text = "Configurações do Sistema",
                 Font = new Font("Segoe UI", 14, FontStyle.Bold),
                 ForeColor = Color.FromArgb(41, 128, 185),
-                Dock = DockStyle.Top,
+                Location = new Point(0, 10),
+                Width = mainPanel.Width,
                 Height = 30,
-                TextAlign = ContentAlignment.MiddleCenter,
-                Margin = new Padding(0, 0, 0, 10)
+                TextAlign = ContentAlignment.MiddleCenter
             };
             
             // Container para as opções
             TableLayoutPanel optionsPanel = new TableLayoutPanel
             {
-                Dock = DockStyle.Top,
                 ColumnCount = 2,
                 RowCount = 5,
                 Height = 220,
                 Width = mainPanel.Width - 40,
-                Location = new Point(20, 50),
+                Location = new Point(20, 80),
                 CellBorderStyle = TableLayoutPanelCellBorderStyle.None
             };
             
