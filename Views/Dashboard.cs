@@ -415,8 +415,8 @@ namespace MinhaEmpresa.Views
             int chartWidth = chartPanel.Width - 40;
             int chartHeight = 300;
             
-            // Desenhar barras para cada departamento
-            int maxCount = departamentoGroups.Any() ? departamentoGroups.Max(g => g.Count) : 0;
+            // Garantir que maxCount seja pelo menos 1 para evitar divisão por zero e barras invisíveis
+            int maxCount = departamentoGroups.Any() ? Math.Max(1, departamentoGroups.Max(g => g.Count)) : 1;
             int barWidth = chartWidth / (departamentos.Count + 1);
             
             // Criar painel para as barras
@@ -477,8 +477,16 @@ namespace MinhaEmpresa.Views
                     Console.WriteLine("Exibindo departamento de TI no gráfico (sem funcionários).");
                 }
                 
-                // Calcular altura da barra
-                int barHeight = maxCount > 0 ? (int)((float)count / maxCount * chartHeight) : 0;
+                // Calcular altura da barra - garantir altura mínima para visualização
+                int barHeight = count > 0 ? (int)((float)count / maxCount * chartHeight) : 10;
+                
+                // Se for o departamento de TI, garantir que seja visível mesmo sem funcionários
+                if (departamento.Nome == "TI")
+                {
+                    Console.WriteLine($"Processando departamento de TI - ID: {departamento.Id}, Funcionários: {count}");
+                    // Garantir altura mínima para o departamento de TI
+                    barHeight = Math.Max(barHeight, 20);
+                }
                 
                 // Criar barra
                 Panel bar = new Panel

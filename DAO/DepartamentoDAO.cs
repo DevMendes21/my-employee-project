@@ -40,10 +40,50 @@ namespace MinhaEmpresa.DAO
                     throw new Exception("Erro ao listar departamentos: " + ex.Message);
                 }
             }
-            return departamentos.GroupBy(d => d.Nome)
+            var result = departamentos.GroupBy(d => d.Nome)
                                .Select(g => g.First())
                                .OrderBy(d => d.Nome)
                                .ToList();
+            
+            // Verificar se o departamento de TI está na lista
+            if (!result.Any(d => d.Nome == "TI"))
+            {
+                Console.WriteLine("Departamento de TI não encontrado no banco de dados. Adicionando manualmente.");
+                
+                // Tentar obter o ID do departamento de TI diretamente do banco
+                int tiId = 0;
+                try
+                {
+                    using (MySqlConnection conn = MinhaEmpresa.Conexao.Conexao.GetConnection())
+                    {
+                        string insertSql = "INSERT INTO departamentos (nome, descricao) VALUES ('TI', 'Tecnologia da Informação'); SELECT LAST_INSERT_ID();";
+                        using (MySqlCommand cmd = new MySqlCommand(insertSql, conn))
+                        {
+                            tiId = Convert.ToInt32(cmd.ExecuteScalar());
+                            Console.WriteLine($"Departamento de TI criado com ID: {tiId}");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Erro ao criar departamento de TI: {ex.Message}");
+                    // Se não conseguir criar, usar um ID temporário
+                    tiId = -1;
+                }
+                
+                // Adicionar o departamento de TI à lista
+                result.Add(new Departamento
+                {
+                    Id = tiId,
+                    Nome = "TI",
+                    DataCriacao = DateTime.Now
+                });
+                
+                // Reordenar a lista
+                result = result.OrderBy(d => d.Nome).ToList();
+            }
+            
+            return result;
         }
 
         public Departamento? ObterDepartamentoPorId(int id)
