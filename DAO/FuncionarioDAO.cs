@@ -18,7 +18,7 @@ namespace MinhaEmpresa.DAO
             {
                 try
                 {
-                    conn.Open();
+                    // A conexão já é aberta no GetConnection()
                     using (MySqlCommand cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@nome", funcionario.Nome);
@@ -50,7 +50,7 @@ namespace MinhaEmpresa.DAO
             {
                 try
                 {
-                    conn.Open();
+                    // A conexão já é aberta no GetConnection()
                     using (MySqlCommand cmd = new MySqlCommand(sql, conn))
                     {
                         using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -98,7 +98,7 @@ namespace MinhaEmpresa.DAO
             {
                 try
                 {
-                    conn.Open();
+                    // A conexão já é aberta no GetConnection()
                     using (MySqlCommand cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@id", funcionario.Id);
@@ -125,7 +125,7 @@ namespace MinhaEmpresa.DAO
             {
                 try
                 {
-                    conn.Open();
+                    // A conexão já é aberta no GetConnection()
                     using (MySqlCommand cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@id", id);
