@@ -67,19 +67,21 @@ namespace MinhaEmpresa.DAO
                                 {
                                     Id = Convert.ToInt32(reader["id"]),
                                     Nome = reader["nome"].ToString() ?? string.Empty,
-                                    Email = reader["email"] != DBNull.Value ? reader["email"].ToString() : null,
-                                    Telefone = reader["telefone"] != DBNull.Value ? reader["telefone"].ToString() : null,
+                                    Email = reader["email"] != DBNull.Value ? reader["email"].ToString() ?? string.Empty : string.Empty,
+                                    Telefone = reader["telefone"] != DBNull.Value ? reader["telefone"].ToString() ?? string.Empty : string.Empty,
                                     CargoId = Convert.ToInt32(reader["cargo_id"]),
                                     Cargo = new Cargo
                                     {
                                         Id = Convert.ToInt32(reader["cargo_id"]),
-                                        Nome = reader["cargo_nome"].ToString() ?? string.Empty
+                                        Nome = reader["cargo_nome"].ToString() ?? string.Empty,
+                                        Nivel = "N/A" // Setting a default value for required field
                                     },
                                     DepartamentoId = Convert.ToInt32(reader["departamento_id"]),
                                     Departamento = new Departamento
                                     {
                                         Id = Convert.ToInt32(reader["departamento_id"]),
-                                        Nome = reader["departamento_nome"].ToString() ?? string.Empty
+                                        Nome = reader["departamento_nome"].ToString() ?? string.Empty,
+                                        DataCriacao = DateTime.Now // Setting a default value
                                     },
                                     Salario = Convert.ToDecimal(reader["salario"]),
                                     DataContratacao = Convert.ToDateTime(reader["data_contratacao"]),

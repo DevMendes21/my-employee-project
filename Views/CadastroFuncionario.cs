@@ -74,11 +74,11 @@ namespace MinhaEmpresa.Views
             };
             var cargos = new List<Cargo>
             {
-                new Cargo { Id = 1, Nome = "Analista" },
-                new Cargo { Id = 2, Nome = "Desenvolvedor" },
-                new Cargo { Id = 3, Nome = "Gerente" },
-                new Cargo { Id = 4, Nome = "Coordenador" },
-                new Cargo { Id = 5, Nome = "Assistente" }
+                new Cargo { Id = 1, Nome = "Analista", Nivel = "Junior" },
+                new Cargo { Id = 2, Nome = "Desenvolvedor", Nivel = "Pleno" },
+                new Cargo { Id = 3, Nome = "Gerente", Nivel = "Senior" },
+                new Cargo { Id = 4, Nome = "Coordenador", Nivel = "Senior" },
+                new Cargo { Id = 5, Nome = "Assistente", Nivel = "Junior" }
             };
             cmbCargo.DataSource = cargos;
             cmbCargo.DisplayMember = "Nome";
@@ -198,8 +198,8 @@ namespace MinhaEmpresa.Views
                     {
                         Id = funcionarioId ?? 0,
                         Nome = txtNome.Text,
-                        Email = string.IsNullOrWhiteSpace(txtEmail.Text) ? null : txtEmail.Text,
-                        Telefone = string.IsNullOrWhiteSpace(txtTelefone.Text) ? null : txtTelefone.Text,
+                        Email = txtEmail.Text,
+                        Telefone = txtTelefone.Text,
                         CargoId = cargo.Id,
                         Cargo = cargo,
                         Salario = Convert.ToDecimal(txtSalario.Text),
@@ -207,7 +207,8 @@ namespace MinhaEmpresa.Views
                         Departamento = departamento,
                         DataContratacao = dtpDataContratacao.Value,
                         DataNascimento = dtpDataNascimento.Value,
-                        Status = (StatusFuncionario)Enum.Parse(typeof(StatusFuncionario), cmbStatus.SelectedItem.ToString()!),
+                        Status = cmbStatus.SelectedItem?.ToString() is string statusStr && Enum.TryParse<StatusFuncionario>(statusStr, out var status) ? 
+                            status : StatusFuncionario.Ativo,
                         Observacoes = string.IsNullOrWhiteSpace(txtObservacoes.Text) ? null : txtObservacoes.Text
                     };
 
@@ -286,8 +287,8 @@ namespace MinhaEmpresa.Views
             if (funcionario == null) return;
 
             txtNome.Text = funcionario.Nome;
-            txtEmail.Text = funcionario.Email ?? "";
-            txtTelefone.Text = funcionario.Telefone ?? "";
+            txtEmail.Text = funcionario.Email;
+            txtTelefone.Text = funcionario.Telefone;
             
             // Selecionar o cargo
             for (int i = 0; i < cmbCargo.Items.Count; i++)
@@ -317,7 +318,7 @@ namespace MinhaEmpresa.Views
             // Selecionar o status
             cmbStatus.SelectedItem = funcionario.Status.ToString();
             
-            txtObservacoes.Text = funcionario.Observacoes ?? "";
+            txtObservacoes.Text = funcionario.Observacoes ?? string.Empty;
         }
     }
 }

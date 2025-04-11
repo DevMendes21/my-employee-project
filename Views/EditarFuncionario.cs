@@ -7,15 +7,15 @@ namespace MinhaEmpresa.Views
 {
     public partial class EditarFuncionario : Form
     {
-        private TextBox txtNome;
-        private ComboBox cmbCargo;
-        private TextBox txtSalario;
-        private ComboBox cmbDepartamento;
-        private DateTimePicker dtpDataContratacao;
-        private Button btnSalvar;
-        private Button btnCancelar;
-        private FuncionarioDAO funcionarioDAO;
-        private Funcionario funcionario;
+        private TextBox txtNome = null!;
+        private ComboBox cmbCargo = null!;
+        private TextBox txtSalario = null!;
+        private ComboBox cmbDepartamento = null!;
+        private DateTimePicker dtpDataContratacao = null!;
+        private Button btnSalvar = null!;
+        private Button btnCancelar = null!;
+        private FuncionarioDAO funcionarioDAO = null!;
+        private Funcionario funcionario = null!;
 
         public EditarFuncionario(Funcionario funcionario)
         {
@@ -56,11 +56,11 @@ namespace MinhaEmpresa.Views
             };
             var cargos = new List<Cargo>
             {
-                new Cargo { Id = 1, Nome = "Analista" },
-                new Cargo { Id = 2, Nome = "Desenvolvedor" },
-                new Cargo { Id = 3, Nome = "Gerente" },
-                new Cargo { Id = 4, Nome = "Coordenador" },
-                new Cargo { Id = 5, Nome = "Assistente" }
+                new Cargo { Id = 1, Nome = "Analista", Nivel = "Junior" },
+                new Cargo { Id = 2, Nome = "Desenvolvedor", Nivel = "Pleno" },
+                new Cargo { Id = 3, Nome = "Gerente", Nivel = "Senior" },
+                new Cargo { Id = 4, Nome = "Coordenador", Nivel = "Senior" },
+                new Cargo { Id = 5, Nome = "Assistente", Nivel = "Junior" }
             };
             cmbCargo.DataSource = cargos;
             cmbCargo.DisplayMember = "Nome";
@@ -76,11 +76,11 @@ namespace MinhaEmpresa.Views
             };
             var departamentos = new List<Departamento>
             {
-                new Departamento { Id = 1, Nome = "TI" },
-                new Departamento { Id = 2, Nome = "RH" },
-                new Departamento { Id = 3, Nome = "Financeiro" },
-                new Departamento { Id = 4, Nome = "Administrativo" },
-                new Departamento { Id = 5, Nome = "Comercial" }
+                new Departamento { Id = 1, Nome = "TI", DataCriacao = DateTime.Now },
+                new Departamento { Id = 2, Nome = "RH", DataCriacao = DateTime.Now },
+                new Departamento { Id = 3, Nome = "Financeiro", DataCriacao = DateTime.Now },
+                new Departamento { Id = 4, Nome = "Administrativo", DataCriacao = DateTime.Now },
+                new Departamento { Id = 5, Nome = "Comercial", DataCriacao = DateTime.Now }
             };
             cmbDepartamento.DataSource = departamentos;
             cmbDepartamento.DisplayMember = "Nome";
@@ -128,18 +128,27 @@ namespace MinhaEmpresa.Views
             dtpDataContratacao.Value = funcionario.DataContratacao;
         }
 
-        private void BtnSalvar_Click(object sender, EventArgs e)
+        private void BtnSalvar_Click(object? sender, EventArgs e)
         {
             try
             {
                 if (ValidarCampos())
                 {
                     funcionario.Nome = txtNome.Text;
-                    funcionario.CargoId = ((Cargo)cmbCargo.SelectedItem).Id;
-                    funcionario.Cargo = (Cargo)cmbCargo.SelectedItem;
-                    funcionario.Salario = Convert.ToDecimal(txtSalario.Text);
-                    funcionario.DepartamentoId = ((Departamento)cmbDepartamento.SelectedItem).Id;
-                    funcionario.Departamento = (Departamento)cmbDepartamento.SelectedItem;
+                    if (cmbCargo.SelectedItem is Cargo selectedCargo && cmbDepartamento.SelectedItem is Departamento selectedDepartamento)
+                    {
+                        funcionario.CargoId = selectedCargo.Id;
+                        funcionario.Cargo = selectedCargo;
+                        funcionario.Salario = Convert.ToDecimal(txtSalario.Text);
+                        funcionario.DepartamentoId = selectedDepartamento.Id;
+                        funcionario.Departamento = selectedDepartamento;
+                    }
+                    else
+                    {
+                        MessageBox.Show("Erro ao obter cargo ou departamento selecionado.", "Erro",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
                     funcionario.DataContratacao = dtpDataContratacao.Value;
 
                     funcionarioDAO.AtualizarFuncionario(funcionario);

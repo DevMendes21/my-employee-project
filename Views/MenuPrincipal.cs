@@ -10,13 +10,13 @@ namespace MinhaEmpresa.Views
     public class MenuPrincipal : Form
     {
         private readonly FuncionarioDAO funcionarioDAO = new();
-        private readonly Panel sideMenu = new();
-        private readonly Panel dashboardPanel = new();
-        private readonly ListView listSalariosPorDepartamento = new();
-        private readonly ListView listFuncionariosPorCargo = new();
-        private readonly Label lblTotalFuncionarios = new();
-        private readonly Label lblCustoTotal = new();
-        private readonly Label lblMediaSalarial = new();
+        private Panel sideMenu = new();
+        private Panel dashboardPanel = new();
+        private ListView listSalariosPorDepartamento = new();
+        private ListView listFuncionariosPorCargo = new();
+        private Label lblTotalFuncionarios = new();
+        private Label lblCustoTotal = new();
+        private Label lblMediaSalarial = new();
 
         public MenuPrincipal()
         {
