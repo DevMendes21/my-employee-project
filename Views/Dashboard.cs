@@ -540,23 +540,28 @@ namespace MinhaEmpresa.Views
                 // Adicionar eventos de mouse para interatividade
                 bar.MouseEnter += (sender, e) => {
                     // Destacar a barra quando o mouse passar por cima
-                    Panel currentBar = (Panel)sender;
-                    currentBar.BackColor = ControlPaint.Light(colors[currentColorIndex % colors.Length]);
-                    currentBar.Cursor = Cursors.Hand;
+                    if (sender is Panel currentBar)
+                    {
+                        currentBar.BackColor = ControlPaint.Light(colors[currentColorIndex % colors.Length]);
+                        currentBar.Cursor = Cursors.Hand;
+                    }
                 };
                 
                 bar.MouseLeave += (sender, e) => {
                     // Restaurar a cor original quando o mouse sair
-                    Panel currentBar = (Panel)sender;
-                    currentBar.BackColor = colors[currentColorIndex % colors.Length];
+                    if (sender is Panel currentBar)
+                    {
+                        currentBar.BackColor = colors[currentColorIndex % colors.Length];
+                    }
                 };
                 
                 bar.Click += (sender, e) => {
                     // Mostrar detalhes do departamento quando clicar na barra
-                    var dept = (Departamento)((Panel)sender).Tag;
-                    var deptFuncionarios = funcionarios.Where(f => f.DepartamentoId == dept.Id).ToList();
-                    double percentagemDept = totalFuncionarios > 0 ? (double)deptFuncionarios.Count / totalFuncionarios * 100 : 0;
-                    decimal salarioMedio = deptFuncionarios.Any() ? deptFuncionarios.Average(f => f.Salario) : 0;
+                    if (sender is Panel clickedBar && clickedBar.Tag is Departamento dept)
+                    {
+                        var deptFuncionarios = funcionarios.Where(f => f.DepartamentoId == dept.Id).ToList();
+                        double percentagemDept = totalFuncionarios > 0 ? (double)deptFuncionarios.Count / totalFuncionarios * 100 : 0;
+                        decimal salarioMedio = deptFuncionarios.Any() ? deptFuncionarios.Average(f => f.Salario) : 0;
                     
                     // Criar mensagem com quebras de linha usando Environment.NewLine
                     string mensagem = "Departamento: " + dept.Nome;
@@ -564,12 +569,13 @@ namespace MinhaEmpresa.Views
                     mensagem += Environment.NewLine + "Porcentagem do total: " + percentagemDept.ToString("0.0") + "%";
                     mensagem += Environment.NewLine + "Salário médio: R$ " + salarioMedio.ToString("N2");
                     
-                    MessageBox.Show(
-                        mensagem,
-                        $"Detalhes do Departamento {dept.Nome}",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information
-                    );
+                        MessageBox.Show(
+                            mensagem,
+                            $"Detalhes do Departamento {dept.Nome}",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information
+                        );
+                    }
                 };
                 
                 // Adicionar valor no topo da barra com estilo melhorado e porcentagem
