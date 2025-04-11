@@ -27,17 +27,15 @@ packages/
 # Visual Studio Code
 .vscode/
 
-# User-specific files
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
-
 # Rider
 .idea/
 
-# User-specific files
-.suo
-.user
-.userosscache
-.sln.docstates
+# Arquivos de configuração com dados sensíveis
+App.config
+Web.config
+*.Production.config
+*.Development.config
+connection.config
+
+# Mantenha o template de configuração
+!App.config.template
