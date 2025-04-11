@@ -94,13 +94,21 @@ namespace MinhaEmpresa.Views
             btnDashboard.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnDashboard.Click += (s, e) => MostrarDashboard();
             
-            // Test button for role assignment
-            var btnTesteRoles = CriarBotaoMenu("Teste Cargos");
+            // Test buttons for role assignment
+            var btnTesteRoles = CriarBotaoMenu("Teste Cargos Específicos");
             btnTesteRoles.Image = ObterIcone("chart");
             btnTesteRoles.ImageAlign = ContentAlignment.MiddleLeft;
             btnTesteRoles.Padding = new Padding(10, 0, 0, 0);
             btnTesteRoles.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnTesteRoles.Click += (s, e) => TestHelper.TestRoleAssignment();
+            
+            // Test button for all role-department combinations
+            var btnTesteAllCombinations = CriarBotaoMenu("Teste Todas Combinações");
+            btnTesteAllCombinations.Image = ObterIcone("chart");
+            btnTesteAllCombinations.ImageAlign = ContentAlignment.MiddleLeft;
+            btnTesteAllCombinations.Padding = new Padding(10, 0, 0, 0);
+            btnTesteAllCombinations.TextImageRelation = TextImageRelation.ImageBeforeText;
+            btnTesteAllCombinations.Click += (s, e) => TestHelper.TestAllCombinations();
             
             // Funcionarios submenu
             var btnFuncionarios = CriarBotaoMenu("Funcionários");

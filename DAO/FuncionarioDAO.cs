@@ -11,8 +11,38 @@ namespace MinhaEmpresa.DAO
     {
         public void InserirFuncionario(Funcionario funcionario)
         {
-            string sql = "INSERT INTO funcionarios (nome, email, telefone, cargo_id, departamento_id, salario, data_contratacao, data_nascimento, observacoes) " +
-                        "VALUES (@nome, @email, @telefone, @cargoId, @departamentoId, @salario, @dataContratacao, @dataNascimento, @observacoes)";
+            // Garantir que o funcionário tenha um cargo e departamento válidos
+            if (funcionario.CargoId <= 0)
+            {
+                throw new Exception("Cargo inválido. Selecione um cargo válido para o funcionário.");
+            }
+
+            if (funcionario.DepartamentoId <= 0)
+            {
+                throw new Exception("Departamento inválido. Selecione um departamento válido para o funcionário.");
+            }
+
+            // Verificar se o cargo existe
+            CargoDAO cargoDAO = new CargoDAO();
+            var cargo = cargoDAO.ObterCargoPorId(funcionario.CargoId);
+            if (cargo == null)
+            {
+                throw new Exception($"Cargo com ID {funcionario.CargoId} não encontrado.");
+            }
+
+            // Verificar se o departamento existe
+            DepartamentoDAO departamentoDAO = new DepartamentoDAO();
+            var departamento = departamentoDAO.ObterDepartamentoPorId(funcionario.DepartamentoId);
+            if (departamento == null)
+            {
+                throw new Exception($"Departamento com ID {funcionario.DepartamentoId} não encontrado.");
+            }
+
+            // Log para debug
+            Console.WriteLine($"Inserindo funcionário {funcionario.Nome} com cargo {cargo.Nome} (ID: {funcionario.CargoId}) no departamento {departamento.Nome} (ID: {funcionario.DepartamentoId})");
+
+            string sql = "INSERT INTO funcionarios (nome, email, telefone, cargo_id, departamento_id, salario, data_contratacao, data_nascimento, observacoes, status) " +
+                        "VALUES (@nome, @email, @telefone, @cargoId, @departamentoId, @salario, @dataContratacao, @dataNascimento, @observacoes, @status)";
 
             using (MySqlConnection conn = MinhaEmpresa.Conexao.Conexao.GetConnection())
             {
@@ -30,12 +60,17 @@ namespace MinhaEmpresa.DAO
                         cmd.Parameters.AddWithValue("@dataContratacao", funcionario.DataContratacao);
                         cmd.Parameters.AddWithValue("@dataNascimento", funcionario.DataNascimento.HasValue ? (object)funcionario.DataNascimento.Value : DBNull.Value);
                         cmd.Parameters.AddWithValue("@observacoes", funcionario.Observacoes ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@status", funcionario.Status.ToString());
                         cmd.ExecuteNonQuery();
                     }
                 }
+                catch (MySqlException ex)
+                {
+                    throw new Exception($"Erro ao inserir funcionário no banco de dados: {ex.Message}. Cargo ID: {funcionario.CargoId}, Departamento ID: {funcionario.DepartamentoId}");
+                }
                 catch (Exception ex)
                 {
-                    throw new Exception("Erro ao inserir funcionário: " + ex.Message);
+                    throw new Exception($"Erro ao inserir funcionário: {ex.Message}");
                 }
             }
         }
@@ -104,6 +139,36 @@ namespace MinhaEmpresa.DAO
 
         public void AtualizarFuncionario(Funcionario funcionario)
         {
+            // Garantir que o funcionário tenha um cargo e departamento válidos
+            if (funcionario.CargoId <= 0)
+            {
+                throw new Exception("Cargo inválido. Selecione um cargo válido para o funcionário.");
+            }
+
+            if (funcionario.DepartamentoId <= 0)
+            {
+                throw new Exception("Departamento inválido. Selecione um departamento válido para o funcionário.");
+            }
+
+            // Verificar se o cargo existe
+            CargoDAO cargoDAO = new CargoDAO();
+            var cargo = cargoDAO.ObterCargoPorId(funcionario.CargoId);
+            if (cargo == null)
+            {
+                throw new Exception($"Cargo com ID {funcionario.CargoId} não encontrado.");
+            }
+
+            // Verificar se o departamento existe
+            DepartamentoDAO departamentoDAO = new DepartamentoDAO();
+            var departamento = departamentoDAO.ObterDepartamentoPorId(funcionario.DepartamentoId);
+            if (departamento == null)
+            {
+                throw new Exception($"Departamento com ID {funcionario.DepartamentoId} não encontrado.");
+            }
+
+            // Log para debug
+            Console.WriteLine($"Atualizando funcionário {funcionario.Nome} (ID: {funcionario.Id}) com cargo {cargo.Nome} (ID: {funcionario.CargoId}) no departamento {departamento.Nome} (ID: {funcionario.DepartamentoId})");
+
             string sql = @"UPDATE funcionarios 
                          SET nome = @nome, 
                              email = @email,
@@ -137,9 +202,13 @@ namespace MinhaEmpresa.DAO
                         cmd.ExecuteNonQuery();
                     }
                 }
+                catch (MySqlException ex)
+                {
+                    throw new Exception($"Erro ao atualizar funcionário no banco de dados: {ex.Message}. Cargo ID: {funcionario.CargoId}, Departamento ID: {funcionario.DepartamentoId}");
+                }
                 catch (Exception ex)
                 {
-                    throw new Exception("Erro ao atualizar funcionário: " + ex.Message);
+                    throw new Exception($"Erro ao atualizar funcionário: {ex.Message}");
                 }
             }
         }

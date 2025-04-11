@@ -83,19 +83,22 @@ namespace MinhaEmpresa.Views
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             
-            // Carregar departamentos do banco de dados
-            try
+            // Definir departamentos manualmente para garantir que todos estejam disponíveis
+            var departamentos = new List<Departamento>
             {
-                var departamentos = departamentoDAO.ListarDepartamentos();
-                cmbDepartamento.DataSource = departamentos;
-                cmbDepartamento.DisplayMember = "Nome";
-                cmbDepartamento.ValueMember = "Id";
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erro ao carregar departamentos: {ex.Message}", "Erro", 
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+                new Departamento { Id = 1, Nome = "TI", DataCriacao = DateTime.Now },
+                new Departamento { Id = 2, Nome = "RH", DataCriacao = DateTime.Now },
+                new Departamento { Id = 3, Nome = "Financeiro", DataCriacao = DateTime.Now },
+                new Departamento { Id = 4, Nome = "Administrativo", DataCriacao = DateTime.Now },
+                new Departamento { Id = 5, Nome = "Comercial", DataCriacao = DateTime.Now }
+            };
+            
+            // Configurar o ComboBox de departamentos
+            cmbDepartamento.DataSource = null; // Limpar qualquer binding anterior
+            cmbDepartamento.Items.Clear();
+            cmbDepartamento.DataSource = new BindingSource(departamentos, null);
+            cmbDepartamento.DisplayMember = "Nome";
+            cmbDepartamento.ValueMember = "Id";
 
             dtpDataContratacao = new DateTimePicker 
             { 

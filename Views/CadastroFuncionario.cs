@@ -79,7 +79,7 @@ namespace MinhaEmpresa.Views
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             
-            // Definir cargos manualmente para evitar duplicações
+            // Definir cargos manualmente para evitar duplicações e garantir que todos os cargos estejam disponíveis
             var cargos = new List<Cargo>
             {
                 new Cargo { Id = 1, Nome = "Analista", Nivel = "Junior" },
@@ -88,7 +88,11 @@ namespace MinhaEmpresa.Views
                 new Cargo { Id = 4, Nome = "Coordenador", Nivel = "Senior" },
                 new Cargo { Id = 5, Nome = "Assistente", Nivel = "Junior" }
             };
-            cmbCargo.DataSource = cargos;
+            
+            // Configurar o ComboBox de cargos
+            cmbCargo.DataSource = null; // Limpar qualquer binding anterior
+            cmbCargo.Items.Clear();
+            cmbCargo.DataSource = new BindingSource(cargos, null);
             cmbCargo.DisplayMember = "Nome";
             cmbCargo.ValueMember = "Id";
 
@@ -101,19 +105,22 @@ namespace MinhaEmpresa.Views
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
             
-            // Carregar departamentos do banco de dados
-            try
+            // Definir departamentos manualmente para garantir que todos estejam disponíveis
+            var departamentos = new List<Departamento>
             {
-                var departamentos = departamentoDAO.ListarDepartamentos();
-                cmbDepartamento.DataSource = departamentos;
-                cmbDepartamento.DisplayMember = "Nome";
-                cmbDepartamento.ValueMember = "Id";
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Erro ao carregar departamentos: {ex.Message}", "Erro", 
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+                new Departamento { Id = 1, Nome = "TI", DataCriacao = DateTime.Now },
+                new Departamento { Id = 2, Nome = "RH", DataCriacao = DateTime.Now },
+                new Departamento { Id = 3, Nome = "Financeiro", DataCriacao = DateTime.Now },
+                new Departamento { Id = 4, Nome = "Administrativo", DataCriacao = DateTime.Now },
+                new Departamento { Id = 5, Nome = "Comercial", DataCriacao = DateTime.Now }
+            };
+            
+            // Configurar o ComboBox de departamentos
+            cmbDepartamento.DataSource = null; // Limpar qualquer binding anterior
+            cmbDepartamento.Items.Clear();
+            cmbDepartamento.DataSource = new BindingSource(departamentos, null);
+            cmbDepartamento.DisplayMember = "Nome";
+            cmbDepartamento.ValueMember = "Id";
 
             dtpDataContratacao = new DateTimePicker 
             { 
@@ -223,19 +230,33 @@ namespace MinhaEmpresa.Views
                         Observacoes = string.IsNullOrWhiteSpace(txtObservacoes.Text) ? null : txtObservacoes.Text
                     };
 
-                    if (funcionarioId.HasValue)
+                    try
                     {
-                        funcionarioDAO.AtualizarFuncionario(funcionario);
-                        MessageBox.Show("Funcionário atualizado com sucesso!", "Sucesso", 
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        this.Close();
+                        // Garantir que os IDs de cargo e departamento estejam corretamente definidos
+                        funcionario.CargoId = cargo.Id;
+                        funcionario.DepartamentoId = departamento.Id;
+                        
+                        Console.WriteLine($"Tentando salvar funcionário com cargo {cargo.Nome} (ID: {cargo.Id}) no departamento {departamento.Nome} (ID: {departamento.Id})");
+                        
+                        if (funcionarioId.HasValue)
+                        {
+                            funcionarioDAO.AtualizarFuncionario(funcionario);
+                            MessageBox.Show($"Funcionário atualizado com sucesso! Cargo: {cargo.Nome} Departamento: {departamento.Nome}", "Sucesso", 
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            this.Close();
+                        }
+                        else
+                        {
+                            funcionarioDAO.InserirFuncionario(funcionario);
+                            MessageBox.Show($"Funcionário cadastrado com sucesso! Cargo: {cargo.Nome} Departamento: {departamento.Nome}", "Sucesso", 
+                                MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            LimparCampos();
+                        }
                     }
-                    else
+                    catch (Exception ex)
                     {
-                        funcionarioDAO.InserirFuncionario(funcionario);
-                        MessageBox.Show("Funcionário cadastrado com sucesso!", "Sucesso", 
-                            MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        LimparCampos();
+                        MessageBox.Show($"Erro ao salvar funcionário: {ex.Message} Cargo: {cargo.Nome} (ID: {cargo.Id}) Departamento: {departamento.Nome} (ID: {departamento.Id})", "Erro",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
