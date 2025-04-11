@@ -47,12 +47,76 @@ namespace MinhaEmpresa.Views
                 AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             };
 
+            // Configurar colunas
+            dgvFuncionarios.AutoGenerateColumns = false;
+            
+            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Id",
+                HeaderText = "ID",
+                Width = 50
+            });
+            
+            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Nome",
+                HeaderText = "Nome",
+                Width = 150
+            });
+            
+            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Email",
+                HeaderText = "Email",
+                Width = 150
+            });
+            
+            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Telefone",
+                HeaderText = "Telefone",
+                Width = 100
+            });
+            
+            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Cargo.Nome",
+                HeaderText = "Cargo",
+                Width = 100
+            });
+            
+            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Salario",
+                HeaderText = "Salário",
+                Width = 100,
+                DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" }
+            });
+            
+            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Departamento.Nome",
+                HeaderText = "Departamento",
+                Width = 120
+            });
+            
+            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Status",
+                HeaderText = "Status",
+                Width = 80
+            });
+
             // Buttons
             btnEditar = new Button
             {
                 Text = "Editar",
                 Location = new System.Drawing.Point(20, 490),
-                Width = 100
+                Width = 100,
+                Height = 30,
+                BackColor = System.Drawing.Color.FromArgb(0, 120, 212),
+                ForeColor = System.Drawing.Color.White,
+                FlatStyle = FlatStyle.Flat
             };
             btnEditar.Click += BtnEditar_Click;
 
@@ -60,7 +124,11 @@ namespace MinhaEmpresa.Views
             {
                 Text = "Remover",
                 Location = new System.Drawing.Point(140, 490),
-                Width = 100
+                Width = 100,
+                Height = 30,
+                BackColor = System.Drawing.Color.FromArgb(220, 53, 69),
+                ForeColor = System.Drawing.Color.White,
+                FlatStyle = FlatStyle.Flat
             };
             btnRemover.Click += BtnRemover_Click;
 
@@ -68,7 +136,11 @@ namespace MinhaEmpresa.Views
             {
                 Text = "Atualizar",
                 Location = new System.Drawing.Point(260, 490),
-                Width = 100
+                Width = 100,
+                Height = 30,
+                BackColor = System.Drawing.Color.FromArgb(40, 167, 69),
+                ForeColor = System.Drawing.Color.White,
+                FlatStyle = FlatStyle.Flat
             };
             btnAtualizar.Click += (s, e) => CarregarFuncionarios();
 
@@ -95,7 +167,7 @@ namespace MinhaEmpresa.Views
             if (dgvFuncionarios.CurrentRow != null)
             {
                 var funcionario = (Funcionario)dgvFuncionarios.CurrentRow.DataBoundItem;
-                var formEditar = new EditarFuncionario(funcionario);
+                var formEditar = new CadastroFuncionario(funcionario);
                 formEditar.ShowDialog();
                 CarregarFuncionarios(); // Recarrega a lista após edição
             }
