@@ -218,12 +218,26 @@ namespace MinhaEmpresa.Views
         {
             try
             {
-                var funcionarios = funcionarioDAO.ListarFuncionarios();
-                dgvFuncionarios.DataSource = null; // Clear previous binding
+                // Criar uma nova instância do DAO para garantir que não há cache
+                var funcionarioDAOFresh = new FuncionarioDAO();
+                var funcionarios = funcionarioDAOFresh.ListarFuncionarios();
+                
+                // Limpar completamente o DataGridView
+                dgvFuncionarios.DataSource = null;
+                dgvFuncionarios.Rows.Clear();
+                dgvFuncionarios.Refresh();
+                
+                // Configurar nova fonte de dados
                 dgvFuncionarios.DataSource = funcionarios;
                 
                 // Format the nested properties manually
                 FormatarPropriedadesAninhadas();
+                
+                // Forçar atualização visual
+                dgvFuncionarios.Refresh();
+                this.Refresh();
+                
+                Console.WriteLine($"Listagem atualizada: {funcionarios.Count} funcionários carregados");
             }
             catch (Exception ex)
             {
