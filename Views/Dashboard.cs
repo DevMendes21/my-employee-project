@@ -14,6 +14,12 @@ namespace MinhaEmpresa.Views
         private readonly CargoDAO cargoDAO = new CargoDAO();
         private readonly DepartamentoDAO departamentoDAO = new DepartamentoDAO();
         
+        // Configurações do Dashboard
+        private bool temaEscuro = false;
+        private bool atualizacaoAutomatica = true;
+        private string ordenacaoGrafico = "Alfabética";
+        private bool mostrarValores = true;
+        
         // Painéis principais
         private Panel sidePanel = null!;
         private Panel contentPanel = null!;
@@ -115,6 +121,13 @@ namespace MinhaEmpresa.Views
                 Width = sidePanel.Width,
                 Height = 40
             };
+            
+            // Botão de configurações no menu lateral
+            Button btnConfiguracoes = CreateMenuButton("Configurações", "⚙️", 400);
+            btnConfiguracoes.Click += (sender, e) => {
+                AbrirConfiguracoes();
+            };
+            sidePanel.Controls.Add(btnConfiguracoes);
             
             // Separador
             Panel separator = new Panel
@@ -393,6 +406,20 @@ namespace MinhaEmpresa.Views
             // Calcular o total de funcionários para porcentagens
             int totalFuncionarios = funcionarios.Count;
             
+            // Aplicar ordenação conforme configurações
+            if (ordenacaoGrafico == "Alfabética")
+            {
+                departamentos = departamentos.OrderBy(d => d.Nome).ToList();
+            }
+            else // Por quantidade
+            {
+                var departamentoCountDict = funcionarios.GroupBy(f => f.DepartamentoId)
+                    .ToDictionary(g => g.Key, g => g.Count());
+                    
+                departamentos = departamentos.OrderByDescending(d => 
+                    departamentoCountDict.ContainsKey(d.Id) ? departamentoCountDict[d.Id] : 0).ToList();
+            }
+            
             // Agrupar funcionários por departamento
             var departamentoGroups = funcionarios
                 .GroupBy(f => f.DepartamentoId)
@@ -579,17 +606,20 @@ namespace MinhaEmpresa.Views
                 };
                 
                 // Adicionar valor no topo da barra com estilo melhorado e porcentagem
-                Label lblBarValue = new Label
+                if (mostrarValores)
                 {
-                    Text = $"{count} ({porcentagem:0.0}%)",
-                    Location = new Point(0, -25),
-                    Width = barWidth - 30,
-                    TextAlign = ContentAlignment.MiddleCenter,
-                    ForeColor = Color.FromArgb(41, 128, 185),
-                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                    BackColor = Color.Transparent
-                };
-                bar.Controls.Add(lblBarValue);
+                    Label lblBarValue = new Label
+                    {
+                        Text = $"{count} ({porcentagem:0.0}%)",
+                        Location = new Point(0, -25),
+                        Width = barWidth - 30,
+                        TextAlign = ContentAlignment.MiddleCenter,
+                        ForeColor = Color.FromArgb(41, 128, 185),
+                        Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                        BackColor = Color.Transparent
+                    };
+                    bar.Controls.Add(lblBarValue);
+                }
                 
                 // Adicionar barra ao painel
                 barPanel.Controls.Add(bar);
@@ -692,6 +722,86 @@ namespace MinhaEmpresa.Views
         private void UpdateDateTime()
         {
             lblDateTime.Text = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+        }
+        
+        // Métodos para configurações
+        private void AbrirConfiguracoes()
+        {
+            Configuracoes configForm = new Configuracoes(this);
+            if (configForm.ShowDialog() == DialogResult.OK)
+            {
+                // As configurações já foram aplicadas pelo formulário de configurações
+                LoadDashboardData(); // Recarregar dados para aplicar as mudanças
+            }
+        }
+        
+        public void AplicarConfiguracoes(Configuracoes config)
+        {
+            // Aplicar as configurações ao Dashboard
+            temaEscuro = config.TemaEscuro;
+            atualizacaoAutomatica = config.AtualizacaoAutomatica;
+            ordenacaoGrafico = config.OrdenacaoGrafico;
+            mostrarValores = config.MostrarValores;
+            
+            // Aplicar tema
+            AplicarTema();
+            
+            // Configurar timer de atualização automática
+            timer.Enabled = atualizacaoAutomatica;
+        }
+        
+        private void AplicarTema()
+        {
+            if (temaEscuro)
+            {
+                // Aplicar tema escuro
+                this.BackColor = Color.FromArgb(30, 30, 30);
+                contentPanel.BackColor = Color.FromArgb(45, 45, 45);
+                headerPanel.BackColor = Color.FromArgb(20, 60, 90);
+                
+                // Atualizar cores dos painéis de estatísticas
+                foreach (var panel in statPanels)
+                {
+                    panel.BackColor = Color.FromArgb(60, 60, 60);
+                    foreach (Control control in panel.Controls)
+                    {
+                        if (control is Label label)
+                        {
+                            label.ForeColor = Color.White;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // Restaurar tema claro (padrão)
+                this.BackColor = Color.FromArgb(240, 240, 240);
+                contentPanel.BackColor = Color.FromArgb(240, 240, 240);
+                headerPanel.BackColor = Color.FromArgb(41, 128, 185);
+                
+                // Restaurar cores dos painéis de estatísticas
+                foreach (var panel in statPanels)
+                {
+                    panel.BackColor = Color.White;
+                    foreach (Control control in panel.Controls)
+                    {
+                        if (control is Label label && label.Tag?.ToString() != "value")
+                        {
+                            label.ForeColor = Color.FromArgb(100, 100, 100);
+                        }
+                        else if (control is Label valueLabel && valueLabel.Tag?.ToString() == "value")
+                        {
+                            valueLabel.ForeColor = Color.FromArgb(50, 50, 50);
+                        }
+                    }
+                }
+            }
+        }
+        
+        public List<Funcionario> ObterDadosFuncionarios()
+        {
+            // Método para obter a lista de funcionários para exportação
+            return funcionarioDAO.ListarFuncionarios();
         }
     }
 }
