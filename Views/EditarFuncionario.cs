@@ -136,9 +136,65 @@ namespace MinhaEmpresa.Views
         private void PreencherCampos()
         {
             txtNome.Text = funcionario.Nome;
-            cmbCargo.SelectedValue = funcionario.CargoId;
+            
+            // Log para debug - antes de definir o cargo
+            Console.WriteLine($"Carregando funcionário ID {funcionario.Id} - CargoId: {funcionario.CargoId}");
+            foreach (var item in cmbCargo.Items)
+            {
+                if (item is Cargo cargo)
+                {
+                    Console.WriteLine($"Cargo disponível: ID {cargo.Id}, Nome: {cargo.Nome}");
+                }
+            }
+            
+            // Definir o cargo selecionado
+            bool cargoEncontrado = false;
+            foreach (var item in cmbCargo.Items)
+            {
+                if (item is Cargo cargo && cargo.Id == funcionario.CargoId)
+                {
+                    cmbCargo.SelectedItem = item;
+                    cargoEncontrado = true;
+                    Console.WriteLine($"Cargo selecionado: ID {cargo.Id}, Nome: {cargo.Nome}");
+                    break;
+                }
+            }
+            
+            if (!cargoEncontrado)
+            {
+                Console.WriteLine($"ALERTA: Cargo ID {funcionario.CargoId} não encontrado na lista!");
+            }
+            
             txtSalario.Text = funcionario.Salario.ToString("F2");
-            cmbDepartamento.SelectedValue = funcionario.DepartamentoId;
+            
+            // Log para debug - antes de definir o departamento
+            Console.WriteLine($"Carregando funcionário ID {funcionario.Id} - DepartamentoId: {funcionario.DepartamentoId}");
+            foreach (var item in cmbDepartamento.Items)
+            {
+                if (item is Departamento departamento)
+                {
+                    Console.WriteLine($"Departamento disponível: ID {departamento.Id}, Nome: {departamento.Nome}");
+                }
+            }
+            
+            // Definir o departamento selecionado
+            bool departamentoEncontrado = false;
+            foreach (var item in cmbDepartamento.Items)
+            {
+                if (item is Departamento departamento && departamento.Id == funcionario.DepartamentoId)
+                {
+                    cmbDepartamento.SelectedItem = item;
+                    departamentoEncontrado = true;
+                    Console.WriteLine($"Departamento selecionado: ID {departamento.Id}, Nome: {departamento.Nome}");
+                    break;
+                }
+            }
+            
+            if (!departamentoEncontrado)
+            {
+                Console.WriteLine($"ALERTA: Departamento ID {funcionario.DepartamentoId} não encontrado na lista!");
+            }
+            
             dtpDataContratacao.Value = funcionario.DataContratacao;
         }
 
@@ -149,21 +205,45 @@ namespace MinhaEmpresa.Views
                 if (ValidarCampos())
                 {
                     funcionario.Nome = txtNome.Text;
-                    if (cmbCargo.SelectedItem is Cargo selectedCargo && cmbDepartamento.SelectedItem is Departamento selectedDepartamento)
+                    
+                    // Verificar e obter o cargo selecionado
+                    if (cmbCargo.SelectedItem is Cargo selectedCargo)
                     {
+                        Console.WriteLine($"Cargo selecionado para atualização: ID {selectedCargo.Id}, Nome: {selectedCargo.Nome}");
                         funcionario.CargoId = selectedCargo.Id;
                         funcionario.Cargo = selectedCargo;
-                        funcionario.Salario = Convert.ToDecimal(txtSalario.Text);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Erro: Nenhum cargo selecionado.", "Erro",
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+                    
+                    // Verificar e obter o departamento selecionado
+                    if (cmbDepartamento.SelectedItem is Departamento selectedDepartamento)
+                    {
+                        Console.WriteLine($"Departamento selecionado para atualização: ID {selectedDepartamento.Id}, Nome: {selectedDepartamento.Nome}");
                         funcionario.DepartamentoId = selectedDepartamento.Id;
                         funcionario.Departamento = selectedDepartamento;
                     }
                     else
                     {
-                        MessageBox.Show("Erro ao obter cargo ou departamento selecionado.", "Erro",
+                        MessageBox.Show("Erro: Nenhum departamento selecionado.", "Erro",
                             MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
+                    
+                    // Atualizar salário e data de contratação
+                    funcionario.Salario = Convert.ToDecimal(txtSalario.Text);
                     funcionario.DataContratacao = dtpDataContratacao.Value;
+                    
+                    // Log para debug - valores finais antes de salvar
+                    Console.WriteLine($"Valores finais para atualização do funcionário ID {funcionario.Id}:");
+                    Console.WriteLine($"Nome: {funcionario.Nome}");
+                    Console.WriteLine($"CargoId: {funcionario.CargoId}, Cargo: {funcionario.Cargo?.Nome}");
+                    Console.WriteLine($"DepartamentoId: {funcionario.DepartamentoId}, Departamento: {funcionario.Departamento?.Nome}");
+                    Console.WriteLine($"Salário: {funcionario.Salario}");
 
                     funcionarioDAO.AtualizarFuncionario(funcionario);
                     MessageBox.Show("Funcionário atualizado com sucesso!", "Sucesso", 
