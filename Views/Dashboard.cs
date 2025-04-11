@@ -453,26 +453,37 @@ namespace MinhaEmpresa.Views
                 barPanel.Controls.Add(gridLine);
             }
             
-            // Desenhar barras e legendas
+            // Painel para as legendas com borda e estilo
             Panel legendPanel = new Panel
             {
-                Location = new Point(chartX, chartY + chartHeight + 20),
+                Location = new Point(chartX, chartY + chartHeight + 25),
                 Width = chartWidth,
-                Height = 100,
-                BackColor = Color.Transparent,
-                BorderStyle = BorderStyle.None
+                Height = 120,
+                BackColor = Color.White,
+                BorderStyle = BorderStyle.FixedSingle,
+                Padding = new Padding(10)
             };
             
-            // Adicionar título para a legenda
+            // Adicionar título para a legenda com estilo melhorado
             Label lblLegendTitle = new Label
             {
-                Text = "Departamentos:",
-                Location = new Point(0, 0),
+                Text = "Departamentos",
+                Location = new Point(10, 5),
                 AutoSize = true,
-                ForeColor = Color.FromArgb(70, 70, 70),
-                Font = new Font("Segoe UI", 9, FontStyle.Bold)
+                ForeColor = Color.FromArgb(41, 128, 185),
+                Font = new Font("Segoe UI", 11, FontStyle.Bold)
             };
             legendPanel.Controls.Add(lblLegendTitle);
+            
+            // Adicionar linha separadora abaixo do título
+            Panel separator = new Panel
+            {
+                Location = new Point(10, 30),
+                Width = chartWidth - 20,
+                Height = 1,
+                BackColor = Color.FromArgb(230, 230, 230)
+            };
+            legendPanel.Controls.Add(separator);
             
             int colorIndex = 0;
             for (int i = 0; i < departamentos.Count; i++)
@@ -500,36 +511,38 @@ namespace MinhaEmpresa.Views
                     barHeight = Math.Max(barHeight, 20);
                 }
                 
-                // Criar barra
+                // Criar barra com estilo melhorado
                 Panel bar = new Panel
                 {
                     Location = new Point(i * barWidth + 20, chartHeight - barHeight),
-                    Width = barWidth - 20,
+                    Width = barWidth - 30, // Mais espaço entre as barras
                     Height = barHeight,
-                    BackColor = colors[colorIndex % colors.Length]
+                    BackColor = colors[colorIndex % colors.Length],
+                    BorderStyle = BorderStyle.FixedSingle // Adicionar borda para melhor definição
                 };
                 
-                // Adicionar valor no topo da barra
+                // Adicionar valor no topo da barra com estilo melhorado
                 Label lblBarValue = new Label
                 {
                     Text = count.ToString(),
-                    Location = new Point(0, -20),
-                    Width = barWidth - 20,
+                    Location = new Point(0, -25),
+                    Width = barWidth - 30,
                     TextAlign = ContentAlignment.MiddleCenter,
-                    ForeColor = Color.FromArgb(50, 50, 50),
-                    Font = new Font("Segoe UI", 9, FontStyle.Bold)
+                    ForeColor = Color.FromArgb(41, 128, 185),
+                    Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                    BackColor = Color.Transparent
                 };
                 bar.Controls.Add(lblBarValue);
                 
                 // Adicionar barra ao painel
                 barPanel.Controls.Add(bar);
                 
-                // Criar item de legenda
+                // Criar item de legenda com espaçamento melhorado
                 Panel legendItem = new Panel
                 {
-                    Location = new Point((i % 4) * (chartWidth / 4), (i / 4) * 25),
-                    Width = chartWidth / 4,
-                    Height = 20,
+                    Location = new Point(10 + (i % 3) * (chartWidth / 3 - 10), 40 + (i / 3) * 30),
+                    Width = (chartWidth / 3) - 20,
+                    Height = 25,
                     BackColor = Color.Transparent
                 };
                 
@@ -539,26 +552,30 @@ namespace MinhaEmpresa.Views
                     Console.WriteLine("Criando legenda para o departamento de TI");
                 }
                 
+                // Caixa de cor com estilo melhorado
                 Panel colorBox = new Panel
                 {
                     Location = new Point(0, 5),
-                    Width = 10,
-                    Height = 10,
-                    BackColor = colors[colorIndex % colors.Length]
+                    Width = 15,
+                    Height = 15,
+                    BackColor = colors[colorIndex % colors.Length],
+                    BorderStyle = BorderStyle.FixedSingle
                 };
                 
+                // Texto da legenda com estilo melhorado
                 Label lblDepartamento = new Label
                 {
                     Text = departamento.Nome,
-                    Location = new Point(15, 0),
+                    Location = new Point(20, 3),
                     AutoSize = true,
                     ForeColor = Color.FromArgb(50, 50, 50),
-                    Font = new Font("Segoe UI", 8, departamento.Nome == "TI" ? FontStyle.Bold : FontStyle.Regular)
+                    Font = new Font("Segoe UI", 9, FontStyle.Regular)
                 };
                 
-                // Destacar a legenda do TI se necessário
+                // Destacar a legenda do TI com estilo consistente
                 if (departamento.Nome == "TI")
                 {
+                    lblDepartamento.Font = new Font("Segoe UI", 9, FontStyle.Bold);
                     lblDepartamento.ForeColor = Color.FromArgb(41, 128, 185);
                 }
                 
