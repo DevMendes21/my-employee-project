@@ -42,18 +42,18 @@ namespace MinhaEmpresa.Views
             Panel mainPanel = new Panel
             {
                 Dock = DockStyle.Fill,
-                Padding = new Padding(20)
+                Padding = new Padding(10)
             };
             
             // Título
             Label lblTitle = new Label
             {
                 Text = "Configurações do Sistema",
-                Font = new Font("Segoe UI", 14, FontStyle.Bold),
+                Font = new Font("Segoe UI", 16, FontStyle.Bold),
                 ForeColor = Color.FromArgb(41, 128, 185),
-                Location = new Point(0, 10),
+                Location = new Point(0, 15),
                 Width = mainPanel.Width,
-                Height = 30,
+                Height = 35,
                 TextAlign = ContentAlignment.MiddleCenter
             };
             
@@ -63,9 +63,11 @@ namespace MinhaEmpresa.Views
                 ColumnCount = 2,
                 RowCount = 5,
                 Height = 220,
-                Width = mainPanel.Width - 40,
-                Location = new Point(20, 80),
-                CellBorderStyle = TableLayoutPanelCellBorderStyle.None
+                Width = mainPanel.Width,
+                Location = new Point(0, 80),
+                CellBorderStyle = TableLayoutPanelCellBorderStyle.Single,
+                Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
+                Padding = new Padding(10)
             };
             
             optionsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 35));
@@ -73,28 +75,29 @@ namespace MinhaEmpresa.Views
             
             for (int i = 0; i < 5; i++)
             {
-                optionsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 40));
+                optionsPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 44));
             }
             
             // 1. Alternar Cores
             Label lblTema = new Label
             {
                 Text = "Tema:",
-                Font = new Font("Segoe UI", 10),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.MiddleLeft
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(5, 0, 0, 0)
             };
             
             Button btnAlternarTema = new Button
             {
                 Text = "Alternar Tema Claro/Escuro",
-                Font = new Font("Segoe UI", 9),
+                Font = new Font("Segoe UI", 10),
                 Dock = DockStyle.Fill,
                 BackColor = Color.FromArgb(41, 128, 185),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand,
-                Margin = new Padding(5),
+                Margin = new Padding(10, 5, 10, 5),
                 AutoSize = false,
                 AutoEllipsis = true
             };
@@ -108,18 +111,20 @@ namespace MinhaEmpresa.Views
             Label lblAtualizacao = new Label
             {
                 Text = "Atualização:",
-                Font = new Font("Segoe UI", 10),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.MiddleLeft
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(5, 0, 0, 0)
             };
             
             CheckBox chkAtualizacaoAutomatica = new CheckBox
             {
                 Text = "Atualização automática dos dados",
-                Font = new Font("Segoe UI", 9),
+                Font = new Font("Segoe UI", 10),
                 Dock = DockStyle.Fill,
                 Checked = AtualizacaoAutomatica,
-                TextAlign = ContentAlignment.MiddleLeft
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(10, 0, 0, 0)
             };
             chkAtualizacaoAutomatica.CheckedChanged += (sender, e) => {
                 AtualizacaoAutomatica = chkAtualizacaoAutomatica.Checked;
@@ -129,21 +134,24 @@ namespace MinhaEmpresa.Views
             Label lblExportar = new Label
             {
                 Text = "Exportar:",
-                Font = new Font("Segoe UI", 10),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.MiddleLeft
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(5, 0, 0, 0)
             };
             
             Button btnExportar = new Button
             {
                 Text = "Exportar Dados como CSV",
-                Font = new Font("Segoe UI", 9),
+                Font = new Font("Segoe UI", 10),
                 Dock = DockStyle.Fill,
                 BackColor = Color.FromArgb(46, 204, 113),
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand,
-                Margin = new Padding(5)
+                Margin = new Padding(10, 5, 10, 5),
+                AutoSize = false,
+                AutoEllipsis = true
             };
             btnExportar.FlatAppearance.BorderSize = 0;
             btnExportar.Click += (sender, e) => {
@@ -154,17 +162,18 @@ namespace MinhaEmpresa.Views
             Label lblOrdenacao = new Label
             {
                 Text = "Ordenação:",
-                Font = new Font("Segoe UI", 10),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.MiddleLeft
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(5, 0, 0, 0)
             };
             
             ComboBox cmbOrdenacao = new ComboBox
             {
                 Dock = DockStyle.Fill,
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                Font = new Font("Segoe UI", 9),
-                Margin = new Padding(5)
+                Font = new Font("Segoe UI", 10),
+                Margin = new Padding(10, 5, 10, 5)
             };
             cmbOrdenacao.Items.AddRange(new object[] { "Alfabética", "Por quantidade" });
             cmbOrdenacao.SelectedIndex = OrdenacaoGrafico == "Alfabética" ? 0 : 1;
@@ -176,18 +185,20 @@ namespace MinhaEmpresa.Views
             Label lblValores = new Label
             {
                 Text = "Valores:",
-                Font = new Font("Segoe UI", 10),
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
                 Dock = DockStyle.Fill,
-                TextAlign = ContentAlignment.MiddleLeft
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(5, 0, 0, 0)
             };
             
             CheckBox chkMostrarValores = new CheckBox
             {
                 Text = "Mostrar valores no gráfico",
-                Font = new Font("Segoe UI", 9),
+                Font = new Font("Segoe UI", 10),
                 Dock = DockStyle.Fill,
                 Checked = MostrarValores,
-                TextAlign = ContentAlignment.MiddleLeft
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(10, 0, 0, 0)
             };
             chkMostrarValores.CheckedChanged += (sender, e) => {
                 MostrarValores = chkMostrarValores.Checked;
