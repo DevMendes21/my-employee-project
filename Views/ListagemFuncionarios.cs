@@ -214,7 +214,7 @@ namespace MinhaEmpresa.Views
             this.Controls.AddRange(new Control[] { dgvFuncionarios, btnEditar, btnRemover, btnAtualizar });
         }
 
-        private void CarregarFuncionarios()
+        public void CarregarFuncionarios()
         {
             try
             {

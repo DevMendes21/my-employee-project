@@ -168,6 +168,17 @@ namespace MinhaEmpresa.Views
                     funcionarioDAO.AtualizarFuncionario(funcionario);
                     MessageBox.Show("Funcionário atualizado com sucesso!", "Sucesso", 
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    
+                    // Atualizar a listagem de funcionários se estiver aberta
+                    foreach (Form form in Application.OpenForms)
+                    {
+                        if (form is ListagemFuncionarios listagemForm)
+                        {
+                            listagemForm.CarregarFuncionarios();
+                            break;
+                        }
+                    }
+                    
                     this.Close();
                 }
             }

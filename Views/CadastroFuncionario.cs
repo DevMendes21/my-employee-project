@@ -241,14 +241,14 @@ namespace MinhaEmpresa.Views
                         if (funcionarioId.HasValue)
                         {
                             funcionarioDAO.AtualizarFuncionario(funcionario);
-                            MessageBox.Show($"Funcionário atualizado com sucesso! Cargo: {cargo.Nome} Departamento: {departamento.Nome}", "Sucesso", 
+                            MessageBox.Show("Funcionário atualizado com sucesso!", "Sucesso", 
                                 MessageBoxButtons.OK, MessageBoxIcon.Information);
                             this.Close();
                         }
                         else
                         {
                             funcionarioDAO.InserirFuncionario(funcionario);
-                            MessageBox.Show($"Funcionário cadastrado com sucesso! Cargo: {cargo.Nome} Departamento: {departamento.Nome}", "Sucesso", 
+                            MessageBox.Show("Funcionário cadastrado com sucesso!", "Sucesso", 
                                 MessageBoxButtons.OK, MessageBoxIcon.Information);
                             LimparCampos();
                         }
