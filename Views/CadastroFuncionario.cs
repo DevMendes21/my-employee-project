@@ -7,13 +7,17 @@ namespace MinhaEmpresa.Views
 {
     public partial class CadastroFuncionario : Form
     {
-        private TextBox txtNome;
-        private ComboBox cmbCargo;
-        private TextBox txtSalario;
-        private ComboBox cmbDepartamento;
-        private DateTimePicker dtpDataContratacao;
-        private Button btnSalvar;
-        private Button btnVoltar;
+        private TextBox txtNome = null!;
+        private TextBox txtEmail = null!;
+        private TextBox txtTelefone = null!;
+        private ComboBox cmbCargo = null!;
+        private TextBox txtSalario = null!;
+        private ComboBox cmbDepartamento = null!;
+        private DateTimePicker dtpDataContratacao = null!;
+        private DateTimePicker dtpDataNascimento = null!;
+        private TextBox txtObservacoes = null!;
+        private Button btnSalvar = null!;
+        private Button btnVoltar = null!;
         private FuncionarioDAO funcionarioDAO;
 
         public CadastroFuncionario()
@@ -27,7 +31,7 @@ namespace MinhaEmpresa.Views
         {
             this.Text = "Cadastro de Funcionário";
             this.Width = 500;
-            this.Height = 400;
+            this.Height = 550;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -37,17 +41,23 @@ namespace MinhaEmpresa.Views
         {
             // Labels
             Label lblNome = new Label { Text = "Nome:", Location = new System.Drawing.Point(20, 20) };
-            Label lblCargo = new Label { Text = "Cargo:", Location = new System.Drawing.Point(20, 80) };
-            Label lblSalario = new Label { Text = "Salário:", Location = new System.Drawing.Point(20, 140) };
-            Label lblDepartamento = new Label { Text = "Departamento:", Location = new System.Drawing.Point(20, 200) };
+            Label lblEmail = new Label { Text = "Email:", Location = new System.Drawing.Point(20, 60) };
+            Label lblTelefone = new Label { Text = "Telefone:", Location = new System.Drawing.Point(20, 100) };
+            Label lblCargo = new Label { Text = "Cargo:", Location = new System.Drawing.Point(20, 140) };
+            Label lblSalario = new Label { Text = "Salário:", Location = new System.Drawing.Point(20, 180) };
+            Label lblDepartamento = new Label { Text = "Departamento:", Location = new System.Drawing.Point(20, 220) };
             Label lblDataContratacao = new Label { Text = "Data de Contratação:", Location = new System.Drawing.Point(20, 260) };
+            Label lblDataNascimento = new Label { Text = "Data de Nascimento:", Location = new System.Drawing.Point(20, 300) };
+            Label lblObservacoes = new Label { Text = "Observações:", Location = new System.Drawing.Point(20, 340) };
 
             // TextBoxes e ComboBoxes
             txtNome = new TextBox { Location = new System.Drawing.Point(150, 20), Width = 300 };
+            txtEmail = new TextBox { Location = new System.Drawing.Point(150, 60), Width = 300 };
+            txtTelefone = new TextBox { Location = new System.Drawing.Point(150, 100), Width = 300 };
             
             cmbCargo = new ComboBox 
             { 
-                Location = new System.Drawing.Point(150, 80), 
+                Location = new System.Drawing.Point(150, 140), 
                 Width = 300,
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
@@ -63,11 +73,11 @@ namespace MinhaEmpresa.Views
             cmbCargo.DisplayMember = "Nome";
             cmbCargo.ValueMember = "Id";
 
-            txtSalario = new TextBox { Location = new System.Drawing.Point(150, 140), Width = 300 };
+            txtSalario = new TextBox { Location = new System.Drawing.Point(150, 180), Width = 300 };
             
             cmbDepartamento = new ComboBox 
             { 
-                Location = new System.Drawing.Point(150, 200), 
+                Location = new System.Drawing.Point(150, 220), 
                 Width = 300,
                 DropDownStyle = ComboBoxStyle.DropDownList
             };
@@ -90,6 +100,21 @@ namespace MinhaEmpresa.Views
                 Format = DateTimePickerFormat.Short
             };
 
+            dtpDataNascimento = new DateTimePicker 
+            { 
+                Location = new System.Drawing.Point(150, 300), 
+                Width = 300,
+                Format = DateTimePickerFormat.Short
+            };
+
+            txtObservacoes = new TextBox 
+            { 
+                Location = new System.Drawing.Point(150, 340), 
+                Width = 300,
+                Height = 60,
+                Multiline = true
+            };
+
             // Buttons
             btnSalvar = new Button
             {
@@ -110,27 +135,43 @@ namespace MinhaEmpresa.Views
             // Adicionar controles ao formulário
             this.Controls.AddRange(new Control[] 
             { 
-                lblNome, lblCargo, lblSalario, lblDepartamento, lblDataContratacao,
-                txtNome, cmbCargo, txtSalario, cmbDepartamento, dtpDataContratacao,
+                lblNome, lblEmail, lblTelefone, lblCargo, lblSalario, lblDepartamento, 
+                lblDataContratacao, lblDataNascimento, lblObservacoes,
+                txtNome, txtEmail, txtTelefone, cmbCargo, txtSalario, cmbDepartamento, 
+                dtpDataContratacao, dtpDataNascimento, txtObservacoes,
                 btnSalvar, btnVoltar
             });
         }
 
-        private void BtnSalvar_Click(object sender, EventArgs e)
+        private void BtnSalvar_Click(object? sender, EventArgs e)
         {
             try
             {
                 if (ValidarCampos())
                 {
+                    var cargo = cmbCargo.SelectedItem as Cargo;
+                    var departamento = cmbDepartamento.SelectedItem as Departamento;
+                    
+                    if (cargo == null || departamento == null)
+                    {
+                        MessageBox.Show("Selecione um cargo e departamento válidos.", "Aviso", 
+                            MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
                     Funcionario funcionario = new Funcionario
                     {
                         Nome = txtNome.Text,
-                        CargoId = ((Cargo)cmbCargo.SelectedItem).Id,
-                        Cargo = (Cargo)cmbCargo.SelectedItem,
+                        Email = string.IsNullOrWhiteSpace(txtEmail.Text) ? null : txtEmail.Text,
+                        Telefone = string.IsNullOrWhiteSpace(txtTelefone.Text) ? null : txtTelefone.Text,
+                        CargoId = cargo.Id,
+                        Cargo = cargo,
                         Salario = Convert.ToDecimal(txtSalario.Text),
-                        DepartamentoId = ((Departamento)cmbDepartamento.SelectedItem).Id,
-                        Departamento = (Departamento)cmbDepartamento.SelectedItem,
-                        DataContratacao = dtpDataContratacao.Value
+                        DepartamentoId = departamento.Id,
+                        Departamento = departamento,
+                        DataContratacao = dtpDataContratacao.Value,
+                        DataNascimento = dtpDataNascimento.Value,
+                        Observacoes = string.IsNullOrWhiteSpace(txtObservacoes.Text) ? null : txtObservacoes.Text
                     };
 
                     funcionarioDAO.InserirFuncionario(funcionario);
@@ -182,10 +223,14 @@ namespace MinhaEmpresa.Views
         private void LimparCampos()
         {
             txtNome.Clear();
+            txtEmail.Clear();
+            txtTelefone.Clear();
             cmbCargo.SelectedIndex = -1;
             txtSalario.Clear();
             cmbDepartamento.SelectedIndex = -1;
             dtpDataContratacao.Value = DateTime.Now;
+            dtpDataNascimento.Value = DateTime.Now;
+            txtObservacoes.Clear();
         }
     }
 }

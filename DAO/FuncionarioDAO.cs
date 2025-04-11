@@ -11,8 +11,8 @@ namespace MinhaEmpresa.DAO
     {
         public void InserirFuncionario(Funcionario funcionario)
         {
-            string sql = "INSERT INTO funcionarios (nome, cargo_id, departamento_id, salario, data_contratacao) " +
-                        "VALUES (@nome, @cargoId, @departamentoId, @salario, @dataContratacao)";
+            string sql = "INSERT INTO funcionarios (nome, email, telefone, cargo_id, departamento_id, salario, data_contratacao, data_nascimento, observacoes) " +
+                        "VALUES (@nome, @email, @telefone, @cargoId, @departamentoId, @salario, @dataContratacao, @dataNascimento, @observacoes)";
 
             using (MySqlConnection conn = MinhaEmpresa.Conexao.Conexao.GetConnection())
             {
@@ -22,10 +22,14 @@ namespace MinhaEmpresa.DAO
                     using (MySqlCommand cmd = new MySqlCommand(sql, conn))
                     {
                         cmd.Parameters.AddWithValue("@nome", funcionario.Nome);
+                        cmd.Parameters.AddWithValue("@email", funcionario.Email ?? (object)DBNull.Value);
+                        cmd.Parameters.AddWithValue("@telefone", funcionario.Telefone ?? (object)DBNull.Value);
                         cmd.Parameters.AddWithValue("@cargoId", funcionario.CargoId);
                         cmd.Parameters.AddWithValue("@departamentoId", funcionario.DepartamentoId);
                         cmd.Parameters.AddWithValue("@salario", funcionario.Salario);
                         cmd.Parameters.AddWithValue("@dataContratacao", funcionario.DataContratacao);
+                        cmd.Parameters.AddWithValue("@dataNascimento", funcionario.DataNascimento.HasValue ? (object)funcionario.DataNascimento.Value : DBNull.Value);
+                        cmd.Parameters.AddWithValue("@observacoes", funcionario.Observacoes ?? (object)DBNull.Value);
                         cmd.ExecuteNonQuery();
                     }
                 }
@@ -41,7 +45,8 @@ namespace MinhaEmpresa.DAO
             List<Funcionario> funcionarios = new List<Funcionario>();
             string sql = @"SELECT f.*, 
                         c.nome as cargo_nome,
-                        d.nome as departamento_nome
+                        d.nome as departamento_nome,
+                        TIMESTAMPDIFF(YEAR, f.data_nascimento, CURDATE()) as idade
                         FROM funcionarios f
                         INNER JOIN cargos c ON f.cargo_id = c.id
                         INNER JOIN departamentos d ON f.departamento_id = d.id";
@@ -60,21 +65,25 @@ namespace MinhaEmpresa.DAO
                                 Funcionario func = new Funcionario
                                 {
                                     Id = Convert.ToInt32(reader["id"]),
-                                    Nome = reader["nome"].ToString(),
+                                    Nome = reader["nome"].ToString() ?? string.Empty,
+                                    Email = reader["email"] != DBNull.Value ? reader["email"].ToString() : null,
+                                    Telefone = reader["telefone"] != DBNull.Value ? reader["telefone"].ToString() : null,
                                     CargoId = Convert.ToInt32(reader["cargo_id"]),
                                     Cargo = new Cargo
                                     {
                                         Id = Convert.ToInt32(reader["cargo_id"]),
-                                        Nome = reader["cargo_nome"].ToString()
+                                        Nome = reader["cargo_nome"].ToString() ?? string.Empty
                                     },
                                     DepartamentoId = Convert.ToInt32(reader["departamento_id"]),
                                     Departamento = new Departamento
                                     {
                                         Id = Convert.ToInt32(reader["departamento_id"]),
-                                        Nome = reader["departamento_nome"].ToString()
+                                        Nome = reader["departamento_nome"].ToString() ?? string.Empty
                                     },
                                     Salario = Convert.ToDecimal(reader["salario"]),
-                                    DataContratacao = Convert.ToDateTime(reader["data_contratacao"])
+                                    DataContratacao = Convert.ToDateTime(reader["data_contratacao"]),
+                                    DataNascimento = reader["data_nascimento"] != DBNull.Value ? Convert.ToDateTime(reader["data_nascimento"]) : null,
+                                    Observacoes = reader["observacoes"] != DBNull.Value ? reader["observacoes"].ToString() : null
                                 };
                                 funcionarios.Add(func);
                             }
