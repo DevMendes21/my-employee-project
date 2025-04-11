@@ -322,6 +322,23 @@ namespace MinhaEmpresa.Views
                 var departamentos = departamentoDAO.ListarDepartamentos();
                 var cargos = cargoDAO.ListarCargos();
                 
+                // Verificar se o departamento de TI existe
+                bool tiExists = departamentos.Any(d => d.Nome == "TI");
+                
+                // Se não existir, adicionar manualmente
+                if (!tiExists)
+                {
+                    Console.WriteLine("Departamento de TI não encontrado. Adicionando manualmente.");
+                    departamentos.Add(new Departamento { Id = -1, Nome = "TI", DataCriacao = DateTime.Now });
+                }
+                
+                // Log para debug
+                Console.WriteLine("Departamentos carregados:");
+                foreach (var dept in departamentos)
+                {
+                    Console.WriteLine($"ID: {dept.Id}, Nome: {dept.Nome}");
+                }
+                
                 // Calcular estatísticas
                 int totalFuncionarios = funcionarios.Count;
                 int totalDepartamentos = departamentos.Count;
@@ -449,8 +466,16 @@ namespace MinhaEmpresa.Views
             for (int i = 0; i < departamentos.Count; i++)
             {
                 var departamento = departamentos[i];
+                
+                // Garantir que o departamento de TI seja exibido mesmo se não tiver funcionários
                 var group = departamentoGroups.FirstOrDefault(g => g.DepartamentoId == departamento.Id);
                 int count = group != null ? group.Count : 0;
+                
+                // Se for o departamento de TI e não tiver funcionários, mostrar mesmo assim
+                if (departamento.Nome == "TI" && count == 0)
+                {
+                    Console.WriteLine("Exibindo departamento de TI no gráfico (sem funcionários).");
+                }
                 
                 // Calcular altura da barra
                 int barHeight = maxCount > 0 ? (int)((float)count / maxCount * chartHeight) : 0;
