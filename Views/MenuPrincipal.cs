@@ -18,7 +18,8 @@ namespace MinhaEmpresa.Views
             Dock = DockStyle.Fill,
             ColumnCount = 2,
             RowCount = 2,
-            Padding = new Padding(0, 20, 0, 0)
+            Padding = new Padding(10),
+            BackColor = Color.FromArgb(240, 240, 240)
         };
         private ListView listSalariosPorDepartamento = new();
         private ListView listFuncionariosPorCargo = new();
@@ -310,24 +311,25 @@ namespace MinhaEmpresa.Views
             var mainPanel = new Panel
             {
                 Dock = DockStyle.Fill,
-                Padding = new Padding(10),
+                Padding = new Padding(0),
                 BackColor = Color.White,
-                Margin = new Padding(10)
+                Margin = new Padding(5)
             };
 
             var headerPanel = new Panel
             {
                 Dock = DockStyle.Top,
-                Height = 40
+                Height = 50,
+                BackColor = Color.FromArgb(51, 51, 76)
             };
 
             var lblIcone = new Label
             {
                 Text = ObterIcone(icone),
                 Font = new Font("Segoe UI Symbol", 16F, FontStyle.Regular),
-                ForeColor = Color.FromArgb(51, 51, 76),
+                ForeColor = Color.White,
                 Dock = DockStyle.Left,
-                Width = 30,
+                Width = 50,
                 TextAlign = ContentAlignment.MiddleCenter
             };
 
@@ -335,7 +337,7 @@ namespace MinhaEmpresa.Views
             {
                 Text = titulo,
                 Font = new Font("Segoe UI", 12F, FontStyle.Bold),
-                ForeColor = Color.FromArgb(51, 51, 76),
+                ForeColor = Color.White,
                 TextAlign = ContentAlignment.MiddleLeft,
                 Dock = DockStyle.Fill,
                 Padding = new Padding(5, 0, 0, 0)
@@ -346,7 +348,8 @@ namespace MinhaEmpresa.Views
             var contentPanel = new Panel
             {
                 Dock = DockStyle.Fill,
-                Padding = new Padding(0, 10, 0, 0)
+                Padding = new Padding(15),
+                BackColor = Color.White
             };
 
             mainPanel.Controls.Add(contentPanel);
@@ -359,16 +362,39 @@ namespace MinhaEmpresa.Views
         {
             listView.View = View.Details;
             listView.FullRowSelect = true;
-            listView.GridLines = true;
+            listView.GridLines = false;
             listView.Dock = DockStyle.Fill;
             listView.Font = new Font("Segoe UI", 9.75F);
             listView.BackColor = Color.White;
+            listView.ForeColor = Color.FromArgb(64, 64, 64);
             listView.BorderStyle = BorderStyle.None;
 
             foreach (var (Nome, Largura) in colunas)
             {
-                listView.Columns.Add(Nome, Largura);
+                var column = listView.Columns.Add(Nome, Largura);
+                column.TextAlign = HorizontalAlignment.Left;
             }
+
+            // Adicionar estilo alternado nas linhas
+            listView.OwnerDraw = true;
+            listView.DrawItem += (s, e) => {
+                e.DrawDefault = true;
+                if (e.ItemIndex >= 0)
+                {
+                    if (e.ItemIndex % 2 == 0)
+                        e.Item.BackColor = Color.White;
+                    else
+                        e.Item.BackColor = Color.FromArgb(240, 240, 240);
+                }
+            };
+
+            listView.DrawColumnHeader += (s, e) => {
+                e.DrawDefault = false;
+                using var brush = new SolidBrush(Color.FromArgb(51, 51, 76));
+                e.Graphics.FillRectangle(brush, e.Bounds);
+                TextRenderer.DrawText(e.Graphics, e.Header.Text, listView.Font,
+                    e.Bounds, Color.White, TextFormatFlags.Left | TextFormatFlags.VerticalCenter);
+            };
         }
 
         private string ObterIcone(string nome)
@@ -389,12 +415,18 @@ namespace MinhaEmpresa.Views
             try
             {
                 var funcionarios = funcionarioDAO.ListarFuncionarios();
+                if (funcionarios == null || !funcionarios.Any())
+                {
+                    MessageBox.Show("Nenhum funcionário encontrado.", "Aviso",
+                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
 
                 // Atualizar indicadores
                 var totalFuncionarios = funcionarios.Count;
                 var custoTotal = funcionarios.Sum(f => f.Salario);
-                var mediaSalarial = funcionarios.Any() ? funcionarios.Average(f => f.Salario) : 0;
-                var maiorSalario = funcionarios.Any() ? funcionarios.Max(f => f.Salario) : 0;
+                var mediaSalarial = funcionarios.Average(f => f.Salario);
+                var maiorSalario = funcionarios.Max(f => f.Salario);
 
                 indicadoresPanel.Controls.Clear();
                 indicadoresPanel.Controls.Add(CriarCardIndicador("Total de Funcionários", totalFuncionarios.ToString(), "person"), 0, 0);
@@ -452,23 +484,36 @@ namespace MinhaEmpresa.Views
                     })
                     .OrderByDescending(g => g.MediaSalarial);
 
-                var listMediaSalarial = graficosPanel.Controls
-                    .OfType<Panel>()
-                    .FirstOrDefault(p => p.Controls.OfType<Label>().Any(l => l.Text == "Média Salarial por Cargo"))
-                    ?.Controls.OfType<Panel>()
-                    .FirstOrDefault()
-                    ?.Controls.OfType<ListView>()
-                    .FirstOrDefault();
+                var listMediaSalarial = new ListView();
+                var listStatus = new ListView();
 
-                if (listMediaSalarial != null)
+                foreach (Control control in graficosPanel.Controls)
                 {
-                    listMediaSalarial.Items.Clear();
-                    foreach (var item in mediaSalarialPorCargo)
+                    if (control is Panel panel)
                     {
-                        var listItem = new ListViewItem(item.Cargo);
-                        listItem.SubItems.Add(item.MediaSalarial.ToString("C2"));
-                        listMediaSalarial.Items.Add(listItem);
+                        var headerLabel = panel.Controls.OfType<Panel>().FirstOrDefault()?
+                            .Controls.OfType<Label>().FirstOrDefault();
+
+                        if (headerLabel?.Text == "Média Salarial por Cargo")
+                        {
+                            listMediaSalarial = panel.Controls.OfType<Panel>().LastOrDefault()?
+                                .Controls.OfType<ListView>().FirstOrDefault() ?? new ListView();
+                        }
+                        else if (headerLabel?.Text == "Status dos Funcionários")
+                        {
+                            listStatus = panel.Controls.OfType<Panel>().LastOrDefault()?
+                                .Controls.OfType<ListView>().FirstOrDefault() ?? new ListView();
+                        }
                     }
+                }
+
+                // Atualizar média salarial por cargo
+                listMediaSalarial.Items.Clear();
+                foreach (var item in mediaSalarialPorCargo)
+                {
+                    var listItem = new ListViewItem(item.Cargo);
+                    listItem.SubItems.Add(item.MediaSalarial.ToString("C2"));
+                    listMediaSalarial.Items.Add(listItem);
                 }
 
                 // Atualizar lista de status
@@ -482,24 +527,13 @@ namespace MinhaEmpresa.Views
                     })
                     .OrderByDescending(g => g.Total);
 
-                var listStatus = graficosPanel.Controls
-                    .OfType<Panel>()
-                    .FirstOrDefault(p => p.Controls.OfType<Label>().Any(l => l.Text == "Status dos Funcionários"))
-                    ?.Controls.OfType<Panel>()
-                    .FirstOrDefault()
-                    ?.Controls.OfType<ListView>()
-                    .FirstOrDefault();
-
-                if (listStatus != null)
+                listStatus.Items.Clear();
+                foreach (var item in statusFuncionarios)
                 {
-                    listStatus.Items.Clear();
-                    foreach (var item in statusFuncionarios)
-                    {
-                        var listItem = new ListViewItem(item.Status.ToString());
-                        listItem.SubItems.Add(item.Total.ToString());
-                        listItem.SubItems.Add(item.Percentual.ToString("P1"));
-                        listStatus.Items.Add(listItem);
-                    }
+                    var listItem = new ListViewItem(item.Status.ToString());
+                    listItem.SubItems.Add(item.Total.ToString());
+                    listItem.SubItems.Add(item.Percentual.ToString("P1"));
+                    listStatus.Items.Add(listItem);
                 }
             }
             catch (Exception ex)
