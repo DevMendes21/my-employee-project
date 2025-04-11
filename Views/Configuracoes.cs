@@ -30,8 +30,8 @@ namespace MinhaEmpresa.Views
         private void InitializeComponent()
         {
             this.Text = "Configurações";
-            this.Width = 400;
-            this.Height = 350;
+            this.Width = 450;
+            this.Height = 380;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -62,14 +62,14 @@ namespace MinhaEmpresa.Views
                 Dock = DockStyle.Top,
                 ColumnCount = 2,
                 RowCount = 5,
-                Height = 200,
+                Height = 220,
                 Width = mainPanel.Width - 40,
                 Location = new Point(20, 60),
                 CellBorderStyle = TableLayoutPanelCellBorderStyle.None
             };
             
-            optionsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
-            optionsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 50));
+            optionsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 35));
+            optionsPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 65));
             
             for (int i = 0; i < 5; i++)
             {
@@ -94,7 +94,9 @@ namespace MinhaEmpresa.Views
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
                 Cursor = Cursors.Hand,
-                Margin = new Padding(5)
+                Margin = new Padding(5),
+                AutoSize = false,
+                AutoEllipsis = true
             };
             btnAlternarTema.FlatAppearance.BorderSize = 0;
             btnAlternarTema.Click += (sender, e) => {
@@ -213,9 +215,9 @@ namespace MinhaEmpresa.Views
             Button btnSalvar = new Button
             {
                 Text = "Salvar",
-                Width = 100,
-                Height = 35,
-                Location = new Point(this.Width / 2 - 110, 10),
+                Width = 120,
+                Height = 40,
+                Location = new Point(this.Width / 2 - 130, 10),
                 BackColor = Color.FromArgb(41, 128, 185),
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 9),
@@ -232,8 +234,8 @@ namespace MinhaEmpresa.Views
             Button btnCancelar = new Button
             {
                 Text = "Cancelar",
-                Width = 100,
-                Height = 35,
+                Width = 120,
+                Height = 40,
                 Location = new Point(this.Width / 2 + 10, 10),
                 BackColor = Color.FromArgb(231, 76, 60),
                 ForeColor = Color.White,

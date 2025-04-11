@@ -152,13 +152,12 @@ namespace MinhaEmpresa.Views
             Button btnRelatorios = CreateMenuButton("Relatórios", "\uD83D\uDCC8", 300);
             btnRelatorios.Click += (s, e) => MessageBox.Show("Funcionalidade de relatórios em desenvolvimento.", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
             
-            Button btnConfig = CreateMenuButton("Configurações", "\u2699", 360);
-            btnConfig.Click += (s, e) => MessageBox.Show("Funcionalidade de configurações em desenvolvimento.", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // Botão de configurações já adicionado no início do método
             
             // Adicionar controles ao painel lateral
             sidePanel.Controls.AddRange(new Control[] { 
                 lblCompany, separator, btnDashboard, 
-                btnFuncionarios, btnCadastrar, btnRelatorios, btnConfig 
+                btnFuncionarios, btnCadastrar, btnRelatorios
             });
         }
         
