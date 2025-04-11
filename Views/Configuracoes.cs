@@ -30,8 +30,8 @@ namespace MinhaEmpresa.Views
         private void InitializeComponent()
         {
             this.Text = "Configurações";
-            this.Width = 450;
-            this.Height = 380;
+            this.Width = 500;
+            this.Height = 450;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -51,10 +51,10 @@ namespace MinhaEmpresa.Views
                 Text = "Configurações do Sistema",
                 Font = new Font("Segoe UI", 16, FontStyle.Bold),
                 ForeColor = Color.FromArgb(41, 128, 185),
-                Location = new Point(0, 15),
-                Width = mainPanel.Width,
-                Height = 35,
-                TextAlign = ContentAlignment.MiddleCenter
+                Dock = DockStyle.Top,
+                Height = 40,
+                TextAlign = ContentAlignment.MiddleCenter,
+                BackColor = Color.FromArgb(240, 240, 240)
             };
             
             // Container para as opções
@@ -62,9 +62,9 @@ namespace MinhaEmpresa.Views
             {
                 ColumnCount = 2,
                 RowCount = 5,
-                Height = 220,
-                Width = mainPanel.Width,
-                Location = new Point(0, 80),
+                Height = 280,
+                Width = mainPanel.Width - 20,
+                Location = new Point(10, 60),
                 CellBorderStyle = TableLayoutPanelCellBorderStyle.Single,
                 Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right,
                 Padding = new Padding(10)
@@ -220,7 +220,7 @@ namespace MinhaEmpresa.Views
             Panel buttonPanel = new Panel
             {
                 Dock = DockStyle.Bottom,
-                Height = 50
+                Height = 60
             };
             
             Button btnSalvar = new Button
@@ -228,7 +228,7 @@ namespace MinhaEmpresa.Views
                 Text = "Salvar",
                 Width = 120,
                 Height = 40,
-                Location = new Point(this.Width / 2 - 130, 10),
+                Location = new Point(this.Width / 2 - 130, 15),
                 BackColor = Color.FromArgb(41, 128, 185),
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 9),
@@ -247,7 +247,7 @@ namespace MinhaEmpresa.Views
                 Text = "Cancelar",
                 Width = 120,
                 Height = 40,
-                Location = new Point(this.Width / 2 + 10, 10),
+                Location = new Point(this.Width / 2 + 10, 15),
                 BackColor = Color.FromArgb(231, 76, 60),
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 9),
