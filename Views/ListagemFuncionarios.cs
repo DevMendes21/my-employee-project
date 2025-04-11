@@ -36,7 +36,7 @@ namespace MinhaEmpresa.Views
         {
             this.Text = "Listagem de Funcionários";
             this.Width = 1000;
-            this.Height = 600;
+            this.Height = 650; // Aumentar a altura do formulário
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -50,7 +50,7 @@ namespace MinhaEmpresa.Views
             {
                 Location = new System.Drawing.Point(20, 20),
                 Width = 940,
-                Height = 450,
+                Height = 500, // Aumentar a altura do DataGridView
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 ReadOnly = true,
@@ -64,14 +64,19 @@ namespace MinhaEmpresa.Views
                     BackColor = System.Drawing.Color.FromArgb(0, 120, 212),
                     ForeColor = System.Drawing.Color.White,
                     Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold),
-                    Padding = new Padding(10, 5, 10, 5)
+                    Padding = new Padding(10, 8, 10, 8) // Aumentar o padding vertical dos cabeçalhos
                 },
+                ColumnHeadersHeight = 40, // Aumentar a altura dos cabeçalhos
                 DefaultCellStyle = new DataGridViewCellStyle
                 {
                     Font = new System.Drawing.Font("Segoe UI", 9.75F),
-                    Padding = new Padding(5),
+                    Padding = new Padding(5, 10, 5, 10), // Aumentar o padding vertical
                     SelectionBackColor = System.Drawing.Color.FromArgb(0, 120, 212),
                     SelectionForeColor = System.Drawing.Color.White
+                },
+                RowTemplate = new DataGridViewRow
+                {
+                    Height = 40 // Definir altura fixa para todas as linhas
                 },
                 RowHeadersVisible = false,
                 AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
@@ -185,36 +190,40 @@ namespace MinhaEmpresa.Views
             btnEditar = new Button
             {
                 Text = "Editar",
-                Location = new System.Drawing.Point(20, 490),
+                Location = new System.Drawing.Point(20, 540), // Ajustar posiu00e7u00e3o para baixo
                 Width = 100,
-                Height = 30,
+                Height = 35, // Aumentar altura do botu00e3o
                 BackColor = System.Drawing.Color.FromArgb(0, 120, 212),
                 ForeColor = System.Drawing.Color.White,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Flat,
+                Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold)
             };
             btnEditar.Click += BtnEditar_Click;
 
             btnRemover = new Button
             {
                 Text = "Remover",
-                Location = new System.Drawing.Point(140, 490),
+                Location = new System.Drawing.Point(140, 540), // Ajustar posiu00e7u00e3o para baixo
                 Width = 100,
-                Height = 30,
+                Height = 35, // Aumentar altura do botu00e3o
                 BackColor = System.Drawing.Color.FromArgb(220, 53, 69),
                 ForeColor = System.Drawing.Color.White,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Flat,
+                Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold)
             };
             btnRemover.Click += BtnRemover_Click;
 
+            // Adicionar botu00e3o para atualizar
             btnAtualizar = new Button
             {
                 Text = "Atualizar",
-                Location = new System.Drawing.Point(260, 490),
+                Location = new System.Drawing.Point(260, 540), // Ajustar posição para baixo
                 Width = 100,
-                Height = 30,
+                Height = 35, // Aumentar altura do botão
                 BackColor = System.Drawing.Color.FromArgb(40, 167, 69),
                 ForeColor = System.Drawing.Color.White,
-                FlatStyle = FlatStyle.Flat
+                FlatStyle = FlatStyle.Flat,
+                Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold)
             };
             btnAtualizar.Click += (s, e) => CarregarFuncionarios();
 
@@ -269,6 +278,12 @@ namespace MinhaEmpresa.Views
         
         private void FormatarPropriedadesAninhadas()
         {
+            // Garantir que todas as linhas tenham a altura adequada
+            foreach (DataGridViewRow row in dgvFuncionarios.Rows)
+            {
+                row.Height = 40; // Definir altura fixa para cada linha
+            }
+            
             // Handle nested properties manually
             foreach (DataGridViewRow row in dgvFuncionarios.Rows)
             {
