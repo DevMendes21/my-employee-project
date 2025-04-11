@@ -46,10 +46,11 @@ namespace MinhaEmpresa.DAO
             string sql = @"SELECT f.*, 
                         c.nome as cargo_nome,
                         d.nome as departamento_nome,
-                        TIMESTAMPDIFF(YEAR, f.data_nascimento, CURDATE()) as idade
+                        TIMESTAMPDIFF(YEAR, f.data_nascimento, CURDATE()) as idade,
+                        f.status
                         FROM funcionarios f
-                        INNER JOIN cargos c ON f.cargo_id = c.id
-                        INNER JOIN departamentos d ON f.departamento_id = d.id";
+                        LEFT JOIN cargos c ON f.cargo_id = c.id
+                        LEFT JOIN departamentos d ON f.departamento_id = d.id";
 
             using (MySqlConnection conn = MinhaEmpresa.Conexao.Conexao.GetConnection())
             {
@@ -83,7 +84,8 @@ namespace MinhaEmpresa.DAO
                                     Salario = Convert.ToDecimal(reader["salario"]),
                                     DataContratacao = Convert.ToDateTime(reader["data_contratacao"]),
                                     DataNascimento = reader["data_nascimento"] != DBNull.Value ? Convert.ToDateTime(reader["data_nascimento"]) : null,
-                                    Observacoes = reader["observacoes"] != DBNull.Value ? reader["observacoes"].ToString() : null
+                                    Observacoes = reader["observacoes"] != DBNull.Value ? reader["observacoes"].ToString() : null,
+                                    Status = Enum.TryParse<StatusFuncionario>(reader["status"].ToString(), out var status) ? status : StatusFuncionario.Ativo
                                 };
                                 funcionarios.Add(func);
                             }
@@ -127,7 +129,7 @@ namespace MinhaEmpresa.DAO
                         cmd.Parameters.AddWithValue("@departamentoId", funcionario.DepartamentoId);
                         cmd.Parameters.AddWithValue("@salario", funcionario.Salario);
                         cmd.Parameters.AddWithValue("@dataContratacao", funcionario.DataContratacao);
-                        cmd.Parameters.AddWithValue("@dataNascimento", funcionario.DataNascimento);
+                        cmd.Parameters.AddWithValue("@dataNascimento", funcionario.DataNascimento.HasValue ? (object)funcionario.DataNascimento.Value : DBNull.Value);
                         cmd.Parameters.AddWithValue("@status", funcionario.Status.ToString());
                         cmd.Parameters.AddWithValue("@observacoes", funcionario.Observacoes ?? (object)DBNull.Value);
                         cmd.ExecuteNonQuery();
