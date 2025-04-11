@@ -94,6 +94,14 @@ namespace MinhaEmpresa.Views
             btnDashboard.TextImageRelation = TextImageRelation.ImageBeforeText;
             btnDashboard.Click += (s, e) => MostrarDashboard();
             
+            // Test button for role assignment
+            var btnTesteRoles = CriarBotaoMenu("Teste Cargos");
+            btnTesteRoles.Image = ObterIcone("chart");
+            btnTesteRoles.ImageAlign = ContentAlignment.MiddleLeft;
+            btnTesteRoles.Padding = new Padding(10, 0, 0, 0);
+            btnTesteRoles.TextImageRelation = TextImageRelation.ImageBeforeText;
+            btnTesteRoles.Click += (s, e) => TestHelper.TestRoleAssignment();
+            
             // Funcionarios submenu
             var btnFuncionarios = CriarBotaoMenu("Funcionários");
             btnFuncionarios.Image = ObterIcone("user");
