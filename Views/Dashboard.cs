@@ -572,11 +572,8 @@ namespace MinhaEmpresa.Views
                     Font = new Font("Segoe UI", 9, FontStyle.Regular)
                 };
                 
-                // Destacar a legenda do TI apenas com cor diferenciada
-                if (departamento.Nome == "TI")
-                {
-                    lblDepartamento.ForeColor = Color.FromArgb(41, 128, 185);
-                }
+                // Nenhum destaque especial para o departamento de TI
+                // Todos os departamentos usam o mesmo estilo
                 
                 legendItem.Controls.Add(colorBox);
                 legendItem.Controls.Add(lblDepartamento);
