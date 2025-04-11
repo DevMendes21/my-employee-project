@@ -11,13 +11,14 @@ namespace MinhaEmpresa.Views
     public partial class MenuPrincipal : Form
     {
         // UI Components
-        private Panel sideMenu;
-        private Panel dashboardPanel;
-        private TableLayoutPanel indicadoresPanel;
-        private Panel graficosPanel;
-        private ListView listSalariosPorDepartamento;
-        private ListView listFuncionariosPorCargo;
-        private FuncionarioDAO funcionarioDAO;
+        private Panel sideMenu = null!;
+        private Panel dashboardPanel = null!;
+        private TableLayoutPanel indicadoresPanel = null!;
+        private Panel graficosPanel = null!;
+        private FuncionarioDAO funcionarioDAO = null!;
+        
+        // Dictionary to store all ListViews by their title
+        private Dictionary<string, ListView> listViews = new Dictionary<string, ListView>();
 
         public MenuPrincipal()
         {
@@ -51,8 +52,6 @@ namespace MinhaEmpresa.Views
             dashboardPanel = new Panel();
             indicadoresPanel = new TableLayoutPanel();
             graficosPanel = new Panel();
-            listSalariosPorDepartamento = new ListView();
-            listFuncionariosPorCargo = new ListView();
             funcionarioDAO = new FuncionarioDAO();
             
             // Configure form properties
@@ -231,17 +230,15 @@ namespace MinhaEmpresa.Views
                 listView.Columns.Add(coluna, -2);
             }
             
-            // Store the ListView in the appropriate variable based on the title
-            if (titulo == "Salários por Departamento")
+            // Store the ListView in our dictionary
+            if (listViews.ContainsKey(titulo))
             {
-                // Replace the existing ListView with this one
-                listSalariosPorDepartamento = listView;
+                // Remove the old ListView from the dictionary
+                listViews.Remove(titulo);
             }
-            else if (titulo == "Funcionários por Cargo")
-            {
-                // Replace the existing ListView with this one
-                listFuncionariosPorCargo = listView;
-            }
+            
+            // Add the new ListView to the dictionary
+            listViews[titulo] = listView;
             
             contentPanel.Controls.Add(listView);
             
@@ -370,7 +367,10 @@ namespace MinhaEmpresa.Views
 
         private void AtualizarListViewSalarios(List<Funcionario> funcionarios)
         {
-            listSalariosPorDepartamento.Items.Clear();
+            if (!listViews.TryGetValue("Salários por Departamento", out var listView))
+                return;
+                
+            listView.Items.Clear();
             var salariosPorDepartamento = funcionarios
                 .GroupBy(f => f.Departamento?.Nome ?? "Sem Departamento")
                 .Select(g => new
@@ -386,13 +386,16 @@ namespace MinhaEmpresa.Views
                 var listViewItem = new ListViewItem(item.Departamento);
                 listViewItem.SubItems.Add(item.Quantidade.ToString());
                 listViewItem.SubItems.Add(item.TotalSalarios.ToString("C"));
-                listSalariosPorDepartamento.Items.Add(listViewItem);
+                listView.Items.Add(listViewItem);
             }
         }
 
         private void AtualizarListViewCargos(List<Funcionario> funcionarios)
         {
-            listFuncionariosPorCargo.Items.Clear();
+            if (!listViews.TryGetValue("Funcionários por Cargo", out var listView))
+                return;
+                
+            listView.Items.Clear();
             var totalFuncionarios = funcionarios.Count;
             var funcionariosPorCargo = funcionarios
                 .GroupBy(f => f.Cargo?.Nome ?? "Sem Cargo")
@@ -409,116 +412,56 @@ namespace MinhaEmpresa.Views
                 var listViewItem = new ListViewItem(item.Cargo);
                 listViewItem.SubItems.Add(item.Quantidade.ToString());
                 listViewItem.SubItems.Add(item.Percentual.ToString("P1"));
-                listFuncionariosPorCargo.Items.Add(listViewItem);
+                listView.Items.Add(listViewItem);
             }
         }
         
         private void AtualizarListViewMediaSalarial(List<Funcionario> funcionarios)
         {
-            // Find the ListView for media salarial
-            ListView listViewMediaSalarial = null;
-            foreach (Control control in graficosPanel.Controls)
-            {
-                if (control is TableLayoutPanel tablePanel)
+            if (!listViews.TryGetValue("Média Salarial por Cargo", out var listView))
+                return;
+                
+            listView.Items.Clear();
+            var mediaSalarialPorCargo = funcionarios
+                .GroupBy(f => f.Cargo?.Nome ?? "Sem Cargo")
+                .Select(g => new
                 {
-                    foreach (Control panelControl in tablePanel.Controls)
-                    {
-                        if (panelControl is Panel panel)
-                        {
-                            var headerPanel = panel.Controls.OfType<Panel>().FirstOrDefault(p => p.Dock == DockStyle.Top);
-                            if (headerPanel != null)
-                            {
-                                var titleLabel = headerPanel.Controls.OfType<Label>().FirstOrDefault();
-                                if (titleLabel != null && titleLabel.Text == "Média Salarial por Cargo")
-                                {
-                                    var contentPanel = panel.Controls.OfType<Panel>().FirstOrDefault(p => p.Dock == DockStyle.Fill);
-                                    if (contentPanel != null)
-                                    {
-                                        listViewMediaSalarial = contentPanel.Controls.OfType<ListView>().FirstOrDefault();
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (listViewMediaSalarial != null) break;
-                }
-            }
-            
-            if (listViewMediaSalarial != null)
-            {
-                listViewMediaSalarial.Items.Clear();
-                var mediaSalarialPorCargo = funcionarios
-                    .GroupBy(f => f.Cargo?.Nome ?? "Sem Cargo")
-                    .Select(g => new
-                    {
-                        Cargo = g.Key,
-                        MediaSalarial = g.Average(f => f.Salario)
-                    })
-                    .OrderByDescending(g => g.MediaSalarial);
+                    Cargo = g.Key,
+                    MediaSalarial = g.Average(f => f.Salario)
+                })
+                .OrderByDescending(g => g.MediaSalarial);
 
-                foreach (var item in mediaSalarialPorCargo)
-                {
-                    var listViewItem = new ListViewItem(item.Cargo);
-                    listViewItem.SubItems.Add(item.MediaSalarial.ToString("C2"));
-                    listViewMediaSalarial.Items.Add(listViewItem);
-                }
+            foreach (var item in mediaSalarialPorCargo)
+            {
+                var listViewItem = new ListViewItem(item.Cargo);
+                listViewItem.SubItems.Add(item.MediaSalarial.ToString("C2"));
+                listView.Items.Add(listViewItem);
             }
         }
         
         private void AtualizarListViewStatus(List<Funcionario> funcionarios)
         {
-            // Find the ListView for status
-            ListView listViewStatus = null;
-            foreach (Control control in graficosPanel.Controls)
-            {
-                if (control is TableLayoutPanel tablePanel)
+            if (!listViews.TryGetValue("Status dos Funcionários", out var listView))
+                return;
+                
+            listView.Items.Clear();
+            var totalFuncionarios = funcionarios.Count;
+            var statusFuncionarios = funcionarios
+                .GroupBy(f => f.Status)
+                .Select(g => new
                 {
-                    foreach (Control panelControl in tablePanel.Controls)
-                    {
-                        if (panelControl is Panel panel)
-                        {
-                            var headerPanel = panel.Controls.OfType<Panel>().FirstOrDefault(p => p.Dock == DockStyle.Top);
-                            if (headerPanel != null)
-                            {
-                                var titleLabel = headerPanel.Controls.OfType<Label>().FirstOrDefault();
-                                if (titleLabel != null && titleLabel.Text == "Status dos Funcionários")
-                                {
-                                    var contentPanel = panel.Controls.OfType<Panel>().FirstOrDefault(p => p.Dock == DockStyle.Fill);
-                                    if (contentPanel != null)
-                                    {
-                                        listViewStatus = contentPanel.Controls.OfType<ListView>().FirstOrDefault();
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if (listViewStatus != null) break;
-                }
-            }
-            
-            if (listViewStatus != null)
-            {
-                listViewStatus.Items.Clear();
-                var totalFuncionarios = funcionarios.Count;
-                var statusFuncionarios = funcionarios
-                    .GroupBy(f => f.Status)
-                    .Select(g => new
-                    {
-                        Status = g.Key,
-                        Total = g.Count(),
-                        Percentual = totalFuncionarios > 0 ? (double)g.Count() / totalFuncionarios : 0
-                    })
-                    .OrderByDescending(g => g.Total);
+                    Status = g.Key,
+                    Total = g.Count(),
+                    Percentual = totalFuncionarios > 0 ? (double)g.Count() / totalFuncionarios : 0
+                })
+                .OrderByDescending(g => g.Total);
 
-                foreach (var item in statusFuncionarios)
-                {
-                    var listViewItem = new ListViewItem(item.Status.ToString());
-                    listViewItem.SubItems.Add(item.Total.ToString());
-                    listViewItem.SubItems.Add(item.Percentual.ToString("P1"));
-                    listViewStatus.Items.Add(listViewItem);
-                }
+            foreach (var item in statusFuncionarios)
+            {
+                var listViewItem = new ListViewItem(item.Status.ToString());
+                listViewItem.SubItems.Add(item.Total.ToString());
+                listViewItem.SubItems.Add(item.Percentual.ToString("P1"));
+                listView.Items.Add(listViewItem);
             }
         }
     }
