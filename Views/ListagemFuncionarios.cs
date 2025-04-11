@@ -56,7 +56,7 @@ namespace MinhaEmpresa.Views
                 ReadOnly = true,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 MultiSelect = false,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None,
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells,
                 BackgroundColor = System.Drawing.Color.White,
                 BorderStyle = BorderStyle.None,
                 ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
@@ -84,7 +84,7 @@ namespace MinhaEmpresa.Views
             // Configurar colunas
             dgvFuncionarios.AutoGenerateColumns = false;
             
-            // Configurar colunas do DataGridView
+            // Configurar colunas do DataGridView na sequência solicitada
             var colunas = new[]
             {
                 new DataGridViewTextBoxColumn
@@ -122,11 +122,23 @@ namespace MinhaEmpresa.Views
                         Alignment = DataGridViewContentAlignment.MiddleRight
                     }
                 },
+                // Adicionar coluna de Salário Anual
                 new DataGridViewTextBoxColumn
                 {
-                    DataPropertyName = "Email",
-                    HeaderText = "Email",
-                    Width = 180
+                    Name = "ColSalarioAnual",
+                    HeaderText = "Salário Anual",
+                    Width = 120,
+                    DefaultCellStyle = new DataGridViewCellStyle
+                    {
+                        Format = "C2",
+                        Alignment = DataGridViewContentAlignment.MiddleRight
+                    }
+                },
+                new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "Status",
+                    HeaderText = "Status",
+                    Width = 80
                 },
                 new DataGridViewTextBoxColumn
                 {
@@ -136,42 +148,38 @@ namespace MinhaEmpresa.Views
                 },
                 new DataGridViewTextBoxColumn
                 {
-                    DataPropertyName = "Status",
-                    HeaderText = "Status",
-                    Width = 70
+                    DataPropertyName = "Email",
+                    HeaderText = "Email",
+                    Width = 180
+                },
+                new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "Idade",
+                    HeaderText = "Idade",
+                    Width = 60,
+                    DefaultCellStyle = new DataGridViewCellStyle
+                    {
+                        Alignment = DataGridViewContentAlignment.MiddleCenter
+                    }
+                },
+                new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "DataNascimento",
+                    HeaderText = "Data Nascimento",
+                    Width = 120,
+                    DefaultCellStyle = new DataGridViewCellStyle { Format = "dd/MM/yyyy", NullValue = "" }
+                },
+                new DataGridViewTextBoxColumn
+                {
+                    DataPropertyName = "DataContratacao",
+                    HeaderText = "Data Contratação",
+                    Width = 120,
+                    DefaultCellStyle = new DataGridViewCellStyle { Format = "dd/MM/yyyy" }
                 }
             };
 
-            // Add all columns at once
+            // Adicionar todas as colunas de uma vez
             dgvFuncionarios.Columns.AddRange(colunas);
-            
-            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "DataContratacao",
-                HeaderText = "Data Contratação",
-                Width = 120,
-                DefaultCellStyle = new DataGridViewCellStyle { Format = "dd/MM/yyyy" }
-            });
-
-            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "DataNascimento",
-                HeaderText = "Data Nascimento",
-                Width = 120,
-                DefaultCellStyle = new DataGridViewCellStyle { Format = "dd/MM/yyyy", NullValue = "" }
-            });
-            
-            // Add age column using the Idade property
-            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
-            {
-                DataPropertyName = "Idade",
-                HeaderText = "Idade",
-                Width = 60,
-                DefaultCellStyle = new DataGridViewCellStyle
-                {
-                    Alignment = DataGridViewContentAlignment.MiddleCenter
-                }
-            });
 
             // Buttons
             btnEditar = new Button
@@ -233,6 +241,19 @@ namespace MinhaEmpresa.Views
                 // Format the nested properties manually
                 FormatarPropriedadesAninhadas();
                 
+                // Configurar para que a tabela se expanda conforme necessário
+                dgvFuncionarios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.DisplayedCells;
+                
+                // Ajustar o tamanho da tabela para mostrar todas as colunas
+                int totalWidth = 0;
+                foreach (DataGridViewColumn col in dgvFuncionarios.Columns)
+                {
+                    totalWidth += col.Width;
+                }
+                
+                // Garantir que a tabela tenha largura suficiente para mostrar todas as colunas
+                dgvFuncionarios.Width = Math.Min(this.ClientSize.Width - 40, totalWidth + 20);
+                
                 // Forçar atualização visual
                 dgvFuncionarios.Refresh();
                 this.Refresh();
@@ -276,6 +297,10 @@ namespace MinhaEmpresa.Views
                             // Try to get departamento name directly from database if needed
                             row.Cells["ColDepartamento"].Value = "N/A";
                         }
+                        
+                        // Calcular e definir o Salário Anual (salário mensal * 13.33 para incluir 13º e férias)
+                        decimal salarioAnual = funcionario.Salario * 13.33m;
+                        row.Cells["ColSalarioAnual"].Value = salarioAnual;
                     }
                     catch (Exception ex)
                     {
