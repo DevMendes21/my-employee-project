@@ -149,7 +149,17 @@ namespace MinhaEmpresa.Views
                 DefaultCellStyle = new DataGridViewCellStyle { Format = "dd/MM/yyyy", NullValue = "" }
             });
             
-            // Status column is already added in the colunas array above
+            // Add age column using the Idade property
+            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "Idade",
+                HeaderText = "Idade",
+                Width = 60,
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Alignment = DataGridViewContentAlignment.MiddleCenter
+                }
+            });
 
             // Buttons
             btnEditar = new Button
