@@ -7,28 +7,28 @@ namespace MinhaEmpresa.Views
 {
     public partial class ListagemFuncionarios : Form
     {
-        private DataGridView dgvFuncionarios;
-        private Button btnEditar;
-        private Button btnRemover;
-        private Button btnAtualizar;
-        private FuncionarioDAO funcionarioDAO;
+        private DataGridView dgvFuncionarios = new();
+        private Button btnEditar = new();
+        private Button btnRemover = new();
+        private Button btnAtualizar = new();
+        private readonly FuncionarioDAO funcionarioDAO = new();
 
         public ListagemFuncionarios()
         {
             InitializeComponent();
             InitializeCustomComponents();
-            funcionarioDAO = new FuncionarioDAO();
             CarregarFuncionarios();
         }
 
         private void InitializeComponent()
         {
             this.Text = "Listagem de Funcionários";
-            this.Width = 800;
+            this.Width = 1000;
             this.Height = 600;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
+            this.BackColor = System.Drawing.Color.White;
         }
 
         private void InitializeCustomComponents()
@@ -37,14 +37,36 @@ namespace MinhaEmpresa.Views
             dgvFuncionarios = new DataGridView
             {
                 Location = new System.Drawing.Point(20, 20),
-                Width = 740,
+                Width = 940,
                 Height = 450,
                 AllowUserToAddRows = false,
                 AllowUserToDeleteRows = false,
                 ReadOnly = true,
                 SelectionMode = DataGridViewSelectionMode.FullRowSelect,
                 MultiSelect = false,
-                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
+                AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None,
+                BackgroundColor = System.Drawing.Color.White,
+                BorderStyle = BorderStyle.None,
+                ColumnHeadersDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = System.Drawing.Color.FromArgb(0, 120, 212),
+                    ForeColor = System.Drawing.Color.White,
+                    Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Bold),
+                    Padding = new Padding(10, 5, 10, 5)
+                },
+                DefaultCellStyle = new DataGridViewCellStyle
+                {
+                    Font = new System.Drawing.Font("Segoe UI", 9.75F),
+                    Padding = new Padding(5),
+                    SelectionBackColor = System.Drawing.Color.FromArgb(0, 120, 212),
+                    SelectionForeColor = System.Drawing.Color.White
+                },
+                RowHeadersVisible = false,
+                AlternatingRowsDefaultCellStyle = new DataGridViewCellStyle
+                {
+                    BackColor = System.Drawing.Color.FromArgb(240, 240, 240)
+                },
+                EnableHeadersVisualStyles = false
             };
 
             // Configurar colunas
@@ -82,7 +104,7 @@ namespace MinhaEmpresa.Views
             {
                 DataPropertyName = "Cargo.Nome",
                 HeaderText = "Cargo",
-                Width = 100
+                Width = 120
             });
             
             dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
@@ -90,7 +112,11 @@ namespace MinhaEmpresa.Views
                 DataPropertyName = "Salario",
                 HeaderText = "Salário",
                 Width = 100,
-                DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" }
+                DefaultCellStyle = new DataGridViewCellStyle 
+                { 
+                    Format = "C2",
+                    Alignment = DataGridViewContentAlignment.MiddleRight
+                }
             });
             
             dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
@@ -98,6 +124,22 @@ namespace MinhaEmpresa.Views
                 DataPropertyName = "Departamento.Nome",
                 HeaderText = "Departamento",
                 Width = 120
+            });
+            
+            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "DataContratacao",
+                HeaderText = "Data Contratação",
+                Width = 120,
+                DefaultCellStyle = new DataGridViewCellStyle { Format = "dd/MM/yyyy" }
+            });
+
+            dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
+            {
+                DataPropertyName = "DataNascimento",
+                HeaderText = "Data Nascimento",
+                Width = 120,
+                DefaultCellStyle = new DataGridViewCellStyle { Format = "dd/MM/yyyy", NullValue = "" }
             });
             
             dgvFuncionarios.Columns.Add(new DataGridViewTextBoxColumn
@@ -162,14 +204,14 @@ namespace MinhaEmpresa.Views
             }
         }
 
-        private void BtnEditar_Click(object sender, EventArgs e)
+        private void BtnEditar_Click(object? sender, EventArgs e)
         {
             if (dgvFuncionarios.CurrentRow != null)
             {
                 var funcionario = (Funcionario)dgvFuncionarios.CurrentRow.DataBoundItem;
                 var formEditar = new CadastroFuncionario(funcionario);
-                formEditar.ShowDialog();
-                CarregarFuncionarios(); // Recarrega a lista após edição
+                formEditar.FormClosed += (s, args) => CarregarFuncionarios(); // Recarrega após fechar o form
+                formEditar.Show(); // Usar Show() em vez de ShowDialog() para melhor experiência
             }
             else
             {
@@ -178,7 +220,7 @@ namespace MinhaEmpresa.Views
             }
         }
 
-        private void BtnRemover_Click(object sender, EventArgs e)
+        private void BtnRemover_Click(object? sender, EventArgs e)
         {
             if (dgvFuncionarios.CurrentRow != null)
             {
