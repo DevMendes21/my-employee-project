@@ -15,6 +15,7 @@ namespace MinhaEmpresa.Views
         private ComboBox cmbDepartamento = null!;
         private DateTimePicker dtpDataContratacao = null!;
         private DateTimePicker dtpDataNascimento = null!;
+        private ComboBox cmbStatus = null!;
         private TextBox txtObservacoes = null!;
         private Button btnSalvar = null!;
         private Button btnVoltar = null!;
@@ -31,7 +32,7 @@ namespace MinhaEmpresa.Views
         {
             this.Text = "Cadastro de Funcionário";
             this.Width = 500;
-            this.Height = 550;
+            this.Height = 600;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -48,7 +49,8 @@ namespace MinhaEmpresa.Views
             Label lblDepartamento = new Label { Text = "Departamento:", Location = new System.Drawing.Point(20, 220) };
             Label lblDataContratacao = new Label { Text = "Data de Contratação:", Location = new System.Drawing.Point(20, 260) };
             Label lblDataNascimento = new Label { Text = "Data de Nascimento:", Location = new System.Drawing.Point(20, 300) };
-            Label lblObservacoes = new Label { Text = "Observações:", Location = new System.Drawing.Point(20, 340) };
+            Label lblStatus = new Label { Text = "Status:", Location = new System.Drawing.Point(20, 340) };
+            Label lblObservacoes = new Label { Text = "Observações:", Location = new System.Drawing.Point(20, 380) };
 
             // TextBoxes e ComboBoxes
             txtNome = new TextBox { Location = new System.Drawing.Point(150, 20), Width = 300 };
@@ -107,9 +109,21 @@ namespace MinhaEmpresa.Views
                 Format = DateTimePickerFormat.Short
             };
 
+            cmbStatus = new ComboBox
+            {
+                Location = new System.Drawing.Point(150, 340),
+                Width = 300,
+                DropDownStyle = ComboBoxStyle.DropDownList
+            };
+            cmbStatus.Items.AddRange(Enum.GetValues(typeof(StatusFuncionario))
+                                      .Cast<StatusFuncionario>()
+                                      .Select(s => s.ToString())
+                                      .ToArray());
+            cmbStatus.SelectedIndex = 0; // Ativo por padrão
+
             txtObservacoes = new TextBox 
             { 
-                Location = new System.Drawing.Point(150, 340), 
+                Location = new System.Drawing.Point(150, 380), 
                 Width = 300,
                 Height = 60,
                 Multiline = true
@@ -136,9 +150,9 @@ namespace MinhaEmpresa.Views
             this.Controls.AddRange(new Control[] 
             { 
                 lblNome, lblEmail, lblTelefone, lblCargo, lblSalario, lblDepartamento, 
-                lblDataContratacao, lblDataNascimento, lblObservacoes,
+                lblDataContratacao, lblDataNascimento, lblStatus, lblObservacoes,
                 txtNome, txtEmail, txtTelefone, cmbCargo, txtSalario, cmbDepartamento, 
-                dtpDataContratacao, dtpDataNascimento, txtObservacoes,
+                dtpDataContratacao, dtpDataNascimento, cmbStatus, txtObservacoes,
                 btnSalvar, btnVoltar
             });
         }
@@ -171,6 +185,7 @@ namespace MinhaEmpresa.Views
                         Departamento = departamento,
                         DataContratacao = dtpDataContratacao.Value,
                         DataNascimento = dtpDataNascimento.Value,
+                        Status = (StatusFuncionario)Enum.Parse(typeof(StatusFuncionario), cmbStatus.SelectedItem.ToString()!),
                         Observacoes = string.IsNullOrWhiteSpace(txtObservacoes.Text) ? null : txtObservacoes.Text
                     };
 
@@ -230,6 +245,7 @@ namespace MinhaEmpresa.Views
             cmbDepartamento.SelectedIndex = -1;
             dtpDataContratacao.Value = DateTime.Now;
             dtpDataNascimento.Value = DateTime.Now;
+            cmbStatus.SelectedIndex = 0;
             txtObservacoes.Clear();
         }
     }
