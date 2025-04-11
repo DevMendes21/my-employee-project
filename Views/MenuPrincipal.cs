@@ -85,14 +85,72 @@ namespace MinhaEmpresa.Views
                 Dock = DockStyle.Fill
             };
             logoPanel.Controls.Add(lblLogo);
-
+            
+            // Dashboard button
+            var btnDashboard = CriarBotaoMenu("Dashboard");
+            btnDashboard.Image = ObterIcone("dashboard");
+            btnDashboard.ImageAlign = ContentAlignment.MiddleLeft;
+            btnDashboard.Padding = new Padding(10, 0, 0, 0);
+            btnDashboard.TextImageRelation = TextImageRelation.ImageBeforeText;
+            btnDashboard.Click += (s, e) => MostrarDashboard();
+            
+            // Funcionarios submenu
             var btnFuncionarios = CriarBotaoMenu("Funcionários");
-            btnFuncionarios.Click += (s, e) => new ListagemFuncionarios().Show();
-
+            btnFuncionarios.Image = ObterIcone("user");
+            btnFuncionarios.ImageAlign = ContentAlignment.MiddleLeft;
+            btnFuncionarios.Padding = new Padding(10, 0, 0, 0);
+            btnFuncionarios.TextImageRelation = TextImageRelation.ImageBeforeText;
+            
+            var panelSubMenuFuncionarios = new Panel
+            {
+                BackColor = Color.FromArgb(35, 35, 60),
+                Dock = DockStyle.Top,
+                Height = 0,  // Start collapsed
+                Visible = false
+            };
+            
+            var btnListarFuncionarios = CriarBotaoSubMenu("Listar Funcionários");
+            btnListarFuncionarios.Click += (s, e) => new ListagemFuncionarios().Show();
+            
+            var btnNovoFuncionario = CriarBotaoSubMenu("Novo Funcionário");
+            btnNovoFuncionario.Click += (s, e) => new CadastroFuncionario().Show();
+            
+            panelSubMenuFuncionarios.Controls.AddRange(new Control[] { btnNovoFuncionario, btnListarFuncionarios });
+            
+            btnFuncionarios.Click += (s, e) => ToggleSubMenu(panelSubMenuFuncionarios);
+            
+            // Cargos button
             var btnCargos = CriarBotaoMenu("Cargos");
+            btnCargos.Image = ObterIcone("briefcase");
+            btnCargos.ImageAlign = ContentAlignment.MiddleLeft;
+            btnCargos.Padding = new Padding(10, 0, 0, 0);
+            btnCargos.TextImageRelation = TextImageRelation.ImageBeforeText;
+            
+            // Departamentos button
             var btnDepartamentos = CriarBotaoMenu("Departamentos");
-
-            sideMenu.Controls.AddRange(new Control[] { btnDepartamentos, btnCargos, btnFuncionarios, logoPanel });
+            btnDepartamentos.Image = ObterIcone("building");
+            btnDepartamentos.ImageAlign = ContentAlignment.MiddleLeft;
+            btnDepartamentos.Padding = new Padding(10, 0, 0, 0);
+            btnDepartamentos.TextImageRelation = TextImageRelation.ImageBeforeText;
+            
+            // Relatórios button
+            var btnRelatorios = CriarBotaoMenu("Relatórios");
+            btnRelatorios.Image = ObterIcone("chart");
+            btnRelatorios.ImageAlign = ContentAlignment.MiddleLeft;
+            btnRelatorios.Padding = new Padding(10, 0, 0, 0);
+            btnRelatorios.TextImageRelation = TextImageRelation.ImageBeforeText;
+            
+            // Add all controls to the side menu
+            sideMenu.Controls.AddRange(new Control[] 
+            { 
+                btnRelatorios,
+                btnDepartamentos, 
+                btnCargos, 
+                panelSubMenuFuncionarios,
+                btnFuncionarios, 
+                btnDashboard,
+                logoPanel 
+            });
         }
 
         private Button CriarBotaoMenu(string texto)
@@ -132,6 +190,7 @@ namespace MinhaEmpresa.Views
             indicadoresPanel.Height = 150;
             indicadoresPanel.BackColor = Color.FromArgb(240, 240, 240);
             indicadoresPanel.Padding = new Padding(20);
+            indicadoresPanel.Margin = new Padding(0, 0, 0, 20); // Add margin at the bottom
             
             // Configure column and row styles
             for (int i = 0; i < indicadoresPanel.ColumnCount; i++)
@@ -168,6 +227,12 @@ namespace MinhaEmpresa.Views
             var funcionariosCargoPanel = CriarPainelGrafico("Funcionários por Cargo", new[] { "Cargo", "Quantidade", "Percentual" });
             var mediaSalarialPanel = CriarPainelGrafico("Média Salarial por Cargo", new[] { "Cargo", "Média Salarial" });
             var statusPanel = CriarPainelGrafico("Status dos Funcionários", new[] { "Status", "Quantidade", "Percentual" });
+            
+            // Create chart visualizations
+            AdicionarVisualizacaoGrafica(salariosDepartamentoPanel, "salarios");
+            AdicionarVisualizacaoGrafica(funcionariosCargoPanel, "funcionarios");
+            AdicionarVisualizacaoGrafica(mediaSalarialPanel, "media");
+            AdicionarVisualizacaoGrafica(statusPanel, "status");
             
             tableLayout.Controls.Add(salariosDepartamentoPanel, 0, 0);
             tableLayout.Controls.Add(funcionariosCargoPanel, 1, 0);
@@ -289,12 +354,45 @@ namespace MinhaEmpresa.Views
 
         private Panel CriarCardIndicador(string titulo, string valor, string icone)
         {
+            // Determine card color based on icon type
+            Color cardAccentColor = Color.FromArgb(51, 51, 76); // Default
+            switch (icone.ToLower())
+            {
+                case "user":
+                    cardAccentColor = Color.FromArgb(0, 166, 90); // Green
+                    break;
+                case "money":
+                    cardAccentColor = Color.FromArgb(221, 75, 57); // Red
+                    break;
+                case "chart":
+                    cardAccentColor = Color.FromArgb(243, 156, 18); // Orange
+                    break;
+                case "building":
+                    cardAccentColor = Color.FromArgb(60, 141, 188); // Blue
+                    break;
+            }
+            
             var panel = new Panel
             {
                 BackColor = Color.White,
                 Margin = new Padding(5),
-                Padding = new Padding(10),
+                Padding = new Padding(0),
                 Dock = DockStyle.Fill
+            };
+            
+            // Add a left border with accent color
+            var borderPanel = new Panel
+            {
+                BackColor = cardAccentColor,
+                Dock = DockStyle.Left,
+                Width = 5
+            };
+            
+            var contentPanel = new Panel
+            {
+                BackColor = Color.White,
+                Dock = DockStyle.Fill,
+                Padding = new Padding(15, 10, 10, 10)
             };
             
             var lblTitulo = new Label
@@ -309,8 +407,8 @@ namespace MinhaEmpresa.Views
             var lblValor = new Label
             {
                 Text = valor,
-                Font = new Font("Segoe UI", 16F, FontStyle.Bold),
-                ForeColor = Color.FromArgb(51, 51, 76),
+                Font = new Font("Segoe UI", 20F, FontStyle.Bold),
+                ForeColor = cardAccentColor,
                 Dock = DockStyle.Fill,
                 TextAlign = ContentAlignment.MiddleLeft
             };
@@ -319,25 +417,107 @@ namespace MinhaEmpresa.Views
             {
                 Image = ObterIcone(icone),
                 SizeMode = PictureBoxSizeMode.Zoom,
-                Width = 40,
-                Height = 40,
-                Dock = DockStyle.Right
+                Width = 50,
+                Height = 50,
+                Dock = DockStyle.Right,
+                BackColor = Color.Transparent
             };
             
-            panel.Controls.Add(iconePictureBox);
-            panel.Controls.Add(lblValor);
-            panel.Controls.Add(lblTitulo);
+            // Add drop shadow effect
+            panel.Paint += (s, e) =>
+            {
+                var rect = new Rectangle(0, 0, panel.Width, panel.Height);
+                using (var path = new System.Drawing.Drawing2D.GraphicsPath())
+                {
+                    path.AddRectangle(rect);
+                    e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                    using (var pen = new Pen(Color.FromArgb(30, 0, 0, 0), 1))
+                    {
+                        e.Graphics.DrawPath(pen, path);
+                    }
+                }
+            };
+            
+            contentPanel.Controls.Add(iconePictureBox);
+            contentPanel.Controls.Add(lblValor);
+            contentPanel.Controls.Add(lblTitulo);
+            
+            panel.Controls.Add(contentPanel);
+            panel.Controls.Add(borderPanel);
             
             return panel;
         }
 
+        private Button CriarBotaoSubMenu(string texto)
+        {
+            var btn = new Button
+            {
+                Text = texto,
+                FlatStyle = FlatStyle.Flat,
+                ForeColor = Color.LightGray,
+                Font = new Font("Segoe UI", 9F, FontStyle.Regular),
+                Dock = DockStyle.Top,
+                Height = 40,
+                TextAlign = ContentAlignment.MiddleLeft,
+                Padding = new Padding(35, 0, 0, 0),
+                BackColor = Color.FromArgb(35, 35, 60)
+            };
+            btn.FlatAppearance.BorderSize = 0;
+            return btn;
+        }
+        
+        private void ToggleSubMenu(Panel subMenu)
+        {
+            if (subMenu.Visible)
+            {
+                subMenu.Visible = false;
+                subMenu.Height = 0;
+            }
+            else
+            {
+                subMenu.Visible = true;
+                subMenu.Height = 80; // Height for 2 submenu items
+            }
+        }
+        
+        private void MostrarDashboard()
+        {
+            // Show dashboard panel, hide other panels if needed
+            dashboardPanel.Visible = true;
+            // You could hide other panels here if you add more views
+        }
+        
         private Image ObterIcone(string nome)
         {
             // Placeholder - in a real application, you would load actual icons
-            var bitmap = new Bitmap(32, 32);
+            var bitmap = new Bitmap(24, 24);
             using (var g = Graphics.FromImage(bitmap))
             {
-                g.Clear(Color.FromArgb(51, 51, 76));
+                var color = Color.White;
+                
+                switch (nome.ToLower())
+                {
+                    case "dashboard":
+                        color = Color.FromArgb(0, 192, 239); // Light blue
+                        break;
+                    case "user":
+                        color = Color.FromArgb(0, 166, 90); // Green
+                        break;
+                    case "building":
+                        color = Color.FromArgb(243, 156, 18); // Orange
+                        break;
+                    case "briefcase":
+                        color = Color.FromArgb(221, 75, 57); // Red
+                        break;
+                    case "chart":
+                        color = Color.FromArgb(60, 141, 188); // Blue
+                        break;
+                    case "money":
+                        color = Color.FromArgb(0, 192, 239); // Light blue
+                        break;
+                }
+                
+                g.Clear(color);
             }
             return bitmap;
         }
@@ -357,12 +537,213 @@ namespace MinhaEmpresa.Views
             }
         }
 
+        private void AdicionarVisualizacaoGrafica(Panel panel, string tipo)
+        {
+            // Find the content panel that contains the ListView
+            var contentPanel = panel.Controls.OfType<Panel>().FirstOrDefault(p => p.Dock == DockStyle.Fill);
+            if (contentPanel == null) return;
+            
+            // Get the ListView
+            var listView = contentPanel.Controls.OfType<ListView>().FirstOrDefault();
+            if (listView == null) return;
+            
+            // Create a panel for the chart
+            var chartPanel = new Panel
+            {
+                Dock = DockStyle.Top,
+                Height = 150,
+                BackColor = Color.White
+            };
+            
+            // Add the chart panel above the ListView
+            contentPanel.Controls.Add(chartPanel);
+            chartPanel.BringToFront();
+            
+            // We'll draw the chart when data is loaded
+            chartPanel.Paint += (s, e) => 
+            {
+                if (listView.Items.Count == 0) return;
+                
+                var g = e.Graphics;
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                
+                // Draw different chart types based on the data
+                switch (tipo)
+                {
+                    case "salarios":
+                        DesenharGraficoBarras(g, listView, chartPanel.ClientRectangle, Color.FromArgb(0, 192, 239));
+                        break;
+                    case "funcionarios":
+                        DesenharGraficoPizza(g, listView, chartPanel.ClientRectangle, new[] { 
+                            Color.FromArgb(0, 166, 90),  // Green
+                            Color.FromArgb(243, 156, 18), // Orange
+                            Color.FromArgb(221, 75, 57),  // Red
+                            Color.FromArgb(60, 141, 188)  // Blue
+                        });
+                        break;
+                    case "media":
+                        DesenharGraficoBarras(g, listView, chartPanel.ClientRectangle, Color.FromArgb(243, 156, 18));
+                        break;
+                    case "status":
+                        DesenharGraficoPizza(g, listView, chartPanel.ClientRectangle, new[] { 
+                            Color.FromArgb(0, 166, 90),   // Green for Active
+                            Color.FromArgb(221, 75, 57),   // Red for Inactive
+                            Color.FromArgb(243, 156, 18),  // Orange for Leave
+                            Color.FromArgb(60, 141, 188)   // Blue for Other
+                        });
+                        break;
+                }
+            };
+        }
+        
+        private void DesenharGraficoBarras(Graphics g, ListView listView, Rectangle rect, Color barColor)
+        {
+            if (listView.Items.Count == 0) return;
+            
+            // Calculate the maximum value for scaling
+            decimal maxValue = 0;
+            var values = new List<decimal>();
+            var labels = new List<string>();
+            
+            for (int i = 0; i < Math.Min(listView.Items.Count, 5); i++) // Limit to 5 items
+            {
+                var item = listView.Items[i];
+                string valueText = item.SubItems[item.SubItems.Count - 1].Text.Replace("R$", "").Replace(".", "").Replace(",", ".");
+                
+                if (decimal.TryParse(valueText, out decimal value))
+                {
+                    values.Add(value);
+                    labels.Add(item.Text);
+                    maxValue = Math.Max(maxValue, value);
+                }
+            }
+            
+            if (values.Count == 0) return;
+            
+            // Draw the bars
+            int barWidth = (rect.Width - 40) / values.Count;
+            int maxHeight = rect.Height - 40;
+            
+            for (int i = 0; i < values.Count; i++)
+            {
+                int barHeight = maxValue > 0 ? (int)((values[i] / maxValue) * maxHeight) : 0;
+                Rectangle barRect = new Rectangle(
+                    rect.X + 20 + (i * barWidth),
+                    rect.Y + rect.Height - 20 - barHeight,
+                    barWidth - 10,
+                    barHeight
+                );
+                
+                // Draw the bar
+                using (var brush = new SolidBrush(barColor))
+                {
+                    g.FillRectangle(brush, barRect);
+                }
+                
+                // Draw the label
+                using (var brush = new SolidBrush(Color.Black))
+                using (var font = new Font("Segoe UI", 8))
+                {
+                    var labelSize = g.MeasureString(labels[i], font);
+                    g.DrawString(labels[i], font, brush, 
+                        rect.X + 20 + (i * barWidth) + ((barWidth - 10) / 2) - (labelSize.Width / 2),
+                        rect.Y + rect.Height - 15);
+                }
+            }
+        }
+        
+        private void DesenharGraficoPizza(Graphics g, ListView listView, Rectangle rect, Color[] colors)
+        {
+            if (listView.Items.Count == 0) return;
+            
+            // Calculate the total value
+            decimal totalValue = 0;
+            var values = new List<decimal>();
+            var labels = new List<string>();
+            
+            for (int i = 0; i < Math.Min(listView.Items.Count, colors.Length); i++) // Limit to available colors
+            {
+                var item = listView.Items[i];
+                string valueText = item.SubItems[1].Text; // Assume the count is in the second column
+                
+                if (decimal.TryParse(valueText, out decimal value))
+                {
+                    values.Add(value);
+                    labels.Add(item.Text);
+                    totalValue += value;
+                }
+            }
+            
+            if (totalValue == 0) return;
+            
+            // Draw the pie chart
+            int size = Math.Min(rect.Width, rect.Height) - 40;
+            Rectangle pieRect = new Rectangle(
+                rect.X + (rect.Width - size) / 2,
+                rect.Y + 10,
+                size,
+                size
+            );
+            
+            float startAngle = 0;
+            for (int i = 0; i < values.Count; i++)
+            {
+                float sweepAngle = (float)((values[i] / totalValue) * 360);
+                
+                // Draw the pie slice
+                using (var brush = new SolidBrush(colors[i % colors.Length]))
+                {
+                    g.FillPie(brush, pieRect, startAngle, sweepAngle);
+                }
+                
+                // Draw the legend item
+                int legendY = rect.Y + 10 + (i * 20);
+                Rectangle legendRect = new Rectangle(rect.X + rect.Width - 100, legendY, 15, 15);
+                
+                using (var brush = new SolidBrush(colors[i % colors.Length]))
+                {
+                    g.FillRectangle(brush, legendRect);
+                }
+                
+                using (var brush = new SolidBrush(Color.Black))
+                using (var font = new Font("Segoe UI", 8))
+                {
+                    g.DrawString(labels[i], font, brush, rect.X + rect.Width - 80, legendY);
+                }
+                
+                startAngle += sweepAngle;
+            }
+        }
+
         private void AtualizarListViews(List<Funcionario> funcionarios)
         {
             AtualizarListViewSalarios(funcionarios);
             AtualizarListViewCargos(funcionarios);
             AtualizarListViewMediaSalarial(funcionarios);
             AtualizarListViewStatus(funcionarios);
+            
+            // Refresh the chart panels
+            foreach (Control control in graficosPanel.Controls)
+            {
+                if (control is TableLayoutPanel tablePanel)
+                {
+                    foreach (Control panelControl in tablePanel.Controls)
+                    {
+                        if (panelControl is Panel panel)
+                        {
+                            var contentPanel = panel.Controls.OfType<Panel>().FirstOrDefault(p => p.Dock == DockStyle.Fill);
+                            if (contentPanel != null)
+                            {
+                                var chartPanel = contentPanel.Controls.OfType<Panel>().FirstOrDefault(p => p.Dock == DockStyle.Top);
+                                if (chartPanel != null)
+                                {
+                                    chartPanel.Invalidate(); // Trigger repaint to update the chart
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private void AtualizarListViewSalarios(List<Funcionario> funcionarios)
