@@ -32,7 +32,8 @@ namespace MinhaEmpresa.Views
         {
             this.Text = "Cadastro de Funcionário";
             this.Width = 500;
-            this.Height = 600;
+            this.Height = 650;
+            this.AutoScroll = true;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -99,14 +100,16 @@ namespace MinhaEmpresa.Views
             { 
                 Location = new System.Drawing.Point(150, 260), 
                 Width = 300,
-                Format = DateTimePickerFormat.Short
+                Format = DateTimePickerFormat.Custom,
+                CustomFormat = "dd/MM/yyyy"
             };
 
             dtpDataNascimento = new DateTimePicker 
             { 
                 Location = new System.Drawing.Point(150, 300), 
                 Width = 300,
-                Format = DateTimePickerFormat.Short
+                Format = DateTimePickerFormat.Custom,
+                CustomFormat = "dd/MM/yyyy"
             };
 
             cmbStatus = new ComboBox
@@ -125,24 +128,32 @@ namespace MinhaEmpresa.Views
             { 
                 Location = new System.Drawing.Point(150, 380), 
                 Width = 300,
-                Height = 60,
-                Multiline = true
+                Height = 80,
+                Multiline = true,
+                ScrollBars = ScrollBars.Vertical
             };
 
             // Buttons
             btnSalvar = new Button
             {
                 Text = "Salvar",
-                Location = new System.Drawing.Point(150, 300),
-                Width = 100
+                Location = new System.Drawing.Point(150, 480),
+                Width = 100,
+                Height = 30,
+                BackColor = System.Drawing.Color.FromArgb(0, 120, 212),
+                ForeColor = System.Drawing.Color.White,
+                FlatStyle = FlatStyle.Flat
             };
             btnSalvar.Click += BtnSalvar_Click;
 
             btnVoltar = new Button
             {
                 Text = "Voltar",
-                Location = new System.Drawing.Point(350, 300),
-                Width = 100
+                Location = new System.Drawing.Point(350, 480),
+                Width = 100,
+                Height = 30,
+                BackColor = System.Drawing.Color.FromArgb(234, 234, 234),
+                FlatStyle = FlatStyle.Flat
             };
             btnVoltar.Click += (s, e) => this.Close();
 
