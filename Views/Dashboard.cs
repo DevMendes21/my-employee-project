@@ -459,8 +459,20 @@ namespace MinhaEmpresa.Views
                 Location = new Point(chartX, chartY + chartHeight + 20),
                 Width = chartWidth,
                 Height = 100,
-                BackColor = Color.Transparent
+                BackColor = Color.Transparent,
+                BorderStyle = BorderStyle.None
             };
+            
+            // Adicionar título para a legenda
+            Label lblLegendTitle = new Label
+            {
+                Text = "Departamentos:",
+                Location = new Point(0, 0),
+                AutoSize = true,
+                ForeColor = Color.FromArgb(70, 70, 70),
+                Font = new Font("Segoe UI", 9, FontStyle.Bold)
+            };
+            legendPanel.Controls.Add(lblLegendTitle);
             
             int colorIndex = 0;
             for (int i = 0; i < departamentos.Count; i++)
@@ -515,11 +527,17 @@ namespace MinhaEmpresa.Views
                 // Criar item de legenda
                 Panel legendItem = new Panel
                 {
-                    Location = new Point(i * (chartWidth / 4), (i / 4) * 25),
+                    Location = new Point((i % 4) * (chartWidth / 4), (i / 4) * 25),
                     Width = chartWidth / 4,
                     Height = 20,
                     BackColor = Color.Transparent
                 };
+                
+                // Garantir que a legenda do TI seja visível
+                if (departamento.Nome == "TI")
+                {
+                    Console.WriteLine("Criando legenda para o departamento de TI");
+                }
                 
                 Panel colorBox = new Panel
                 {
@@ -535,8 +553,14 @@ namespace MinhaEmpresa.Views
                     Location = new Point(15, 0),
                     AutoSize = true,
                     ForeColor = Color.FromArgb(50, 50, 50),
-                    Font = new Font("Segoe UI", 8)
+                    Font = new Font("Segoe UI", 8, departamento.Nome == "TI" ? FontStyle.Bold : FontStyle.Regular)
                 };
+                
+                // Destacar a legenda do TI se necessário
+                if (departamento.Nome == "TI")
+                {
+                    lblDepartamento.ForeColor = Color.FromArgb(41, 128, 185);
+                }
                 
                 legendItem.Controls.Add(colorBox);
                 legendItem.Controls.Add(lblDepartamento);
