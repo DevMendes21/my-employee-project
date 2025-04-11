@@ -12,7 +12,7 @@ namespace MinhaEmpresa.DAO
         public List<Cargo> ListarCargos()
         {
             List<Cargo> cargos = new List<Cargo>();
-            string sql = "SELECT * FROM cargos";
+            string sql = "SELECT DISTINCT id, nome, nivel FROM cargos ORDER BY nome";
 
             using (MySqlConnection conn = MinhaEmpresa.Conexao.Conexao.GetConnection())
             {
@@ -40,7 +40,10 @@ namespace MinhaEmpresa.DAO
                     throw new Exception("Erro ao listar cargos: " + ex.Message);
                 }
             }
-            return cargos;
+            return cargos.GroupBy(c => c.Nome)
+                         .Select(g => g.First())
+                         .OrderBy(c => c.Nome)
+                         .ToList();
         }
 
         public Cargo? ObterCargoPorId(int id)

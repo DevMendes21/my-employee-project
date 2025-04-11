@@ -12,7 +12,7 @@ namespace MinhaEmpresa.DAO
         public List<Departamento> ListarDepartamentos()
         {
             List<Departamento> departamentos = new List<Departamento>();
-            string sql = "SELECT * FROM departamentos";
+            string sql = "SELECT DISTINCT id, nome, data_criacao FROM departamentos ORDER BY nome";
 
             using (MySqlConnection conn = MinhaEmpresa.Conexao.Conexao.GetConnection())
             {
@@ -40,7 +40,10 @@ namespace MinhaEmpresa.DAO
                     throw new Exception("Erro ao listar departamentos: " + ex.Message);
                 }
             }
-            return departamentos;
+            return departamentos.GroupBy(d => d.Nome)
+                               .Select(g => g.First())
+                               .OrderBy(d => d.Nome)
+                               .ToList();
         }
 
         public Departamento? ObterDepartamentoPorId(int id)
