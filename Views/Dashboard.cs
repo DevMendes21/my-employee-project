@@ -59,7 +59,7 @@ namespace MinhaEmpresa.Views
         /// <summary>
         /// Carrega as configurau00e7u00f5es salvas
         /// </summary>
-        private void CarregarConfiguracoes()
+        public void CarregarConfiguracoes()
         {
             try
             {
@@ -379,7 +379,7 @@ namespace MinhaEmpresa.Views
             contentPanel.Controls.Add(chartPanel);
         }
         
-        private void LoadDashboardData()
+        public void LoadDashboardData()
         {
             try
             {

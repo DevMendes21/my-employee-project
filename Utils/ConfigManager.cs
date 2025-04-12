@@ -25,6 +25,7 @@ namespace MinhaEmpresa.Utils
             public bool AtualizacaoAutomatica { get; set; } = true;
             public string OrdenacaoGrafico { get; set; } = "Alfabu00e9tica";
             public bool MostrarValores { get; set; } = true;
+            public string Idioma { get; set; } = "pt-BR";
             public Dictionary<string, object> ConfiguracoesAdicionais { get; set; } = new Dictionary<string, object>();
         }
         

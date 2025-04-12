@@ -1,6 +1,7 @@
 using System;
 using System.Windows.Forms;
 using MinhaEmpresa.Views;
+using MinhaEmpresa.Utils;
 
 namespace MinhaEmpresa
 {
@@ -18,7 +19,14 @@ namespace MinhaEmpresa
                 Application.ThreadException += new System.Threading.ThreadExceptionEventHandler(Application_ThreadException);
                 AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
                 
-                Application.Run(new Dashboard());
+                // Inicializar o dashboard
+                Dashboard dashboard = new Dashboard();
+                
+                // Adicionar o botu00e3o de idioma ao dashboard
+                DashboardHelper.AdicionarBotaoIdioma(dashboard);
+                
+                // Iniciar o aplicativo
+                Application.Run(dashboard);
             }
             catch (Exception ex)
             {

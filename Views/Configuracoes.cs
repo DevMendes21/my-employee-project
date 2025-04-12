@@ -17,6 +17,7 @@ namespace MinhaEmpresa.Views
         public bool AtualizacaoAutomatica { get; private set; }
         public string OrdenacaoGrafico { get; private set; } = "Alfabética";  // Valor padrão
         public bool MostrarValores { get; private set; }
+        public string Idioma { get; private set; } = "pt-BR";  // Valor padrão
         
         // Referência ao Dashboard para atualizar as configurações
         private readonly Dashboard dashboard;
@@ -99,8 +100,8 @@ namespace MinhaEmpresa.Views
             var optionsPanel = new TableLayoutPanel
             {
                 ColumnCount = 2,
-                RowCount = 5,
-                Height = 280,
+                RowCount = 7, // Aumentado para acomodar a opu00e7u00e3o de idioma
+                Height = 380, // Aumentado para comportar mais opu00e7u00f5es
                 Width = mainPanel.Width - 20,
                 Location = new Point(10, 60),
                 CellBorderStyle = TableLayoutPanelCellBorderStyle.Single,
