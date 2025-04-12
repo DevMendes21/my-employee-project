@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace MinhaEmpresa.Views
+namespace MyEmployeeProject.Views
 {
     public partial class Menu : Form
     {

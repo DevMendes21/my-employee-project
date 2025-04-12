@@ -1,11 +1,11 @@
 using System;
 using System.Windows.Forms;
 using System.Collections.Generic;
-using MinhaEmpresa.Models;
-using MinhaEmpresa.DAO;
-using MinhaEmpresa.Conexao;
+using MyEmployeeProject.Models;
+using MyEmployeeProject.DAO;
+using MyEmployeeProject.Conexao;
 
-namespace MinhaEmpresa
+namespace MyEmployeeProject
 {
     public class TestRoleAssignment : Form
     {
@@ -125,7 +125,7 @@ namespace MinhaEmpresa
                 }
 
                 // Verificar se existe alguma restrição no banco de dados
-                using (var conn = MinhaEmpresa.Conexao.Conexao.GetConnection())
+                using (var conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
                 {
                     string sql = "SELECT COUNT(*) FROM funcionarios WHERE cargo_id = @cargoId AND departamento_id = @deptoId";
                     using (var cmd = new MySql.Data.MySqlClient.MySqlCommand(sql, conn))

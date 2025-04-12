@@ -1,4 +1,4 @@
-namespace MinhaEmpresa.Views
+namespace MyEmployeeProject.Views
 {
     partial class Menu
     {

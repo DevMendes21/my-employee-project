@@ -3,10 +3,10 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Collections.Generic;
-using MinhaEmpresa.DAO;
-using MinhaEmpresa.Models;
+using MyEmployeeProject.DAO;
+using MyEmployeeProject.Models;
 
-namespace MinhaEmpresa.Views
+namespace MyEmployeeProject.Views
 {
     public partial class MenuPrincipal : Form
     {

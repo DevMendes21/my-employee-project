@@ -1,10 +1,10 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using MinhaEmpresa.Utils;
-using static MinhaEmpresa.Utils.ConfigManager;
+using MyEmployeeProject.Utils;
+using static MyEmployeeProject.Utils.ConfigManager;
 
-namespace MinhaEmpresa.Views
+namespace MyEmployeeProject.Views
 {
     /// <summary>
     /// Formulu00e1rio para seleu00e7u00e3o de idioma

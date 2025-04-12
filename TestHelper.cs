@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using System.Text;
-using MinhaEmpresa.Models;
-using MinhaEmpresa.DAO;
+using MyEmployeeProject.Models;
+using MyEmployeeProject.DAO;
 
-namespace MinhaEmpresa
+namespace MyEmployeeProject
 {
     public static class TestHelper
     {

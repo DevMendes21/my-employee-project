@@ -2,9 +2,9 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Linq;
-using MinhaEmpresa.Views;
+using MyEmployeeProject.Views;
 
-namespace MinhaEmpresa.Utils
+namespace MyEmployeeProject.Utils
 {
     /// <summary>
     /// Classe auxiliar para adicionar funcionalidades ao Dashboard

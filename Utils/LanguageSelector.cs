@@ -1,9 +1,9 @@
 using System;
 using System.Windows.Forms;
-using MinhaEmpresa.Views;
-using static MinhaEmpresa.Utils.ConfigManager;
+using MyEmployeeProject.Views;
+using static MyEmployeeProject.Utils.ConfigManager;
 
-namespace MinhaEmpresa.Utils
+namespace MyEmployeeProject.Utils
 {
     /// <summary>
     /// Classe para gerenciar a seleção de idiomas no sistema

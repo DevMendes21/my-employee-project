@@ -1,9 +1,9 @@
 using System;
 using System.Windows.Forms;
-using MinhaEmpresa.Views;
-using MinhaEmpresa.Utils;
+using MyEmployeeProject.Views;
+using MyEmployeeProject.Utils;
 
-namespace MinhaEmpresa
+namespace MyEmployeeProject
 {
     static class Program
     {

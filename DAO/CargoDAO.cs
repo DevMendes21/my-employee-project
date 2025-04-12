@@ -14,7 +14,7 @@ namespace MyEmployeeProject.DAO
             List<Cargo> cargos = new List<Cargo>();
             string sql = "SELECT DISTINCT id, nome, nivel FROM cargos ORDER BY nome";
 
-            using (MySqlConnection conn = MinhaEmpresa.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
             {
                 try
                 {
@@ -51,7 +51,7 @@ namespace MyEmployeeProject.DAO
             string sql = "SELECT * FROM cargos WHERE id = @id";
             Cargo? cargo = null;
 
-            using (MySqlConnection conn = MinhaEmpresa.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
             {
                 try
                 {
