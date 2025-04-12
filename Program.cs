@@ -22,8 +22,6 @@ namespace MyEmployeeProject
                 // Inicializar o dashboard
                 Dashboard dashboard = new Dashboard();
                 
-                // Adicionar o botu00e3o de idioma ao dashboard
-                DashboardHelper.AdicionarBotaoIdioma(dashboard);
                 
                 // Iniciar o aplicativo
                 Application.Run(dashboard);

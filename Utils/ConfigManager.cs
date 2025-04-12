@@ -26,7 +26,6 @@ namespace MyEmployeeProject.Utils
             public string OrdenacaoGrafico { get; set; } = "Alfabética";
             public bool MostrarValores { get; set; } = true;
             public bool AltoContraste { get; set; } = false;
-            public string Idioma { get; set; } = "pt-BR";
             public Dictionary<string, object> ConfiguracoesAdicionais { get; set; } = new Dictionary<string, object>();
         }
         

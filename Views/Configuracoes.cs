@@ -8,7 +8,6 @@ using MyEmployeeProject.Models;
 using MyEmployeeProject.Utils;
 using static MyEmployeeProject.Utils.ConfigManager;
 using static MyEmployeeProject.Utils.UITheme;
-using static MyEmployeeProject.Utils.LocalizationManager;
 
 namespace MyEmployeeProject.Views
 {
@@ -19,7 +18,6 @@ namespace MyEmployeeProject.Views
         public bool AtualizacaoAutomatica { get; private set; }
         public string OrdenacaoGrafico { get; private set; } = "Alfabética";  // Valor padrão
         public bool MostrarValores { get; private set; }
-        public string Idioma { get; private set; } = "pt-BR";  // Valor padrão
         
         // Referência ao Dashboard para atualizar as configurações
         private readonly Dashboard dashboard;

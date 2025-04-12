@@ -8,7 +8,6 @@ using MyEmployeeProject.Models;
 using MyEmployeeProject.Utils;
 using static MyEmployeeProject.Utils.ConfigManager;
 using static MyEmployeeProject.Utils.UITheme;
-using static MyEmployeeProject.Utils.LocalizationManager;
 using static MyEmployeeProject.Utils.KeyboardShortcuts;
 namespace MyEmployeeProject.Views
 {
