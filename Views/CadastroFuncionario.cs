@@ -2,10 +2,10 @@ using System;
 using System.Windows.Forms;
 using System.Collections.Generic;
 using System.Linq;
-using MinhaEmpresa.Models;
-using MinhaEmpresa.DAO;
+using MyEmployeeProject.Models;
+using MyEmployeeProject.DAO;
 
-namespace MinhaEmpresa.Views
+namespace MyEmployeeProject.Views
 {
     public partial class CadastroFuncionario : Form
     {

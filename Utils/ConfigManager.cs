@@ -3,7 +3,7 @@ using System.IO;
 using System.Text.Json;
 using System.Collections.Generic;
 
-namespace MinhaEmpresa.Utils
+namespace MyEmployeeProject.Utils
 {
     /// <summary>
     /// Gerencia a persistu00eancia e carregamento das configurau00e7u00f5es do sistema
@@ -12,7 +12,7 @@ namespace MinhaEmpresa.Utils
     {
         private static readonly string ConfigFilePath = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "MinhaEmpresa",
+            "MyEmployeeProject",
             "config.json"
         );
         
@@ -23,8 +23,9 @@ namespace MinhaEmpresa.Utils
         {
             public bool TemaEscuro { get; set; } = false;
             public bool AtualizacaoAutomatica { get; set; } = true;
-            public string OrdenacaoGrafico { get; set; } = "Alfabu00e9tica";
+            public string OrdenacaoGrafico { get; set; } = "Alfabética";
             public bool MostrarValores { get; set; } = true;
+            public bool AltoContraste { get; set; } = false;
             public string Idioma { get; set; } = "pt-BR";
             public Dictionary<string, object> ConfiguracoesAdicionais { get; set; } = new Dictionary<string, object>();
         }

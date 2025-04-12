@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using MinhaEmpresa.DAO;
-using MinhaEmpresa.Models;
-using MinhaEmpresa.Utils;
-using static MinhaEmpresa.Utils.ConfigManager;
-using static MinhaEmpresa.Utils.KeyboardShortcuts;
-
-namespace MinhaEmpresa.Views
+using MyEmployeeProject.DAO;
+using MyEmployeeProject.Models;
+using MyEmployeeProject.Utils;
+using static MyEmployeeProject.Utils.ConfigManager;
+using static MyEmployeeProject.Utils.UITheme;
+using static MyEmployeeProject.Utils.LocalizationManager;
+using static MyEmployeeProject.Utils.KeyboardShortcuts;
+namespace MyEmployeeProject.Views
 {
     public partial class Dashboard : Form
     {

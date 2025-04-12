@@ -4,11 +4,13 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using System.Collections.Generic;
-using MinhaEmpresa.Models;
-using MinhaEmpresa.Utils;
-using static MinhaEmpresa.Utils.ConfigManager;
+using MyEmployeeProject.Models;
+using MyEmployeeProject.Utils;
+using static MyEmployeeProject.Utils.ConfigManager;
+using static MyEmployeeProject.Utils.UITheme;
+using static MyEmployeeProject.Utils.LocalizationManager;
 
-namespace MinhaEmpresa.Views
+namespace MyEmployeeProject.Views
 {
     public partial class Configuracoes : Form
     {

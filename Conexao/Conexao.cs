@@ -2,7 +2,7 @@ using MySql.Data.MySqlClient;
 using System;
 using System.Configuration;
 
-namespace MinhaEmpresa.Conexao
+namespace MyEmployeeProject.Conexao
 {
     using global::MySql.Data.MySqlClient;
     using global::System.Configuration;

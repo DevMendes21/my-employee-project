@@ -1,9 +1,9 @@
 using System;
 using System.Windows.Forms;
-using MinhaEmpresa.Models;
-using MinhaEmpresa.DAO;
+using MyEmployeeProject.Models;
+using MyEmployeeProject.DAO;
 
-namespace MinhaEmpresa.Views
+namespace MyEmployeeProject.Views
 {
     public partial class ListagemFuncionarios : Form
     {

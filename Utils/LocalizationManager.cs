@@ -5,7 +5,7 @@ using System.IO;
 using System.Text.Json;
 using System.Threading;
 
-namespace MinhaEmpresa.Utils
+namespace MyEmployeeProject.Utils
 {
     /// <summary>
     /// Gerencia a localizau00e7u00e3o e internacionalizau00e7u00e3o do sistema
@@ -14,7 +14,7 @@ namespace MinhaEmpresa.Utils
     {
         private static readonly string LocalizationDirectory = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "MinhaEmpresa",
+            "MyEmployeeProject",
             "Localization"
         );
 

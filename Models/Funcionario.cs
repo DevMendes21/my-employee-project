@@ -1,6 +1,6 @@
 using System;
 
-namespace MinhaEmpresa.Models
+namespace MyEmployeeProject.Models
 {
     public class Departamento
     {

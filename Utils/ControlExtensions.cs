@@ -1,6 +1,6 @@
 using System.Windows.Forms;
 
-namespace MinhaEmpresa.Utils
+namespace MyEmployeeProject.Utils
 {
     /// <summary>
     /// Classe de extensu00f5es para controles da interface

@@ -2,16 +2,22 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Collections.Generic;
-using MinhaEmpresa.Utils;
-using static MinhaEmpresa.Utils.ConfigManager;
+using MyEmployeeProject.Utils;
+using MyEmployeeProject.Models;
+using static MyEmployeeProject.Utils.Export;
+using static MyEmployeeProject.Utils.ConfigManager;
+using static MyEmployeeProject.Utils.UITheme;
+using static MyEmployeeProject.Utils.LocalizationManager;
 
-namespace MinhaEmpresa.Views
+namespace MyEmployeeProject.Views
 {
     /// <summary>
     /// Tela de configurau00e7u00f5es do sistema com suporte a idiomas
     /// </summary>
     public partial class ConfiguracoesIdioma : Form
     {
+        private readonly ToolTip toolTip = new ToolTip();
+
         // Propriedades para armazenar as configurau00e7u00f5es
         private bool _temaEscuro;
         private bool _atualizacaoAutomatica;
@@ -104,7 +110,8 @@ namespace MinhaEmpresa.Views
                 _temaEscuro = !_temaEscuro;
                 AtualizarTema();
             };
-            btnAlternarTema.SetToolTip("Alterna entre o tema claro e escuro da interface");
+            var toolTip = new ToolTip();
+toolTip.SetToolTip(btnAlternarTema, "Alterna entre o tema claro e escuro da interface");
             
             // 2. Atualizau00e7u00e3o Automu00e1tica
             Label lblAtualizacao = new Label
@@ -254,11 +261,40 @@ namespace MinhaEmpresa.Views
                 Margin = new Padding(10, 5, 10, 5)
             };
             
-            // Adicionar idiomas disponu00edveis
-            cmbIdioma.Items.Add("Portuguu00eas (Brasil)");
-            cmbIdioma.Items.Add("English (US)");
+            // Adicionar idiomas disponíveis
+            cmbIdioma.Items.Add(new IdiomaItem("pt-BR", "Português (Brasil)"));
+            cmbIdioma.Items.Add(new IdiomaItem("en-US", "English (US)"));
+            
+            // Configurar exibição
+            cmbIdioma.DisplayMember = "Nome";
+            cmbIdioma.ValueMember = "Codigo";
             
             // Selecionar o idioma atual
+            string idiomaAtual = Config.Idioma;
+            foreach (IdiomaItem item in cmbIdioma.Items)
+            {
+                if (item.Code == idiomaAtual)
+                {
+                    cmbIdioma.SelectedItem = item;
+                    break;
+                }
+            }
+            
+            // Adicionar handler para mudança de idioma
+            cmbIdioma.SelectedIndexChanged += (sender, e) =>
+            {
+                if (cmbIdioma.SelectedItem is IdiomaItem item)
+                {
+                    var config = Config;
+                    config.Idioma = item.Code;
+                    ConfigManager.SalvarConfiguracoes(config);
+                    LocalizationManager.CurrentLanguage = item.Code;
+                }
+            };
+            
+            // Adicionar tooltip
+            ToolTip tooltip = new ToolTip();
+            tooltip.SetToolTip(cmbIdioma, "Selecione o idioma do sistema");
             cmbIdioma.SelectedIndex = _idioma == "pt-BR" ? 0 : 1;
             
             cmbIdioma.SelectedIndexChanged += (sender, e) =>
@@ -365,27 +401,29 @@ namespace MinhaEmpresa.Views
         {
             try
             {
-                // Atualizar objeto de configurau00e7u00f5es
+                // Atualizar objeto de configurações
                 var appConfig = new AppConfig
                 {
                     TemaEscuro = _temaEscuro,
                     AtualizacaoAutomatica = _atualizacaoAutomatica,
                     OrdenacaoGrafico = _ordenacaoGrafico,
                     MostrarValores = _mostrarValores,
+                    AltoContraste = _altoContraste,
                     Idioma = _idioma
                 };
                 
-                // Salvar configurau00e7u00f5es no arquivo
+                // Salvar configurações no arquivo
                 ConfigManager.SalvarConfiguracoes(appConfig);
                 
                 // Atualizar idioma do sistema
                 LocalizationManager.CurrentLanguage = _idioma;
                 
-                // Mostrar feedback ao usuu00e1rio
-                MessageBox.Show("Configurau00e7u00f5es salvas com sucesso!", "Configurau00e7u00f5es", 
-                    MessageBoxButtons.OK, MessageBoxIcon.Information);
+                // Mostrar feedback ao usuário
+                string message = _idioma == "pt-BR" ? "Configurações salvas com sucesso!" : "Settings saved successfully!";
+                string title = _idioma == "pt-BR" ? "Configurações" : "Settings";
+                MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 
-                // Fechar o formulu00e1rio
+                // Fechar o formulário
                 this.DialogResult = DialogResult.OK;
                 this.Close();
             }

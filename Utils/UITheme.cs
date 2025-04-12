@@ -1,8 +1,8 @@
 using System.Drawing;
 using System.Windows.Forms;
-using static MinhaEmpresa.Utils.ConfigManager;
+using static MyEmployeeProject.Utils.ConfigManager;
 
-namespace MinhaEmpresa.Utils
+namespace MyEmployeeProject.Utils
 {
     /// <summary>
     /// Classe de utilitários para manter consistência visual em toda a aplicação

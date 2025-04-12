@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using MySql.Data.MySqlClient;
-using MinhaEmpresa.Models;
-using MinhaEmpresa.Conexao;
+using MyEmployeeProject.Models;
+using MyEmployeeProject.Conexao;
 
-namespace MinhaEmpresa.DAO
+namespace MyEmployeeProject.DAO
 {
     public class FuncionarioDAO
     {
@@ -44,7 +44,7 @@ namespace MinhaEmpresa.DAO
             string sql = "INSERT INTO funcionarios (nome, email, telefone, cargo_id, departamento_id, salario, data_contratacao, data_nascimento, observacoes, status) " +
                         "VALUES (@nome, @email, @telefone, @cargoId, @departamentoId, @salario, @dataContratacao, @dataNascimento, @observacoes, @status)";
 
-            using (MySqlConnection conn = MinhaEmpresa.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
             {
                 try
                 {
@@ -87,7 +87,7 @@ namespace MinhaEmpresa.DAO
                         LEFT JOIN cargos c ON f.cargo_id = c.id
                         LEFT JOIN departamentos d ON f.departamento_id = d.id";
 
-            using (MySqlConnection conn = MinhaEmpresa.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
             {
                 try
                 {
@@ -182,7 +182,7 @@ namespace MinhaEmpresa.DAO
                              observacoes = @observacoes
                          WHERE id = @id";
 
-            using (MySqlConnection conn = MinhaEmpresa.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
             {
                 try
                 {
@@ -217,7 +217,7 @@ namespace MinhaEmpresa.DAO
         {
             string sql = "DELETE FROM funcionarios WHERE id = @id";
 
-            using (MySqlConnection conn = MinhaEmpresa.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
             {
                 try
                 {
