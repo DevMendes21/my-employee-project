@@ -46,7 +46,7 @@ namespace MinhaEmpresa.Utils
                     }
                     catch (Exception ex)
                     {
-                        LogManager.Error($"Erro ao definir cultura: {ex.Message}", "LocalizationManager");
+                        Console.WriteLine($"Erro ao definir cultura: {ex.Message}");
                     }
                 }
             }
@@ -62,25 +62,41 @@ namespace MinhaEmpresa.Utils
         /// </summary>
         static LocalizationManager()
         {
-            // Garantir que o diretu00f3rio de localizau00e7u00e3o exista
-            if (!Directory.Exists(LocalizationDirectory))
+            try
             {
+                // Garantir que o diretu00f3rio de localizau00e7u00e3o exista
+                if (!Directory.Exists(LocalizationDirectory))
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(LocalizationDirectory);
+                        // Criar arquivos de traduu00e7u00e3o padru00e3o se nu00e3o existirem
+                        CreateDefaultTranslationFiles();
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Erro ao criar diretu00f3rio de localizau00e7u00e3o: {ex.Message}");
+                    }
+                }
+
                 try
                 {
-                    Directory.CreateDirectory(LocalizationDirectory);
-                    // Criar arquivos de traduu00e7u00e3o padru00e3o se nu00e3o existirem
-                    CreateDefaultTranslationFiles();
+                    // Carregar idioma salvo nas configurau00e7u00f5es
+                    string savedLanguage = ConfigManager.ObterConfiguracao<string>("CurrentLanguage", "pt-BR");
+                    _currentLanguage = savedLanguage;
+                    LoadTranslations(savedLanguage);
                 }
                 catch (Exception ex)
                 {
-                    LogManager.Error($"Erro ao criar diretu00f3rio de localizau00e7u00e3o: {ex.Message}", "LocalizationManager");
+                    Console.WriteLine($"Erro ao carregar idioma: {ex.Message}");
+                    // Em caso de erro, usar o idioma padru00e3o
+                    _currentLanguage = "pt-BR";
                 }
             }
-
-            // Carregar idioma salvo nas configurau00e7u00f5es
-            string savedLanguage = ConfigManager.ObterConfiguracao<string>("CurrentLanguage", "pt-BR");
-            _currentLanguage = savedLanguage;
-            LoadTranslations(savedLanguage);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro na inicializau00e7u00e3o do LocalizationManager: {ex.Message}");
+            }
         }
 
         /// <summary>
@@ -138,14 +154,14 @@ namespace MinhaEmpresa.Utils
                 }
                 else
                 {
-                    LogManager.Warning($"Arquivo de traduu00e7u00e3o nu00e3o encontrado: {filePath}", "LocalizationManager");
+                    Console.WriteLine($"Arquivo de traduu00e7u00e3o nu00e3o encontrado: {filePath}");
                     // Criar arquivo de traduu00e7u00e3o padru00e3o
                     CreateDefaultTranslationFile(language);
                 }
             }
             catch (Exception ex)
             {
-                LogManager.Error($"Erro ao carregar traduu00e7u00f5es: {ex.Message}", "LocalizationManager");
+                Console.WriteLine($"Erro ao carregar traduu00e7u00f5es: {ex.Message}");
             }
         }
 
@@ -206,11 +222,11 @@ namespace MinhaEmpresa.Utils
                     _translations.Add(language, defaultTranslations);
                 }
 
-                LogManager.Info($"Arquivo de traduu00e7u00e3o criado: {language}", "LocalizationManager");
+                Console.WriteLine($"Arquivo de traduu00e7u00e3o criado: {language}");
             }
             catch (Exception ex)
             {
-                LogManager.Error($"Erro ao criar arquivo de traduu00e7u00e3o: {ex.Message}", "LocalizationManager");
+                Console.WriteLine($"Erro ao criar arquivo de traduu00e7u00e3o: {ex.Message}");
             }
         }
 
@@ -359,7 +375,7 @@ namespace MinhaEmpresa.Utils
             }
             catch (Exception ex)
             {
-                LogManager.Error($"Erro ao definir traduu00e7u00e3o: {ex.Message}", "LocalizationManager");
+                Console.WriteLine($"Erro ao definir traduu00e7u00e3o: {ex.Message}");
             }
         }
 
@@ -382,7 +398,7 @@ namespace MinhaEmpresa.Utils
             }
             catch (Exception ex)
             {
-                LogManager.Error($"Erro ao salvar traduu00e7u00f5es: {ex.Message}", "LocalizationManager");
+                Console.WriteLine($"Erro ao salvar traduu00e7u00f5es: {ex.Message}");
             }
         }
 

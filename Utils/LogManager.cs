@@ -35,17 +35,24 @@ namespace MinhaEmpresa.Utils
         /// </summary>
         static LogManager()
         {
-            // Garantir que o diretório de logs exista
-            if (!Directory.Exists(LogDirectory))
+            try
             {
-                try
+                // Garantir que o diretório de logs exista
+                if (!Directory.Exists(LogDirectory))
                 {
-                    Directory.CreateDirectory(LogDirectory);
+                    try
+                    {
+                        Directory.CreateDirectory(LogDirectory);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Erro ao criar diretório de logs: {ex.Message}");
+                    }
                 }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Erro ao criar diretório de logs: {ex.Message}");
-                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro na inicialização do LogManager: {ex.Message}");
             }
         }
 
