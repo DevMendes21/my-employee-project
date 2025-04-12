@@ -5,6 +5,9 @@ using System.Linq;
 using System.Windows.Forms;
 using MinhaEmpresa.DAO;
 using MinhaEmpresa.Models;
+using MinhaEmpresa.Utils;
+using static MinhaEmpresa.Utils.ConfigManager;
+using static MinhaEmpresa.Utils.KeyboardShortcuts;
 
 namespace MinhaEmpresa.Views
 {
@@ -37,12 +40,38 @@ namespace MinhaEmpresa.Views
         {
             InitializeComponent();
             InitializeCustomComponents();
+            CarregarConfiguracoes();
+            ConfigurarTeclasAtalho();
             LoadDashboardData();
             
             // Atualizar data e hora a cada segundo
             timer = new System.Windows.Forms.Timer { Interval = 1000 };
             timer.Tick += (s, e) => UpdateDateTime();
             timer.Start();
+            
+            // Configurar suporte a teclas de atalho
+            SetupFormShortcuts(this);
+        }
+        
+        /// <summary>
+        /// Carrega as configurau00e7u00f5es salvas
+        /// </summary>
+        private void CarregarConfiguracoes()
+        {
+            // Carregar configurau00e7u00f5es do arquivo
+            temaEscuro = Config.TemaEscuro;
+            atualizacaoAutomatica = Config.AtualizacaoAutomatica;
+            ordenacaoGrafico = Config.OrdenacaoGrafico;
+            mostrarValores = Config.MostrarValores;
+            
+            // Carregar configurau00e7u00f5es de acessibilidade
+            UITheme.LoadAccessibilitySettings();
+            
+            // Aplicar tema
+            AplicarTema();
+            
+            // Configurar timer de atualizau00e7u00e3o automau00e1tica
+            timer.Enabled = atualizacaoAutomatica;
         }
         
         private void InitializeComponent()
@@ -51,7 +80,7 @@ namespace MinhaEmpresa.Views
             this.Width = 1200;
             this.Height = 800;
             this.StartPosition = FormStartPosition.CenterScreen;
-            this.BackColor = Color.FromArgb(240, 240, 240);
+            this.BackColor = UITheme.LightBackground;
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
             this.MaximizeBox = true;
             this.Icon = SystemIcons.Application;
@@ -80,7 +109,7 @@ namespace MinhaEmpresa.Views
             // Painel lateral (menu)
             sidePanel = new Panel
             {
-                BackColor = Color.FromArgb(52, 73, 94),
+                BackColor = UITheme.SecondaryColor,
                 Location = new Point(0, 0),
                 Width = 250,
                 Height = this.ClientSize.Height,
@@ -90,7 +119,7 @@ namespace MinhaEmpresa.Views
             // Painel de cabeçalho
             headerPanel = new Panel
             {
-                BackColor = Color.FromArgb(41, 128, 185),
+                BackColor = UITheme.PrimaryColor,
                 Location = new Point(250, 0),
                 Width = this.ClientSize.Width - 250,
                 Height = 80,
@@ -100,7 +129,7 @@ namespace MinhaEmpresa.Views
             // Painel de conteúdo
             contentPanel = new Panel
             {
-                BackColor = Color.FromArgb(240, 240, 240),
+                BackColor = UITheme.LightBackground,
                 Location = new Point(250, 80),
                 Width = this.ClientSize.Width - 250,
                 Height = this.ClientSize.Height - 80,
@@ -137,21 +166,26 @@ namespace MinhaEmpresa.Views
             Button btnDashboard = CreateMenuButton("Dashboard", "\uD83D\uDCCA", 120);
             btnDashboard.BackColor = Color.FromArgb(41, 128, 185); // Destacar o botão ativo
             btnDashboard.Click += (s, e) => { /* Já estamos no dashboard */ };
+            btnDashboard.SetToolTip("Visualizar painel principal com estatísticas e gráficos");
             
             Button btnFuncionarios = CreateMenuButton("Funcionários", "\uD83D\uDC64", 180);
             btnFuncionarios.Click += (s, e) => new ListagemFuncionarios().Show();
+            btnFuncionarios.SetToolTip("Visualizar e gerenciar lista de funcionários (Ctrl+F)");
             
             Button btnCadastrar = CreateMenuButton("Novo Funcionário", "\u2795", 240);
             btnCadastrar.Click += (s, e) => new CadastroFuncionario().Show();
+            btnCadastrar.SetToolTip("Cadastrar novo funcionário no sistema (Ctrl+N)");
             
             Button btnRelatorios = CreateMenuButton("Relatórios", "\uD83D\uDCC8", 300);
             btnRelatorios.Click += (s, e) => MessageBox.Show("Funcionalidade de relatórios em desenvolvimento.", "Informação", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            btnRelatorios.SetToolTip("Gerar relatórios e exportar dados");
             
             // Botão de configurações
             Button btnConfiguracoes = CreateMenuButton("Configurações", "⚙️", 360);
             btnConfiguracoes.Click += (sender, e) => {
                 AbrirConfiguracoes();
             };
+            btnConfiguracoes.SetToolTip("Abrir tela de configurações do sistema (Ctrl+C)");
             
             // Adicionar controles ao painel lateral
             sidePanel.Controls.AddRange(new Control[] { 
@@ -746,6 +780,9 @@ namespace MinhaEmpresa.Views
             
             // Configurar timer de atualização automática
             timer.Enabled = atualizacaoAutomatica;
+            
+            // Redesenhar o gráfico com as novas configurações
+            LoadDashboardData();
         }
         
         private void AplicarTema()
@@ -753,19 +790,19 @@ namespace MinhaEmpresa.Views
             if (temaEscuro)
             {
                 // Aplicar tema escuro
-                this.BackColor = Color.FromArgb(30, 30, 30);
-                contentPanel.BackColor = Color.FromArgb(45, 45, 45);
-                headerPanel.BackColor = Color.FromArgb(20, 60, 90);
+                this.BackColor = UITheme.DarkBackground;
+                contentPanel.BackColor = UITheme.DarkPanelBackground;
+                headerPanel.BackColor = UITheme.DarkHeaderBackground;
                 
                 // Atualizar cores dos painéis de estatísticas
                 foreach (var panel in statPanels)
                 {
-                    panel.BackColor = Color.FromArgb(60, 60, 60);
+                    panel.BackColor = UITheme.HighContrastMode ? Color.Black : Color.FromArgb(60, 60, 60);
                     foreach (Control control in panel.Controls)
                     {
                         if (control is Label label)
                         {
-                            label.ForeColor = Color.White;
+                            label.ForeColor = UITheme.DarkTextColor;
                         }
                     }
                 }
@@ -773,25 +810,34 @@ namespace MinhaEmpresa.Views
             else
             {
                 // Restaurar tema claro (padrão)
-                this.BackColor = Color.FromArgb(240, 240, 240);
-                contentPanel.BackColor = Color.FromArgb(240, 240, 240);
-                headerPanel.BackColor = Color.FromArgb(41, 128, 185);
+                this.BackColor = UITheme.LightBackground;
+                contentPanel.BackColor = UITheme.LightBackground;
+                headerPanel.BackColor = UITheme.PrimaryColor;
                 
                 // Restaurar cores dos painéis de estatísticas
                 foreach (var panel in statPanels)
                 {
-                    panel.BackColor = Color.White;
+                    panel.BackColor = UITheme.HighContrastMode ? Color.White : Color.White;
                     foreach (Control control in panel.Controls)
                     {
                         if (control is Label label && label.Tag?.ToString() != "value")
                         {
-                            label.ForeColor = Color.FromArgb(100, 100, 100);
+                            label.ForeColor = UITheme.SubtitleTextColor;
                         }
                         else if (control is Label valueLabel && valueLabel.Tag?.ToString() == "value")
                         {
-                            valueLabel.ForeColor = Color.FromArgb(50, 50, 50);
+                            valueLabel.ForeColor = UITheme.LightTextColor;
                         }
                     }
+                }
+            }
+            
+            // Atualizar borda dos botões para melhor contraste se necessário
+            foreach (Control control in sidePanel.Controls)
+            {
+                if (control is Button button)
+                {
+                    button.FlatAppearance.BorderSize = UITheme.HighContrastMode ? 1 : 0;
                 }
             }
         }
@@ -800,6 +846,89 @@ namespace MinhaEmpresa.Views
         {
             // Método para obter a lista de funcionários para exportação
             return funcionarioDAO.ListarFuncionarios();
+        }
+        
+        /// <summary>
+        /// Configura as teclas de atalho para o Dashboard
+        /// </summary>
+        private void ConfigurarTeclasAtalho()
+        {
+            // Tecla F1 - Ajuda
+            RegisterShortcut(Keys.F1, () => {
+                string ajudaTexto = @"Teclas de atalho disponíveis:
+
+F1 - Exibir esta ajuda
+F5 - Atualizar dados
+Ctrl+C - Abrir configurações
+Ctrl+F - Abrir lista de funcionários
+Ctrl+N - Novo funcionário
+Alt+H - Alternar modo de alto contraste";
+                MessageBox.Show(ajudaTexto, "Ajuda - Teclas de Atalho", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            });
+            
+            // Tecla F5 - Atualizar dados
+            RegisterShortcut(Keys.F5, () => {
+                LoadDashboardData();
+                MostrarMensagemStatus("Dados atualizados com sucesso!");
+            });
+            
+            // Ctrl+C - Abrir configurações
+            RegisterShortcut(Keys.Control | Keys.C, () => {
+                AbrirConfiguracoes();
+            });
+            
+            // Ctrl+F - Abrir lista de funcionários
+            RegisterShortcut(Keys.Control | Keys.F, () => {
+                new ListagemFuncionarios().Show();
+            });
+            
+            // Ctrl+N - Novo funcionário
+            RegisterShortcut(Keys.Control | Keys.N, () => {
+                new CadastroFuncionario().Show();
+            });
+            
+            // Alt+H - Alternar modo de alto contraste
+            RegisterShortcut(Keys.Alt | Keys.H, () => {
+                UITheme.HighContrastMode = !UITheme.HighContrastMode;
+                AplicarTema();
+                MostrarMensagemStatus(UITheme.HighContrastMode ? "Modo de alto contraste ativado" : "Modo de alto contraste desativado");
+            });
+        }
+        
+        /// <summary>
+        /// Exibe uma mensagem de status temporária para o usuário
+        /// </summary>
+        private void MostrarMensagemStatus(string mensagem)
+        {
+            // Criar um label temporário para exibir a mensagem
+            Label lblStatus = new Label
+            {
+                Text = mensagem,
+                AutoSize = false,
+                TextAlign = ContentAlignment.MiddleCenter,
+                Dock = DockStyle.None,
+                Width = 300,
+                Height = 40,
+                Location = new Point((this.Width - 300) / 2, this.Height - 100),
+                BackColor = UITheme.SuccessColor,
+                ForeColor = UITheme.DarkTextColor,
+                Font = new Font("Segoe UI", 12, FontStyle.Bold),
+                BorderStyle = BorderStyle.FixedSingle,
+                Padding = new Padding(10)
+            };
+            
+            this.Controls.Add(lblStatus);
+            lblStatus.BringToFront();
+            
+            // Timer para remover a mensagem após alguns segundos
+            System.Windows.Forms.Timer statusTimer = new System.Windows.Forms.Timer { Interval = 3000 };
+            statusTimer.Tick += (s, e) => {
+                this.Controls.Remove(lblStatus);
+                lblStatus.Dispose();
+                statusTimer.Stop();
+                statusTimer.Dispose();
+            };
+            statusTimer.Start();
         }
     }
 }
