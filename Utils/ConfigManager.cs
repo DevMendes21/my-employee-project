@@ -31,6 +31,21 @@ namespace MinhaEmpresa.Utils
         // Instu00e2ncia u00fanica das configurau00e7u00f5es
         private static AppConfig? _config;
         
+        // Inicializador estático para garantir que as configurações sejam carregadas
+        static ConfigManager()
+        {
+            try
+            {
+                _config = CarregarConfiguracoes();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Erro ao inicializar ConfigManager: {ex.Message}");
+                // Em caso de erro, criar uma configuração padrão
+                _config = new AppConfig();
+            }
+        }
+        
         /// <summary>
         /// Obtu00e9m as configurau00e7u00f5es atuais do sistema
         /// </summary>
@@ -38,9 +53,10 @@ namespace MinhaEmpresa.Utils
         {
             get
             {
+                // Garantir que _config nunca seja nulo
                 if (_config == null)
                 {
-                    _config = CarregarConfiguracoes();
+                    _config = new AppConfig();
                 }
                 return _config;
             }

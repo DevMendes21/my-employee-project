@@ -39,14 +39,17 @@ namespace MinhaEmpresa.Views
         public Dashboard()
         {
             InitializeComponent();
+            
+            // Inicializar o timer antes de carregar as configurau00e7u00f5es
+            timer = new System.Windows.Forms.Timer { Interval = 1000 };
+            timer.Tick += (s, e) => UpdateDateTime();
+            
             InitializeCustomComponents();
             CarregarConfiguracoes();
             ConfigurarTeclasAtalho();
             LoadDashboardData();
             
-            // Atualizar data e hora a cada segundo
-            timer = new System.Windows.Forms.Timer { Interval = 1000 };
-            timer.Tick += (s, e) => UpdateDateTime();
+            // Iniciar o timer
             timer.Start();
             
             // Configurar suporte a teclas de atalho
@@ -58,20 +61,38 @@ namespace MinhaEmpresa.Views
         /// </summary>
         private void CarregarConfiguracoes()
         {
-            // Carregar configurau00e7u00f5es do arquivo
-            temaEscuro = Config.TemaEscuro;
-            atualizacaoAutomatica = Config.AtualizacaoAutomatica;
-            ordenacaoGrafico = Config.OrdenacaoGrafico;
-            mostrarValores = Config.MostrarValores;
-            
-            // Carregar configurau00e7u00f5es de acessibilidade
-            UITheme.LoadAccessibilitySettings();
-            
-            // Aplicar tema
-            AplicarTema();
-            
-            // Configurar timer de atualizau00e7u00e3o automau00e1tica
-            timer.Enabled = atualizacaoAutomatica;
+            try
+            {
+                // Carregar configurau00e7u00f5es do arquivo
+                temaEscuro = Config.TemaEscuro;
+                atualizacaoAutomatica = Config.AtualizacaoAutomatica;
+                ordenacaoGrafico = Config.OrdenacaoGrafico;
+                mostrarValores = Config.MostrarValores;
+                
+                // Carregar configurau00e7u00f5es de acessibilidade
+                UITheme.LoadAccessibilitySettings();
+                
+                // Aplicar tema
+                AplicarTema();
+                
+                // Configurar timer de atualizau00e7u00e3o automau00e1tica (verificar se o timer foi inicializado)
+                if (timer != null)
+                {
+                    timer.Enabled = atualizacaoAutomatica;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Em caso de erro, usar configurau00e7u00f5es padru00e3o
+                Console.WriteLine($"Erro ao carregar configurau00e7u00f5es: {ex.Message}");
+                MessageBox.Show($"Ocorreu um erro ao carregar as configurau00e7u00f5es. Seru00e3o usadas as configurau00e7u00f5es padru00e3o.\n\nDetalhes: {ex.Message}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                
+                // Definir valores padru00e3o
+                temaEscuro = false;
+                atualizacaoAutomatica = true;
+                ordenacaoGrafico = "Alfabu00e9tica";
+                mostrarValores = true;
+            }
         }
         
         private void InitializeComponent()
