@@ -85,3 +85,10 @@ MinhaEmpresa/
 ├── Views/       # Formulários da interface
 └── Program.cs   # Ponto de entrada
 ```
+
+## Arquivos que eu preferi fazer todo em Ingles
+
+```
+MenuPrincipal.cs
+Menu.Designer.cs
+```
