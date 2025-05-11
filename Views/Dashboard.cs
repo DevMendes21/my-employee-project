@@ -40,7 +40,7 @@ namespace MyEmployeeProject.Views
         {
             InitializeComponent();
             
-            // Inicializar o timer antes de carregar as configurau00e7u00f5es
+            // Inicializar o timer antes de carregar as configuraçoes
             timer = new System.Windows.Forms.Timer { Interval = 1000 };
             timer.Tick += (s, e) => UpdateDateTime();
             
@@ -57,25 +57,25 @@ namespace MyEmployeeProject.Views
         }
         
         /// <summary>
-        /// Carrega as configurau00e7u00f5es salvas
+        /// Carrega as configuraçoes salvas
         /// </summary>
         public void CarregarConfiguracoes()
         {
             try
             {
-                // Carregar configurau00e7u00f5es do arquivo
+                // Carregar configuraçoes do arquivo
                 temaEscuro = Config.TemaEscuro;
                 atualizacaoAutomatica = Config.AtualizacaoAutomatica;
                 ordenacaoGrafico = Config.OrdenacaoGrafico;
                 mostrarValores = Config.MostrarValores;
                 
-                // Carregar configurau00e7u00f5es de acessibilidade
+                // Carregar configuraçoes de acessibilidade
                 UITheme.LoadAccessibilitySettings();
                 
                 // Aplicar tema
                 AplicarTema();
                 
-                // Configurar timer de atualizau00e7u00e3o automau00e1tica (verificar se o timer foi inicializado)
+                // Configurar timer de atualizacao automatica (verificar se o timer foi inicializado)
                 if (timer != null)
                 {
                     timer.Enabled = atualizacaoAutomatica;
@@ -83,11 +83,11 @@ namespace MyEmployeeProject.Views
             }
             catch (Exception ex)
             {
-                // Em caso de erro, usar configurau00e7u00f5es padru00e3o
-                Console.WriteLine($"Erro ao carregar configurau00e7u00f5es: {ex.Message}");
-                MessageBox.Show($"Ocorreu um erro ao carregar as configurau00e7u00f5es. Seru00e3o usadas as configurau00e7u00f5es padru00e3o.\n\nDetalhes: {ex.Message}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                // Em caso de erro, usar configuraçoes padroes
+                Console.WriteLine($"Erro ao carregar configuraçoes: {ex.Message}");
+                MessageBox.Show($"Ocorreu um erro ao carregar as configuraçoes. Serao usadas as configuraçoes padroes.\n\nDetalhes: {ex.Message}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 
-                // Definir valores padru00e3o
+                // Definir valores padroes
                 temaEscuro = false;
                 atualizacaoAutomatica = true;
                 ordenacaoGrafico = "Alfabu00e9tica";

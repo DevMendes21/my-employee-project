@@ -3,7 +3,7 @@ using System.Windows.Forms;
 namespace MyEmployeeProject.Utils
 {
     /// <summary>
-    /// Classe de extensu00f5es para controles da interface
+    /// Classe de extensões para controles da interface
     /// </summary>
     public static class ControlExtensions
     {
@@ -12,7 +12,7 @@ namespace MyEmployeeProject.Utils
         /// <summary>
         /// Define uma dica de ferramenta (tooltip) para um controle
         /// </summary>
-        /// <param name="control">O controle que receberu00e1 o tooltip</param>
+        /// <param name="control">O controle que receberão o tooltip</param>
         /// <param name="text">O texto do tooltip</param>
         public static void SetToolTip(this Control control, string text)
         {

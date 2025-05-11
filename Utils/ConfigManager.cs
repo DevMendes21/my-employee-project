@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace MyEmployeeProject.Utils
 {
     /// <summary>
-    /// Gerencia a persistu00eancia e carregamento das configurau00e7u00f5es do sistema
+    /// Gerencia a persistencia e carregamento das configurações do sistema
     /// </summary>
     public static class ConfigManager
     {
@@ -17,7 +17,7 @@ namespace MyEmployeeProject.Utils
         );
         
         /// <summary>
-        /// Configurau00e7u00f5es do sistema
+        /// configurações do sistema
         /// </summary>
         public class AppConfig
         {
@@ -29,7 +29,7 @@ namespace MyEmployeeProject.Utils
             public Dictionary<string, object> ConfiguracoesAdicionais { get; set; } = new Dictionary<string, object>();
         }
         
-        // Instu00e2ncia u00fanica das configurau00e7u00f5es
+        // Instancia unica das configurações
         private static AppConfig? _config;
         
         // Inicializador estático para garantir que as configurações sejam carregadas
@@ -48,7 +48,7 @@ namespace MyEmployeeProject.Utils
         }
         
         /// <summary>
-        /// Obtu00e9m as configurau00e7u00f5es atuais do sistema
+        /// Obtem as configurações atuais do sistema
         /// </summary>
         public static AppConfig Config
         {
@@ -64,13 +64,13 @@ namespace MyEmployeeProject.Utils
         }
         
         /// <summary>
-        /// Carrega as configurau00e7u00f5es do arquivo
+        /// Carrega as configurações do arquivo
         /// </summary>
         private static AppConfig CarregarConfiguracoes()
         {
             try
             {
-                // Verificar se o diretu00f3rio existe, caso contru00e1rio, criu00e1-lo
+                // Verificar se o diretorio existe, caso contrario, crie
                 string? configDir = Path.GetDirectoryName(ConfigFilePath);
                 if (!string.IsNullOrEmpty(configDir) && !Directory.Exists(configDir))
                 {
@@ -87,23 +87,23 @@ namespace MyEmployeeProject.Utils
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao carregar configurau00e7u00f5es: {ex.Message}");
-                // Em caso de erro, retornar configurau00e7u00f5es padru00e3o
+                Console.WriteLine($"Erro ao carregar configurações: {ex.Message}");
+                // Em caso de erro, retornar configurações padru00e3o
             }
             
             return new AppConfig();
         }
         
         /// <summary>
-        /// Salva as configurau00e7u00f5es no arquivo
+        /// Salva as configurações no arquivo
         /// </summary>
         public static void SalvarConfiguracoes(AppConfig config)
         {
             try
             {
-                _config = config; // Atualiza a instu00e2ncia em memu00f3ria
+                _config = config; // Atualiza a Instancia em memu00f3ria
                 
-                // Verificar se o diretu00f3rio existe, caso contru00e1rio, criu00e1-lo
+                // Verificar se o diretorio existe, caso contrario, cria
                 string? configDir = Path.GetDirectoryName(ConfigFilePath);
                 if (!string.IsNullOrEmpty(configDir) && !Directory.Exists(configDir))
                 {
@@ -117,13 +117,13 @@ namespace MyEmployeeProject.Utils
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Erro ao salvar configurau00e7u00f5es: {ex.Message}");
+                Console.WriteLine($"Erro ao salvar configurações: {ex.Message}");
                 // Aqui poderia ser implementado um log de erros
             }
         }
         
         /// <summary>
-        /// Define uma configurau00e7u00e3o adicional
+        /// Define uma configuração adicional
         /// </summary>
         public static void DefinirConfiguracao(string chave, object valor)
         {
@@ -140,7 +140,7 @@ namespace MyEmployeeProject.Utils
         }
         
         /// <summary>
-        /// Obtu00e9m uma configurau00e7u00e3o adicional
+        /// Obtem uma configuração adicional
         /// </summary>
         public static T ObterConfiguracao<T>(string chave, T valorPadrao = default!)
         {

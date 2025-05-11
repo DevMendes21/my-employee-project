@@ -5,18 +5,18 @@ using System.Collections.Generic;
 namespace MyEmployeeProject.Utils
 {
     /// <summary>
-    /// Gerencia atalhos de teclado para a aplicau00e7u00e3o
+    /// Gerencia atalhos de teclado para a aplicação
     /// </summary>
     public static class KeyboardShortcuts
     {
-        // Dicionu00e1rio para armazenar os atalhos registrados
+        // Dicionario para armazenar os atalhos registrados
         private static Dictionary<Keys, Action> _shortcuts = new Dictionary<Keys, Action>();
         
         /// <summary>
         /// Registra um atalho de teclado
         /// </summary>
         /// <param name="key">A tecla do atalho</param>
-        /// <param name="action">A au00e7u00e3o a ser executada</param>
+        /// <param name="action">A ação a ser executada</param>
         public static void RegisterShortcut(Keys key, Action action)
         {
             if (!_shortcuts.ContainsKey(key))
@@ -30,7 +30,7 @@ namespace MyEmployeeProject.Utils
         }
         
         /// <summary>
-        /// Processa uma tecla pressionada e executa a au00e7u00e3o correspondente, se houver
+        /// Processa uma tecla pressionada e executa a ação correspondente, se houver
         /// </summary>
         /// <param name="key">A tecla pressionada</param>
         /// <returns>True se a tecla corresponder a um atalho registrado</returns>
@@ -45,9 +45,9 @@ namespace MyEmployeeProject.Utils
         }
         
         /// <summary>
-        /// Configura os atalhos padru00e3o para um formulu00e1rio
+        /// Configura os atalhos padroes para um formulário
         /// </summary>
-        /// <param name="form">O formulu00e1rio que receberu00e1 os atalhos</param>
+        /// <param name="form">O formulário que recebera os atalhos</param>
         public static void SetupFormShortcuts(Form form)
         {
             // Adiciona o manipulador de eventos de tecla
@@ -74,10 +74,10 @@ namespace MyEmployeeProject.Utils
         }
         
         /// <summary>
-        /// Obtu00e9m uma descriu00e7u00e3o amiu00e1vel do atalho
+        /// Obtem uma Descrição amigavel do atalho
         /// </summary>
         /// <param name="key">A tecla do atalho</param>
-        /// <returns>Descriu00e7u00e3o do atalho em formato legiu00edvel</returns>
+        /// <returns>Descrição do atalho em formato legivel</returns>
         public static string GetShortcutDescription(Keys key)
         {
             string description = "";
