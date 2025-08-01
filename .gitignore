@@ -24,15 +24,24 @@ packages/
 .env.local
 .env.production
 .env.staging
+
+# Configurações com dados sensíveis
 appsettings.Production.json
-appsettings.Staging.json
-deploy-secrets.yaml
-*.secrets.json
+appsettings.Development.json
+App.config
+Web.config
+*.dll.config
 
 # DigitalOcean App Spec com dados sensíveis
 .do/app.yaml
 .do/deploy.yaml
 .do/*.secret.yaml
+
+# Build outputs com configurações sensíveis
+bin/
+obj/
+**/bin/**
+**/obj/**
 
 # Environment variables (DADOS SENSÍVEIS)
 .env

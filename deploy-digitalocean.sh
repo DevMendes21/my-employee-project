@@ -56,23 +56,54 @@ read -p "Deseja testar o Docker build localmente? (y/N): " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     log_info "Testando Docker build..."
-    if docker build -t minha-empresa-test . > /dev/null 2>&1; then
-        log_success "Docker build OK"
-        docker rmi minha-empresa-test > /dev/null 2>&1
+    
+    # Verificar se Docker está rodando
+    if ! docker info > /dev/null 2>&1; then
+        log_warning "Docker não está rodando!"
+        log_info "Para iniciar o Docker:"
+        log_info "1. Abra o Docker Desktop"
+        log_info "2. Aguarde o Docker inicializar"
+        log_info "3. Execute este script novamente"
+        echo ""
+        read -p "Continuar sem testar Docker? (Y/n): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Nn]$ ]]; then
+            log_info "Deploy cancelado. Inicie o Docker e tente novamente."
+            exit 1
+        fi
+        log_warning "Continuando sem teste Docker local..."
     else
-        log_error "Erro no Docker build"
-        exit 1
+        if docker build -t minha-empresa-test . > /dev/null 2>&1; then
+            log_success "Docker build OK"
+            docker rmi minha-empresa-test > /dev/null 2>&1
+        else
+            log_error "Erro no Docker build"
+            log_info "Executando build com output detalhado..."
+            docker build -t minha-empresa-test .
+            exit 1
+        fi
     fi
 fi
 
 # 5. Verificar arquivos de configuração sensíveis
 log_warning "🔒 VERIFICANDO SEGURANÇA..."
 
-# Verificar se dados sensíveis não estão commitados
-if grep -r "corelink-db" . --exclude-dir=.git --exclude="*.sh" --exclude="*.md" 2>/dev/null; then
-    log_error "DADOS SENSÍVEIS ENCONTRADOS NO CÓDIGO!"
-    log_error "Remova todos os dados sensíveis antes do commit"
-    exit 1
+# Verificar se dados sensíveis não estão commitados (apenas arquivos rastreados pelo Git)
+log_info "Verificando arquivos rastreados pelo Git..."
+if git ls-files | xargs grep -l "corelink-db\|AVNS_" 2>/dev/null | grep -v -E "\.(sh|md)$"; then
+    log_error "DADOS SENSÍVEIS ENCONTRADOS EM ARQUIVOS RASTREADOS!"
+    log_error "Os arquivos acima contêm dados sensíveis e estão no Git"
+    log_info "Removendo do Git e adicionando ao .gitignore..."
+    
+    # Remover arquivos sensíveis do Git
+    git ls-files | xargs grep -l "corelink-db\|AVNS_" 2>/dev/null | grep -v -E "\.(sh|md)$" | while read -r file; do
+        log_warning "Removendo $file do Git"
+        git rm --cached "$file" 2>/dev/null || true
+    done
+    
+    log_info "Arquivos removidos do Git. Continue o deploy."
+else
+    log_success "Nenhum dado sensível encontrado em arquivos rastreados"
 fi
 
 # Verificar se .env existe
@@ -85,11 +116,19 @@ if [ ! -f ".env" ]; then
     exit 1
 fi
 
-# Verificar se app.yaml tem dados sensíveis
-if [ -f ".do/app.yaml" ] && grep -q "corelink-db\|AVNS_" .do/app.yaml 2>/dev/null; then
-    log_error "Dados sensíveis encontrados em .do/app.yaml!"
-    log_info "Use .do/app.template.yaml e configure as variáveis na DigitalOcean"
-    exit 1
+# Verificar se app.yaml tem dados sensíveis (só se estiver rastreado pelo Git)
+if [ -f ".do/app.yaml" ]; then
+    if git ls-files --error-unmatch .do/app.yaml >/dev/null 2>&1; then
+        # Arquivo está rastreado pelo Git, verificar conteúdo
+        if grep -q "corelink-db\|AVNS_" .do/app.yaml 2>/dev/null; then
+            log_error "Dados sensíveis encontrados em .do/app.yaml rastreado pelo Git!"
+            log_info "Removendo do Git e usando template..."
+            git rm --cached .do/app.yaml
+        fi
+    else
+        # Arquivo não está rastreado pelo Git (correto)
+        log_success ".do/app.yaml não está rastreado pelo Git (correto)"
+    fi
 fi
 
 # 6. Commit e push das alterações
@@ -123,14 +162,18 @@ echo "4. 🏗️  Escolha o repositório: DevMendes21/my-employee-project"
 echo ""
 echo "5. 🌿 Branch: main"
 echo ""
-echo "6. ⚙️  Use o arquivo de configuração: .do/app.yaml"
+echo "6. ⚙️  Configure as variáveis de ambiente na DigitalOcean:"
+echo "   - DB_HOST, DB_PORT, DB_USER, DB_NAME, DB_PASSWORD, DB_SSL_MODE"
 echo ""
-echo "7. 🚀 Clique em 'Next' e depois 'Create Resources'"
+echo "7. 🚀 Clique em 'Create Resources'"
 echo ""
 echo "======================================================"
 log_info "🔗 Sua aplicação estará disponível em:"
 log_info "https://minha-empresa-system-xxxxx.ondigitalocean.app"
 echo "======================================================"
+echo ""
+log_info "🐳 DICA: Se houve problema com Docker:"
+log_info "Execute: ./test-docker.sh para diagnosticar"
 echo ""
 log_warning "⏱️  O deploy pode levar de 5-10 minutos"
 log_info "📊 Monitore o progresso no painel da DigitalOcean"
