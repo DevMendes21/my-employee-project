@@ -1,0 +1,187 @@
+@model MyEmployeeProject.Models.Cargo
+@{
+    ViewData["Title"] = "Editar Cargo";
+}
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="mb-0">
+            <i class="fas fa-edit me-2 text-primary"></i>
+            Editar Cargo
+        </h2>
+        <p class="text-muted">Atualize as informações do cargo</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="/Cargo" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>
+            Voltar à Lista
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            <input type="hidden" name="Id" value="@Model.Id" />
+            
+            <div class="row">
+                <!-- Informações do Cargo -->
+                <div class="col-md-6">
+                    <h5 class="mb-3 text-primary">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Informações do Cargo
+                    </h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">ID do Cargo</label>
+                        <input type="text" class="form-control" value="@Model.Id" readonly>
+                        <div class="form-text">Identificador único do cargo</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Nome do Cargo *</label>
+                        <input type="text" class="form-control" name="Nome" value="@Model.Nome" required>
+                        <div class="form-text">Ex: Desenvolvedor, Analista, Gerente</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Nível *</label>
+                        <select class="form-select" name="Nivel" required>
+                            <option value="">Selecione um nível</option>
+                            @{
+                                var isJunior = Model.Nivel == "Júnior" ? "selected" : "";
+                                var isPleno = Model.Nivel == "Pleno" ? "selected" : "";
+                                var isSenior = Model.Nivel == "Sênior" ? "selected" : "";
+                            }
+                            <option value="Júnior" selected="@isJunior">Júnior</option>
+                            <option value="Pleno" selected="@isPleno">Pleno</option>
+                            <option value="Sênior" selected="@isSenior">Sênior</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Informações Salariais -->
+                <div class="col-md-6">
+                    <h5 class="mb-3 text-primary">
+                        <i class="fas fa-dollar-sign me-2"></i>
+                        Informações Salariais
+                    </h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Salário Base *</label>
+                        <div class="input-group">
+                            <span class="input-group-text">R$</span>
+                            <input type="number" class="form-control" name="SalarioBase" step="0.01" min="0" value="@Model.SalarioBase" required>
+                        </div>
+                        <div class="form-text">Valor base para este cargo e nível</div>
+                    </div>
+                    
+                    <!-- Histórico de alterações -->
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="fas fa-history me-2"></i>
+                                Alteração
+                            </h6>
+                            <p class="card-text small mb-0">
+                                <strong>Data:</strong> @DateTime.Now.ToString("dd/MM/yyyy HH:mm")<br>
+                                <strong>Status:</strong> <span class="badge bg-warning">Editando</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botões -->
+            <div class="row">
+                <div class="col-12">
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <!-- Botão de excluir à esquerda -->
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="fas fa-trash me-2"></i>
+                            Excluir Cargo
+                        </button>
+                        
+                        <!-- Botões de ação à direita -->
+                        <div class="d-flex gap-2">
+                            <a href="/Cargo" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                Salvar Alterações
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o cargo "<strong>@Model.Nome</strong>"?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Atenção:</strong> Esta ação não pode ser desfeita. Certifique-se de que não há funcionários vinculados a este cargo.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>
+                    Cancelar
+                </button>
+                <form method="post" asp-action="Delete" class="d-inline">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>
+                        Confirmar Exclusão
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-sugestão de salário baseado no nível
+        document.querySelector('select[name="Nivel"]').addEventListener('change', function() {
+            const nivel = this.value;
+            const salarioInput = document.querySelector('input[name="SalarioBase"]');
+            const currentValue = parseFloat(salarioInput.value) || 0;
+            
+            if (nivel && currentValue === 0) {
+                let sugestao = 0;
+                switch(nivel) {
+                    case 'Júnior':
+                        sugestao = 3500;
+                        break;
+                    case 'Pleno':
+                        sugestao = 6000;
+                        break;
+                    case 'Sênior':
+                        sugestao = 10000;
+                        break;
+                }
+                
+                if (sugestao > 0) {
+                    salarioInput.value = sugestao.toFixed(2);
+                }
+            }
+        });
+    </script>
+}

@@ -234,5 +234,92 @@ namespace MyEmployeeProject.DAO
                 }
             }
         }
+
+        public void ExcluirFuncionario(int id)
+        {
+            RemoverFuncionario(id);
+        }
+
+        public int ContarFuncionarios()
+        {
+            string sql = "SELECT COUNT(*) FROM funcionarios";
+            
+            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+            {
+                try
+                {
+                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                    {
+                        return Convert.ToInt32(cmd.ExecuteScalar());
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Erro ao contar funcionários: " + ex.Message);
+                }
+            }
+        }
+
+        public Funcionario? ObterFuncionarioPorId(int id)
+        {
+            string sql = @"SELECT f.*, 
+                        c.nome as cargo_nome, c.nivel as cargo_nivel, c.salario_base,
+                        d.nome as departamento_nome, d.descricao as departamento_descricao
+                        FROM funcionarios f
+                        LEFT JOIN cargos c ON f.cargo_id = c.id
+                        LEFT JOIN departamentos d ON f.departamento_id = d.id
+                        WHERE f.id = @id";
+
+            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+            {
+                try
+                {
+                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", id);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                return new Funcionario
+                                {
+                                    Id = reader.GetInt32("id"),
+                                    Nome = reader.GetString("nome"),
+                                    Email = reader.IsDBNull("email") ? string.Empty : reader.GetString("email"),
+                                    Telefone = reader.IsDBNull("telefone") ? string.Empty : reader.GetString("telefone"),
+                                    CargoId = reader.GetInt32("cargo_id"),
+                                    DepartamentoId = reader.GetInt32("departamento_id"),
+                                    Salario = reader.GetDecimal("salario"),
+                                    DataContratacao = reader.GetDateTime("data_contratacao"),
+                                    DataNascimento = reader.IsDBNull("data_nascimento") ? null : reader.GetDateTime("data_nascimento"),
+                                    Status = Enum.Parse<StatusFuncionario>(reader.GetString("status")),
+                                    Observacoes = reader.IsDBNull("observacoes") ? null : reader.GetString("observacoes"),
+                                    DataCriacao = reader.GetDateTime("data_criacao"),
+                                    DataAtualizacao = reader.GetDateTime("data_atualizacao"),
+                                    Cargo = reader.IsDBNull("cargo_nome") ? null : new Cargo
+                                    {
+                                        Id = reader.GetInt32("cargo_id"),
+                                        Nome = reader.GetString("cargo_nome"),
+                                        Nivel = reader.IsDBNull("cargo_nivel") ? string.Empty : reader.GetString("cargo_nivel"),
+                                        SalarioBase = reader.IsDBNull("salario_base") ? 0 : reader.GetDecimal("salario_base")
+                                    },
+                                    Departamento = reader.IsDBNull("departamento_nome") ? null : new Departamento
+                                    {
+                                        Id = reader.GetInt32("departamento_id"),
+                                        Nome = reader.GetString("departamento_nome"),
+                                        Descricao = reader.IsDBNull("departamento_descricao") ? null : reader.GetString("departamento_descricao")
+                                    }
+                                };
+                            }
+                            return null;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Erro ao buscar funcionário: " + ex.Message);
+                }
+            }
+        }
     }
 }

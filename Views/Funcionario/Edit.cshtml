@@ -1,0 +1,262 @@
+@model MyEmployeeProject.Models.Funcionario
+@{
+    ViewData["Title"] = "Editar Funcionário";
+}
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="mb-0">
+            <i class="fas fa-user-edit me-2 text-primary"></i>
+            Editar Funcionário
+        </h2>
+        <p class="text-muted">Atualize as informações do funcionário</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="/Funcionario" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>
+            Voltar à Lista
+        </a>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(ViewBag.Error))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        @ViewBag.Error
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            <input type="hidden" name="Id" value="@Model.Id" />
+            
+            <div class="row">
+                <!-- Informações Pessoais -->
+                <div class="col-md-6">
+                    <h5 class="mb-3 text-primary">
+                        <i class="fas fa-user me-2"></i>
+                        Informações Pessoais
+                    </h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">ID do Funcionário</label>
+                        <input type="text" class="form-control" value="@Model.Id" readonly>
+                        <div class="form-text">Identificador único do funcionário</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Nome Completo *</label>
+                        <input type="text" class="form-control" name="Nome" value="@Model.Nome" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" name="Email" value="@Model.Email">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Telefone</label>
+                        <input type="tel" class="form-control" name="Telefone" value="@Model.Telefone">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Data de Nascimento</label>
+                        <input type="date" class="form-control" name="DataNascimento" value="@(Model.DataNascimento?.ToString("yyyy-MM-dd"))">
+                    </div>
+                </div>
+                
+                <!-- Informações Profissionais -->
+                <div class="col-md-6">
+                    <h5 class="mb-3 text-primary">
+                        <i class="fas fa-briefcase me-2"></i>
+                        Informações Profissionais
+                    </h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Cargo *</label>
+                        <select class="form-select" name="CargoId" required>
+                            <option value="">Selecione um cargo</option>
+                            @if (ViewBag.Cargos != null)
+                            {
+                                @foreach (var cargo in ViewBag.Cargos)
+                                {
+                                    var selected = cargo.Id == Model.CargoId ? "selected" : "";
+                                    <option value="@cargo.Id" selected="@selected">@cargo.Nome - @cargo.Nivel</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Departamento *</label>
+                        <select class="form-select" name="DepartamentoId" required>
+                            <option value="">Selecione um departamento</option>
+                            @if (ViewBag.Departamentos != null)
+                            {
+                                @foreach (var departamento in ViewBag.Departamentos)
+                                {
+                                    var selected = departamento.Id == Model.DepartamentoId ? "selected" : "";
+                                    <option value="@departamento.Id" selected="@selected">@departamento.Nome</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Salário *</label>
+                        <div class="input-group">
+                            <span class="input-group-text">R$</span>
+                            <input type="number" class="form-control" name="Salario" step="0.01" min="0" value="@Model.Salario" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Data de Contratação</label>
+                        <input type="date" class="form-control" name="DataContratacao" value="@Model.DataContratacao.ToString("yyyy-MM-dd")" readonly>
+                        <div class="form-text">Data original de contratação (não editável)</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Status *</label>
+                        <select class="form-select" name="Status" required>
+                            @{
+                                var statusAtivo = Model.Status.ToString() == "Ativo" ? "selected" : "";
+                                var statusInativo = Model.Status.ToString() == "Inativo" ? "selected" : "";
+                                var statusFerias = Model.Status.ToString() == "Ferias" ? "selected" : "";
+                                var statusLicenca = Model.Status.ToString() == "Licenca" ? "selected" : "";
+                            }
+                            <option value="Ativo" selected="@statusAtivo">Ativo</option>
+                            <option value="Inativo" selected="@statusInativo">Inativo</option>
+                            <option value="Ferias" selected="@statusFerias">Férias</option>
+                            <option value="Licenca" selected="@statusLicenca">Licença</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Observações -->
+            <div class="row">
+                <div class="col-12">
+                    <h5 class="mb-3 text-primary">
+                        <i class="fas fa-sticky-note me-2"></i>
+                        Observações
+                    </h5>
+                    <div class="mb-3">
+                        <textarea class="form-control" name="Observacoes" rows="3" placeholder="Observações adicionais sobre o funcionário...">@Model.Observacoes</textarea>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botões -->
+            <div class="row">
+                <div class="col-12">
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <!-- Botão de excluir à esquerda -->
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="fas fa-trash me-2"></i>
+                            Excluir Funcionário
+                        </button>
+                        
+                        <!-- Botões de ação à direita -->
+                        <div class="d-flex gap-2">
+                            <a href="/Funcionario" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>
+                                Salvar Alterações
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o funcionário "<strong>@Model.Nome</strong>"?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Atenção:</strong> Esta ação não pode ser desfeita. Todos os dados do funcionário serão permanentemente removidos.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>
+                    Cancelar
+                </button>
+                <form method="post" action="/Funcionario/Delete" class="d-inline">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>
+                        Confirmar Exclusão
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-preencher salário baseado no cargo selecionado
+        document.querySelector('select[name="CargoId"]').addEventListener('change', function() {
+            const cargoSelect = this;
+            const salarioInput = document.querySelector('input[name="Salario"]');
+            
+            if (cargoSelect.value && salarioInput.value == 0) {
+                // Aqui você pode implementar uma lógica para buscar o salário base do cargo
+                // Para agora, vamos manter o salário atual
+            }
+        });
+        
+        // Validação do formulário
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const cargo = document.querySelector('select[name="CargoId"]').value;
+            const departamento = document.querySelector('select[name="DepartamentoId"]').value;
+            const nome = document.querySelector('input[name="Nome"]').value.trim();
+            const salario = document.querySelector('input[name="Salario"]').value;
+            
+            if (!nome) {
+                alert('Nome é obrigatório!');
+                e.preventDefault();
+                return;
+            }
+            
+            if (!cargo) {
+                alert('Selecione um cargo!');
+                e.preventDefault();
+                return;
+            }
+            
+            if (!departamento) {
+                alert('Selecione um departamento!');
+                e.preventDefault();
+                return;
+            }
+            
+            if (!salario || salario <= 0) {
+                alert('Salário deve ser maior que zero!');
+                e.preventDefault();
+                return;
+            }
+        });
+    </script>
+}

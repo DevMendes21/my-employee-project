@@ -19,6 +19,16 @@ x86/
 *.nupkg
 packages/
 
+# Environment variables (DADOS SENSÍVEIS)
+.env
+.env.local
+.env.production
+.env.staging
+
+# Configurações com dados sensíveis
+appsettings.Production.json
+appsettings.Development.json
+
 # User-specific files
 *.rsuser
 *.userosscache

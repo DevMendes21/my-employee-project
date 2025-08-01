@@ -1,0 +1,168 @@
+@model List<MyEmployeeProject.Models.Funcionario>
+@{
+    ViewData["Title"] = "Funcionários";
+}
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="mb-0">
+            <i class="fas fa-users me-2 text-primary"></i>
+            Funcionários
+        </h2>
+        <p class="text-muted">Gerencie todos os funcionários da empresa</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="/Funcionario/Create" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>
+            Novo Funcionário
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Telefone</th>
+                            <th>Cargo</th>
+                            <th>Departamento</th>
+                            <th>Salário</th>
+                            <th>Status</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var funcionario in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary rounded-circle text-white d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            @funcionario.Nome.Substring(0, 1).ToUpper()
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">@funcionario.Nome</div>
+                                            <small class="text-muted">ID: @funcionario.Id</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>@funcionario.Email</td>
+                                <td>@funcionario.Telefone</td>
+                                <td>
+                                    @if (funcionario.Cargo != null)
+                                    {
+                                        <span class="badge bg-primary">@funcionario.Cargo.Nome</span>
+                                        <br>
+                                        <small class="text-muted">@funcionario.Cargo.Nivel</small>
+                                    }
+                                </td>
+                                <td>
+                                    @if (funcionario.Departamento != null)
+                                    {
+                                        @funcionario.Departamento.Nome
+                                    }
+                                </td>
+                                <td>
+                                    <strong>R$ @funcionario.Salario.ToString("N2")</strong>
+                                </td>
+                                <td>
+                                    @switch (funcionario.Status)
+                                    {
+                                        case MyEmployeeProject.Models.StatusFuncionario.Ativo:
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>Ativo
+                                            </span>
+                                            break;
+                                        case MyEmployeeProject.Models.StatusFuncionario.Inativo:
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times me-1"></i>Inativo
+                                            </span>
+                                            break;
+                                        case MyEmployeeProject.Models.StatusFuncionario.Ferias:
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-umbrella-beach me-1"></i>Férias
+                                            </span>
+                                            break;
+                                        case MyEmployeeProject.Models.StatusFuncionario.Licenca:
+                                            <span class="badge bg-info">
+                                                <i class="fas fa-hospital me-1"></i>Licença
+                                            </span>
+                                            break;
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a href="/Funcionario/Edit/@funcionario.Id" class="btn btn-sm btn-outline-primary" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="confirmarExclusao(@funcionario.Id, '@funcionario.Nome')" title="Excluir">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-4x text-muted mb-4"></i>
+                <h4 class="text-muted">Nenhum funcionário cadastrado</h4>
+                <p class="text-muted mb-4">Comece adicionando funcionários ao sistema para gerenciar sua equipe.</p>
+                <a href="/Funcionario/Create" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>
+                    Cadastrar Primeiro Funcionário
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="modalExcluir" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                    Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o funcionário <strong id="nomeFuncionario"></strong>?</p>
+                <p class="text-muted">Esta ação não pode ser desfeita.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formExcluir" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>
+                        Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmarExclusao(id, nome) {
+            document.getElementById('nomeFuncionario').textContent = nome;
+            document.getElementById('formExcluir').action = '/Funcionario/Delete/' + id;
+            
+            var modal = new bootstrap.Modal(document.getElementById('modalExcluir'));
+            modal.show();
+        }
+    </script>
+}

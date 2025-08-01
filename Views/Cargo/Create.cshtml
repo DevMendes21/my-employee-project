@@ -1,0 +1,144 @@
+@model MyEmployeeProject.Models.Cargo
+@{
+    ViewData["Title"] = "Novo Cargo";
+}
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="mb-0">
+            <i class="fas fa-briefcase me-2 text-primary"></i>
+            Novo Cargo
+        </h2>
+        <p class="text-muted">Cadastre um novo cargo no sistema</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="/Cargo" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>
+            Voltar à Lista
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            <div class="row">
+                <!-- Informações do Cargo -->
+                <div class="col-md-6">
+                    <h5 class="mb-3 text-primary">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Informações do Cargo
+                    </h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Nome do Cargo *</label>
+                        <input type="text" class="form-control" name="Nome" value="@Model?.Nome" required>
+                        <div class="form-text">Ex: Desenvolvedor, Analista, Gerente</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Nível *</label>
+                        <select class="form-select" name="Nivel" required>
+                            <option value="">Selecione um nível</option>
+                            @{
+                                var nivelJunior = Model?.Nivel == "Júnior" ? "selected" : "";
+                                var nivelPleno = Model?.Nivel == "Pleno" ? "selected" : "";
+                                var nivelSenior = Model?.Nivel == "Sênior" ? "selected" : "";
+                            }
+                            <option value="Júnior" selected="@nivelJunior">Júnior</option>
+                            <option value="Pleno" selected="@nivelPleno">Pleno</option>
+                            <option value="Sênior" selected="@nivelSenior">Sênior</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Informações Salariais -->
+                <div class="col-md-6">
+                    <h5 class="mb-3 text-primary">
+                        <i class="fas fa-dollar-sign me-2"></i>
+                        Informações Salariais
+                    </h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Salário Base *</label>
+                        <div class="input-group">
+                            <span class="input-group-text">R$</span>
+                            <input type="number" class="form-control" name="SalarioBase" step="0.01" min="0" value="@Model?.SalarioBase" required>
+                        </div>
+                        <div class="form-text">Valor base para este cargo e nível</div>
+                    </div>
+                    
+                    <!-- Informações de exemplo baseadas no nível -->
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                <i class="fas fa-lightbulb me-2"></i>
+                                Sugestões Salariais
+                            </h6>
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <strong>Júnior</strong><br>
+                                    <small class="text-muted">R$ 2.500 - R$ 4.500</small>
+                                </div>
+                                <div class="col-4">
+                                    <strong>Pleno</strong><br>
+                                    <small class="text-muted">R$ 4.500 - R$ 8.000</small>
+                                </div>
+                                <div class="col-4">
+                                    <strong>Sênior</strong><br>
+                                    <small class="text-muted">R$ 8.000 - R$ 15.000</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botões -->
+            <div class="row">
+                <div class="col-12">
+                    <hr>
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="/Cargo" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>
+                            Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>
+                            Salvar Cargo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-sugestão de salário baseado no nível
+        document.querySelector('select[name="Nivel"]').addEventListener('change', function() {
+            const nivel = this.value;
+            const salarioInput = document.querySelector('input[name="SalarioBase"]');
+            
+            if (nivel && !salarioInput.value) {
+                let sugestao = 0;
+                switch(nivel) {
+                    case 'Júnior':
+                        sugestao = 3500;
+                        break;
+                    case 'Pleno':
+                        sugestao = 6000;
+                        break;
+                    case 'Sênior':
+                        sugestao = 10000;
+                        break;
+                }
+                
+                if (sugestao > 0) {
+                    salarioInput.value = sugestao.toFixed(2);
+                }
+            }
+        });
+    </script>
+}

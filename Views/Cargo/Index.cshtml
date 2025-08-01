@@ -1,0 +1,144 @@
+@model List<MyEmployeeProject.Models.Cargo>
+@{
+    ViewData["Title"] = "Cargos";
+}
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2 class="mb-0">
+            <i class="fas fa-briefcase me-2 text-primary"></i>
+            Cargos
+        </h2>
+        <p class="text-muted">Gerencie todos os cargos da empresa</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="/Cargo/Create" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>
+            Novo Cargo
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        @if (Model != null && Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nome</th>
+                            <th>Nível</th>
+                            <th>Salário Base</th>
+                            <th>Data Criação</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var cargo in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-warning rounded-circle text-white d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            <i class="fas fa-briefcase"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">@cargo.Nome</div>
+                                            <small class="text-muted">ID: @cargo.Id</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    @switch (cargo.Nivel.ToLower())
+                                    {
+                                        case "júnior":
+                                        case "junior":
+                                            <span class="badge bg-success">@cargo.Nivel</span>
+                                            break;
+                                        case "pleno":
+                                            <span class="badge bg-warning">@cargo.Nivel</span>
+                                            break;
+                                        case "sênior":
+                                        case "senior":
+                                            <span class="badge bg-danger">@cargo.Nivel</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-info">@cargo.Nivel</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    <strong>R$ @cargo.SalarioBase.ToString("N2")</strong>
+                                </td>
+                                <td>@cargo.DataCriacao.ToString("dd/MM/yyyy")</td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a href="/Cargo/Edit/@cargo.Id" class="btn btn-sm btn-outline-primary" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button class="btn btn-sm btn-outline-danger" onclick="confirmarExclusao(@cargo.Id, '@cargo.Nome')" title="Excluir">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-briefcase fa-4x text-muted mb-4"></i>
+                <h4 class="text-muted">Nenhum cargo cadastrado</h4>
+                <p class="text-muted mb-4">Comece adicionando cargos ao sistema para organizar as funções da empresa.</p>
+                <a href="/Cargo/Create" class="btn btn-primary btn-lg">
+                    <i class="fas fa-plus me-2"></i>
+                    Cadastrar Primeiro Cargo
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal de Confirmação de Exclusão -->
+<div class="modal fade" id="modalExcluir" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                    Confirmar Exclusão
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Tem certeza que deseja excluir o cargo <strong id="nomeCargo"></strong>?</p>
+                <p class="text-muted">Esta ação não pode ser desfeita e pode afetar funcionários associados a este cargo.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="formExcluir" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash me-2"></i>
+                        Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmarExclusao(id, nome) {
+            document.getElementById('nomeCargo').textContent = nome;
+            document.getElementById('formExcluir').action = '/Cargo/Delete/' + id;
+            
+            var modal = new bootstrap.Modal(document.getElementById('modalExcluir'));
+            modal.show();
+        }
+    </script>
+}

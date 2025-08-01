@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultContentItems>false</EnableDefaultContentItems>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="8.0.33" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Program.Web.cs" />
+    <Compile Include="Models\Funcionario.cs" />
+    <Compile Include="DAO\*.cs" />
+    <Compile Include="Conexao\Conexao.cs" />
+    <Compile Include="Conexao\ConexaoUniversal.cs" />
+    <Compile Include="Controllers\*.cs" />
+    <Compile Include="Utils\ConfigManager.cs" />
+    <Compile Include="Utils\Export.cs" />
+    <Compile Include="Utils\LogManager.cs" />
+    <Compile Include="Utils\ValidationHelper.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Views\**\*.cshtml" />
+    <Content Include="appsettings.json" />
+    <Content Include="wwwroot\**" />
+  </ItemGroup>
+
+</Project>

@@ -12,7 +12,7 @@ namespace MyEmployeeProject.DAO
         public List<Cargo> ListarCargos()
         {
             List<Cargo> cargos = new List<Cargo>();
-            string sql = "SELECT DISTINCT id, nome, nivel FROM cargos ORDER BY nome";
+            string sql = "SELECT DISTINCT id, nome, nivel, salario_base FROM cargos ORDER BY nome";
 
             using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
             {
@@ -28,7 +28,8 @@ namespace MyEmployeeProject.DAO
                                 {
                                     Id = Convert.ToInt32(reader["id"]),
                                     Nome = reader["nome"].ToString() ?? string.Empty,
-                                    Nivel = reader["nivel"].ToString() ?? string.Empty
+                                    Nivel = reader["nivel"].ToString() ?? string.Empty,
+                                    SalarioBase = Convert.ToDecimal(reader["salario_base"])
                                 };
                                 cargos.Add(cargo);
                             }
@@ -66,7 +67,8 @@ namespace MyEmployeeProject.DAO
                                 {
                                     Id = Convert.ToInt32(reader["id"]),
                                     Nome = reader["nome"].ToString() ?? string.Empty,
-                                    Nivel = reader["nivel"].ToString() ?? string.Empty
+                                    Nivel = reader["nivel"].ToString() ?? string.Empty,
+                                    SalarioBase = Convert.ToDecimal(reader["salario_base"])
                                 };
                             }
                         }
@@ -78,6 +80,77 @@ namespace MyEmployeeProject.DAO
                 }
             }
             return cargo;
+        }
+
+        public bool InserirCargo(Cargo cargo)
+        {
+            string sql = "INSERT INTO cargos (nome, nivel, salario_base, data_criacao) VALUES (@nome, @nivel, @salario_base, @data_criacao)";
+
+            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+            {
+                try
+                {
+                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@nome", cargo.Nome);
+                        cmd.Parameters.AddWithValue("@nivel", cargo.Nivel);
+                        cmd.Parameters.AddWithValue("@salario_base", cargo.SalarioBase);
+                        cmd.Parameters.AddWithValue("@data_criacao", DateTime.Now);
+
+                        return cmd.ExecuteNonQuery() > 0;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Erro ao inserir cargo: " + ex.Message);
+                }
+            }
+        }
+
+        public bool AtualizarCargo(Cargo cargo)
+        {
+            string sql = "UPDATE cargos SET nome = @nome, nivel = @nivel, salario_base = @salario_base WHERE id = @id";
+
+            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+            {
+                try
+                {
+                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", cargo.Id);
+                        cmd.Parameters.AddWithValue("@nome", cargo.Nome);
+                        cmd.Parameters.AddWithValue("@nivel", cargo.Nivel);
+                        cmd.Parameters.AddWithValue("@salario_base", cargo.SalarioBase);
+
+                        return cmd.ExecuteNonQuery() > 0;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Erro ao atualizar cargo: " + ex.Message);
+                }
+            }
+        }
+
+        public bool ExcluirCargo(int id)
+        {
+            string sql = "DELETE FROM cargos WHERE id = @id";
+
+            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+            {
+                try
+                {
+                    using (MySqlCommand cmd = new MySqlCommand(sql, conn))
+                    {
+                        cmd.Parameters.AddWithValue("@id", id);
+                        return cmd.ExecuteNonQuery() > 0;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception("Erro ao excluir cargo: " + ex.Message);
+                }
+            }
         }
     }
 }
