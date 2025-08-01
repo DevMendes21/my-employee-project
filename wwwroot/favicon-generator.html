@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Favicon Generator</title>
+  </head>
+  <body>
+    <canvas id="favicon" width="16" height="16" style="display: none"></canvas>
+    <script>
+      // Create a simple favicon
+      const canvas = document.getElementById('favicon');
+      const ctx = canvas.getContext('2d');
+
+      // Blue background
+      ctx.fillStyle = '#007bff';
+      ctx.fillRect(0, 0, 16, 16);
+
+      // White "E" for Enterprise
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '12px Arial';
+      ctx.fillText('E', 3, 12);
+
+      // Convert to data URL and create download
+      const link = document.createElement('a');
+      link.download = 'favicon.ico';
+      link.href = canvas.toDataURL();
+      link.click();
+    </script>
+  </body>
+</html>
