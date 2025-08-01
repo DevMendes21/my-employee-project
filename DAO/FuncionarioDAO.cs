@@ -44,7 +44,7 @@ namespace MyEmployeeProject.DAO
             string sql = "INSERT INTO funcionarios (nome, email, telefone, cargo_id, departamento_id, salario, data_contratacao, data_nascimento, observacoes, status) " +
                         "VALUES (@nome, @email, @telefone, @cargoId, @departamentoId, @salario, @dataContratacao, @dataNascimento, @observacoes, @status)";
 
-            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = ConexaoUniversal.GetConnection())
             {
                 try
                 {
@@ -87,7 +87,7 @@ namespace MyEmployeeProject.DAO
                         LEFT JOIN cargos c ON f.cargo_id = c.id
                         LEFT JOIN departamentos d ON f.departamento_id = d.id";
 
-            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = ConexaoUniversal.GetConnection())
             {
                 try
                 {
@@ -182,7 +182,7 @@ namespace MyEmployeeProject.DAO
                              observacoes = @observacoes
                          WHERE id = @id";
 
-            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = ConexaoUniversal.GetConnection())
             {
                 try
                 {
@@ -217,7 +217,7 @@ namespace MyEmployeeProject.DAO
         {
             string sql = "DELETE FROM funcionarios WHERE id = @id";
 
-            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = ConexaoUniversal.GetConnection())
             {
                 try
                 {
@@ -244,7 +244,7 @@ namespace MyEmployeeProject.DAO
         {
             string sql = "SELECT COUNT(*) FROM funcionarios";
             
-            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = ConexaoUniversal.GetConnection())
             {
                 try
                 {
@@ -270,7 +270,7 @@ namespace MyEmployeeProject.DAO
                         LEFT JOIN departamentos d ON f.departamento_id = d.id
                         WHERE f.id = @id";
 
-            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = ConexaoUniversal.GetConnection())
             {
                 try
                 {

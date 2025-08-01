@@ -1,7 +1,14 @@
 using MyEmployeeProject.DAO;
+using MyEmployeeProject.Conexao;
 using Microsoft.AspNetCore.DataProtection;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configurar string de conexão do banco de dados
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+    ?? BuildConnectionString();
+
+ConexaoUniversal.SetConnectionString(connectionString);
 
 // Configure Data Protection for container environments
 builder.Services.AddDataProtection()
@@ -53,3 +60,15 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+static string BuildConnectionString()
+{
+    var host = Environment.GetEnvironmentVariable("DB_HOST") ?? "localhost";
+    var port = Environment.GetEnvironmentVariable("DB_PORT") ?? "3306";
+    var user = Environment.GetEnvironmentVariable("DB_USER") ?? "root";
+    var password = Environment.GetEnvironmentVariable("DB_PASSWORD") ?? "";
+    var database = Environment.GetEnvironmentVariable("DB_NAME") ?? "EmpresaDB";
+    var sslMode = Environment.GetEnvironmentVariable("DB_SSL_MODE") ?? "None";
+    
+    return $"server={host};port={port};user={user};password={password};database={database};sslmode={sslMode};";
+}

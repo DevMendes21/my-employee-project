@@ -14,7 +14,7 @@ namespace MyEmployeeProject.DAO
             List<Cargo> cargos = new List<Cargo>();
             string sql = "SELECT DISTINCT id, nome, nivel, salario_base FROM cargos ORDER BY nome";
 
-            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = ConexaoUniversal.GetConnection())
             {
                 try
                 {
@@ -52,7 +52,7 @@ namespace MyEmployeeProject.DAO
             string sql = "SELECT * FROM cargos WHERE id = @id";
             Cargo? cargo = null;
 
-            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = ConexaoUniversal.GetConnection())
             {
                 try
                 {
@@ -86,7 +86,7 @@ namespace MyEmployeeProject.DAO
         {
             string sql = "INSERT INTO cargos (nome, nivel, salario_base, data_criacao) VALUES (@nome, @nivel, @salario_base, @data_criacao)";
 
-            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = ConexaoUniversal.GetConnection())
             {
                 try
                 {
@@ -111,7 +111,7 @@ namespace MyEmployeeProject.DAO
         {
             string sql = "UPDATE cargos SET nome = @nome, nivel = @nivel, salario_base = @salario_base WHERE id = @id";
 
-            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = ConexaoUniversal.GetConnection())
             {
                 try
                 {
@@ -136,7 +136,7 @@ namespace MyEmployeeProject.DAO
         {
             string sql = "DELETE FROM cargos WHERE id = @id";
 
-            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = ConexaoUniversal.GetConnection())
             {
                 try
                 {

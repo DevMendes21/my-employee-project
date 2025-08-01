@@ -14,7 +14,7 @@ namespace MyEmployeeProject.DAO
             List<Departamento> departamentos = new List<Departamento>();
             string sql = "SELECT DISTINCT id, nome, data_criacao FROM departamentos ORDER BY nome";
 
-            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = ConexaoUniversal.GetConnection())
             {
                 try
                 {
@@ -54,7 +54,7 @@ namespace MyEmployeeProject.DAO
                 int tiId = 0;
                 try
                 {
-                    using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+                    using (MySqlConnection conn = ConexaoUniversal.GetConnection())
                     {
                         string insertSql = "INSERT INTO departamentos (nome, descricao) VALUES ('TI', 'Tecnologia da Informação'); SELECT LAST_INSERT_ID();";
                         using (MySqlCommand cmd = new MySqlCommand(insertSql, conn))
@@ -91,7 +91,7 @@ namespace MyEmployeeProject.DAO
             string sql = "SELECT * FROM departamentos WHERE id = @id";
             Departamento? departamento = null;
 
-            using (MySqlConnection conn = MyEmployeeProject.Conexao.Conexao.GetConnection())
+            using (MySqlConnection conn = ConexaoUniversal.GetConnection())
             {
                 try
                 {
