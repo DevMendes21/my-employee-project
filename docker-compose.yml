@@ -1,6 +1,7 @@
 version: '3.8'
 
 services:
+  # Para desenvolvimento local com MySQL local
   mysql:
     image: mysql:8.0
     container_name: minha-empresa-db
@@ -18,15 +19,21 @@ services:
     networks:
       - app-network
 
+  # Aplicação web - configurada para DigitalOcean
   web:
     build: .
     container_name: minha-empresa-web
     restart: always
     ports:
-      - '5000:80'
+      - '8080:8080'
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=server=mysql;user=empresa_user;database=EmpresaDB;password=empresa_password;
+      - ASPNETCORE_ENVIRONMENT=Production
+      - DB_HOST=${DB_HOST:-mysql}
+      - DB_PORT=${DB_PORT:-3306}
+      - DB_USER=${DB_USER:-empresa_user}
+      - DB_NAME=${DB_NAME:-EmpresaDB}
+      - DB_PASSWORD=${DB_PASSWORD:-empresa_password}
+      - DB_SSL_MODE=${DB_SSL_MODE:-None}
     depends_on:
       - mysql
     networks:

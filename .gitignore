@@ -19,6 +19,21 @@ x86/
 *.nupkg
 packages/
 
+# DADOS SENSÍVEIS - NUNCA COMMITAR
+.env
+.env.local
+.env.production
+.env.staging
+appsettings.Production.json
+appsettings.Staging.json
+deploy-secrets.yaml
+*.secrets.json
+
+# DigitalOcean App Spec com dados sensíveis
+.do/app.yaml
+.do/deploy.yaml
+.do/*.secret.yaml
+
 # Environment variables (DADOS SENSÍVEIS)
 .env
 .env.local

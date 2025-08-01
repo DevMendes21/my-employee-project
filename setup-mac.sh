@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script para configurar o ambiente de desenvolvimento no Mac
-echo "🚀 Configurando o ambiente para o projeto Minha Empresa no Mac..."
+echo "🚀 Configurando o ambiente para o projeto DevMendes21 Enterprise no Mac..."
 
 # Verificar se o Homebrew está instalado
 if ! command -v brew &> /dev/null; then

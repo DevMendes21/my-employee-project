@@ -163,7 +163,7 @@ namespace MyEmployeeProject.Views
             // Logo/Título da empresa
             Label lblCompany = new Label
             {
-                Text = "MINHA EMPRESA",
+                Text = "DevMendes21 Enterprise",
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 16, FontStyle.Bold),
                 TextAlign = ContentAlignment.MiddleCenter,

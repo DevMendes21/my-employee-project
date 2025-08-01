@@ -1,0 +1,41 @@
+#
+# App Spec Template para DigitalOcean App Platform
+# Este é um template - NÃO contém dados sensíveis
+# Copie para .do/app.yaml e preencha com suas credenciais
+#
+name: minha-empresa-system
+region: nyc
+services:
+  - name: web
+    source_dir: /
+    github:
+      repo: DevMendes21/my-employee-project
+      branch: main
+    run_command: dotnet MinhaEmpresa.Web.dll
+    environment_slug: docker
+    instance_count: 1
+    instance_size_slug: basic-xxs
+    dockerfile_path: Dockerfile
+    http_port: 8080
+    health_check:
+      http_path: /
+    envs:
+      - key: DB_HOST
+        value: SEU_DB_HOST_AQUI
+        type: SECRET
+      - key: DB_PORT
+        value: 'SEU_DB_PORT_AQUI'
+      - key: DB_USER
+        value: SEU_DB_USER_AQUI
+        type: SECRET
+      - key: DB_NAME
+        value: SEU_DB_NAME_AQUI
+      - key: DB_PASSWORD
+        value: SEU_DB_PASSWORD_AQUI
+        type: SECRET
+      - key: DB_SSL_MODE
+        value: Required
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ASPNETCORE_URLS
+        value: http://+:8080
